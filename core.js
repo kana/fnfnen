@@ -123,6 +123,8 @@ function update()  //{{{2
 
 function callback_update(d)
 {
+  $('#i_last_updated_time').text('Last updated: ' + new Date().toString());
+
   if (d.error)
     return alert(d.error);
 
