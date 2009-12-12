@@ -4,6 +4,7 @@
 var TWITTER_UI_URI = 'http://twitter.com/';
 var TWITTER_API_URI = 'http://api.twitter.com/1/';
 var MAX_COUNT = 200;
+var DUMMY_SINCE_ID = 0;
 
 var g_seq = (new Date).getTime();
 var g_user = null;
@@ -131,7 +132,7 @@ function update()  //{{{2
                    {'callback': 'callback_update',
                     'count': MAX_COUNT,
                     'seq': g_seq++,
-                    'since_id': g_since_id || 0});
+                    'since_id': g_since_id || DUMMY_SINCE_ID});
   return;
 }
 
