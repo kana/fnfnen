@@ -142,6 +142,9 @@ function callback_update(d)
     }
   }
 
+  var NEWEST_TWEET_INDEX = 0;
+  g_since_id = d[NEWEST_TWEET_INDEX].id;
+
   show_tweets(d, $("#column_home"));
   return;
 }
