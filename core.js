@@ -5,6 +5,7 @@ var DUMMY_SINCE_ID = 1;
 var MAX_COUNT = 200;
 var TWITTER_API_URI = 'http://api.twitter.com/1/';
 var TWITTER_UI_URI = 'http://twitter.com/';
+var UPDATE_AT_START_P = false;
 var UPDATE_INTERVAL = 5 * 60 * 1000;  // in milliseconds
 
 var g_seq = (new Date).getTime();
@@ -217,6 +218,9 @@ $(document).ready(function(){
     update();
   });
   g_update_timer = setInterval(update, UPDATE_INTERVAL);
+
+  if (UPDATE_AT_START_P)
+    update();
 });
 
 
