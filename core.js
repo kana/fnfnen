@@ -43,6 +43,15 @@ function callback_authenticate(d)
 
 
 
+function before_post()  //{{{2
+{
+  // FIXME: Disable or warn too long tweet.
+  return true;
+}
+
+
+
+
 function call_twitter_api(base_uri, api_name, parameters)  //{{{2
 {
   var ps = [];
@@ -179,6 +188,14 @@ function callback_update(d)
 $(document).ready(function(){
   $('#column_home').empty();
   $('#i_error_message').empty();
+
+  var node_iframe = create_element('iframe');
+  node_iframe.attr('name', 'xpost');
+  node_iframe.attr('src', 'about:blank');
+  node_iframe.css('display', 'none');
+  $('body').append(node_iframe);
+  $('#post_form').attr('target', 'xpost');
+  $('#post_form').submit(before_post);
 
   $('#update_button').click(function(){
     update();
