@@ -104,6 +104,7 @@ function html_from_tweet(tweet)  //{{{2
   // FIXME: Add the posted time of a tweet.
   // FIXME: Add the user's icon of a tweet.
   // FIXME: Expand abbreviated URIs in a tweet.
+  // FIXME: Make links for hashtags in a tweet.
   // FIXME: Make links for URIs in a tweet.
   return (''
           /* screen name */
