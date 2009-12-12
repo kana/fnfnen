@@ -60,6 +60,14 @@ var g_lcds_nodes = {}
 
 
 
+function create_element(element_name)  //{{{2
+{
+  return $(document.createElement(element_name));
+}
+
+
+
+
 function html_from_tweet(tweet)  //{{{2
 {
   // FIXME: More information
@@ -100,14 +108,14 @@ function show_tweets(d, node_column)  //{{{2
   if (d.length == 0)
     return 0;
 
-  var node_tweet_hub = $('<div></div>');
-  var node_dummy_tweet = $('<div></div>');
+  var node_tweet_hub = create_element('div');
+  var node_dummy_tweet = create_element('div');
 
   node_tweet_hub.append(node_dummy_tweet);
   node_tweet_hub.addClass('tweet-hub');
 
   for (var i in d) {
-    var node_tweet = $('<div></div>');
+    var node_tweet = create_element('div');
     node_tweet.addClass('tweet');
     node_tweet.html(html_from_tweet(d[i]));
     node_tweet.data('json', d[i]);
