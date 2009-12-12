@@ -55,6 +55,12 @@ function callback_authenticate(d)
 
 function before_post()  //{{{2
 {
+  // Update timeline manually.
+  if ($('#tweet_box').val() == '') {
+    update();
+    return false;
+  }
+
   // FIXME: Disable or warn too long tweet.
   return true;
 }
@@ -214,9 +220,6 @@ $(document).ready(function(){
   $('#post_iframe').load(after_post);
 
   // To update.
-  $('#update_button').click(function(){
-    update();
-  });
   g_update_timer = setInterval(update, UPDATE_INTERVAL);
 
   if (UPDATE_AT_START_P)
