@@ -66,22 +66,23 @@ function before_post()  //{{{2
 
 
 
-function call_twitter_api(base_uri, api_name, _parameters)  //{{{2
-{
-  parameters = $.extend(false, _parameters, {'seq': g_seq++});
+call_twitter_api = (function(){  //{{{2
+  var s_seq = (new Date).getTime();  // To avoid browser-side caching.
+  var s_lcds_nodes = {};  // {api_name: node_script, ...}
 
-  var ps = [];
-  for (var key in parameters)
-    ps.push(key + '=' + parameters[key]);
+  return function(base_uri, api_name, _parameters) {
+    parameters = $.extend(false, _parameters, {'seq': s_seq++});
 
-  g_lcds_nodes[api_name] = load_cross_domain_script(
-    base_uri + api_name + '.json' + '?' + ps.join('&'),
-    g_lcds_nodes[api_name]
- );
-}
+    var ps = [];
+    for (var key in parameters)
+      ps.push(key + '=' + parameters[key]);
 
-var g_seq = (new Date).getTime();
-var g_lcds_nodes = {}
+    s_lcds_nodes[api_name] = load_cross_domain_script(
+      base_uri + api_name + '.json' + '?' + ps.join('&'),
+      s_lcds_nodes[api_name]
+   );
+  }
+})();
 
 
 
