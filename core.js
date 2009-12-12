@@ -20,6 +20,15 @@ var g_user = null;
 
 
 // Code  {{{1
+function after_post()  //{{{2
+{
+  $('#tweet_box').val('');
+  return;
+}
+
+
+
+
 function authenticate()  //{{{2
 {
   call_twitter_api(TWITTER_UI_URI,
@@ -193,6 +202,7 @@ $(document).ready(function(){
   // To post.
     // Add a secret iframe to hide interaction with Twitter.
   var node_iframe = create_element('iframe');
+  node_iframe.attr('id', 'post_iframe');
   node_iframe.attr('name', 'xpost');
   node_iframe.attr('src', 'about:blank');
   node_iframe.css('display', 'none');
@@ -200,6 +210,7 @@ $(document).ready(function(){
   $('#post_form').attr('target', 'xpost');
     // Event handlers.
   $('#post_form').submit(before_post);
+  $('#post_iframe').load(after_post);
 
   // To update.
   $('#update_button').click(function(){
