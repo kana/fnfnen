@@ -8,6 +8,8 @@ style verbose
 accessibility
 religious
 
+disable form-accesskey
+disable form-tabindex
 disable mailto-link
 disable navigation-link
 

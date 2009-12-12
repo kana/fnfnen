@@ -144,8 +144,9 @@ function callback_update(d)
 
 $(document).ready(function(){
   $('#column_home').empty();
-
-  update();
+  $('#update_button').click(function(){
+    update();
+  });
 });
 
 
