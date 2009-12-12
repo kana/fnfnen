@@ -205,6 +205,7 @@ $(document).ready(function(){
   // Misc.
   $('#column_home').empty();
   $('#i_error_message').empty();
+  $('#tweet_box').val('');
 
   // To post.
     // Add a secret iframe to hide interaction with Twitter.
