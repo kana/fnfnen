@@ -127,6 +127,15 @@ function load_cross_domain_script(uri, node)  //{{{2
 
 
 
+function scroll(y_coordinate)  //{{{2
+{
+  scrollTo(0, y_coordinate);
+  return;
+}
+
+
+
+
 function show_tweets(d, node_column)  //{{{2
 {
   // d = [{newest-tweet}, ..., {oldest-tweet}]
@@ -152,6 +161,11 @@ function show_tweets(d, node_column)  //{{{2
   node_dummy_tweet.remove();
 
   node_column.append(node_tweet_hub);
+
+  // Scroll to the head of the latest tweet hub.
+  // FIXME: Customize behavior on this autoscroll.
+  scroll(node_column.attr('scrollHeight')
+         - node_tweet_hub.attr('scrollHeight'));
   return d.length;
 }
 
