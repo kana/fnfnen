@@ -1,0 +1,14 @@
+# Configuration file for htmllint
+
+nobanner
+noechoname
+scorenowhines
+style verbose
+
+accessibility
+religious
+
+disable mailto-link
+disable navigation-link
+
+# __END__
