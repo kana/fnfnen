@@ -186,17 +186,22 @@ function callback_update(d)
 // Main  {{{1
 
 $(document).ready(function(){
+  // Misc.
   $('#column_home').empty();
   $('#i_error_message').empty();
 
+  // To post.
+    // Add a secret iframe to hide interaction with Twitter.
   var node_iframe = create_element('iframe');
   node_iframe.attr('name', 'xpost');
   node_iframe.attr('src', 'about:blank');
   node_iframe.css('display', 'none');
   $('body').append(node_iframe);
   $('#post_form').attr('target', 'xpost');
+    // Event handlers.
   $('#post_form').submit(before_post);
 
+  // To update.
   $('#update_button').click(function(){
     update();
   });
