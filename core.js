@@ -5,7 +5,7 @@ var DUMMY_SINCE_ID = 1;
 var MAX_COUNT = 200;
 var TWITTER_API_URI = 'http://api.twitter.com/1/';
 var TWITTER_UI_URI = 'http://twitter.com/';
-var UPDATE_AT_START_P = false;
+var UPDATE_AT_START_P = false;  // FIXME: Should be true for daily use.
 var UPDATE_INTERVAL = 5 * 60 * 1000;  // in milliseconds
 
 var g_seq = (new Date).getTime();
@@ -95,7 +95,14 @@ function create_element(element_name)  //{{{2
 
 function html_from_tweet(tweet)  //{{{2
 {
-  // FIXME: More information
+  // FIXME: Add a button to reply on a tweet.
+  // FIXME: Add a button to retweet a tweet.
+  // FIXME: Add a button to toggle "favorite".
+  // FIXME: Add a link to the user of a tweet.
+  // FIXME: Add the posted time of a tweet.
+  // FIXME: Add the user's icon of a tweet.
+  // FIXME: Expand abbreviated URIs in a tweet.
+  // FIXME: Make links for URIs in a tweet.
   return (''
           /* screen name */
           + '<span class="screen_name">'
