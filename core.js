@@ -85,10 +85,13 @@ function show_tweets(d, node_column)  //{{{2
 
   var node_tweet_hub = $('<div></div>');
   var node_dummy_tweet = $('<div></div>');
+
   node_tweet_hub.append(node_dummy_tweet);
+  node_tweet_hub.addClass('tweet-hub');
 
   for (var i in d) {
     var node_tweet = $('<div></div>');
+    node_tweet.addClass('tweet');
     node_tweet.html(html_from_tweet(d[i]));
     node_tweet.data('json', d[i]);
 

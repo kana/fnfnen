@@ -1,5 +1,18 @@
 /* Basic stylesheet for fnfnen */
 
-/* FIXME: NIY */
+body {
+  background-color: #eee;
+}
+
+.tweet-hub {
+  margin: 1em auto;
+  border-bottom: thin gray solid;
+  padding-bottom: 1ex;
+  background-color: #ddd;
+}
+
+.tweet {
+  background-color: #eee;
+}
 
 /* __END__ */
