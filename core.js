@@ -1,4 +1,5 @@
 // Core of fnfnen.
+// Variables  {{{1
 
 var TWITTER_UI_URI = 'http://twitter.com/';
 var TWITTER_API_URI = 'http://api.twitter.com/1/';
@@ -13,23 +14,12 @@ var g_since_id = null;
 
 
 
-function load_cross_domain_script(uri, node)
-{
-  if (node && node.parentNode)
-    node.parentNode.removeChild(node);
-
-  node = document.createElement("script");
-  node.src = uri;
-  node.type = "text/javascript";
-  document.body.appendChild(node);
-
-  return node;
-}
 
 
 
 
-function authenticate()
+// Code  {{{1
+function authenticate()  //{{{2
 {
   g_authentication_element = load_cross_domain_script(
     (TWITTER_API_URI
@@ -53,7 +43,68 @@ function callback_authenticate(d)
 
 
 
-function update()
+function html_from_tweet(tweet)  //{{{2
+{
+  // FIXME: More information
+  return (''
+          /* screen name */
+          + '<span class="screen_name">'
+          + tweet.user.screen_name
+          + '</span>'
+          /* text */
+          + '<span class="text">'
+          + tweet.text
+          + '</span>'
+         );
+}
+
+
+
+
+function load_cross_domain_script(uri, node)  //{{{2
+{
+  if (node && node.parentNode)
+    node.parentNode.removeChild(node);
+
+  node = document.createElement("script");
+  node.src = uri;
+  node.type = "text/javascript";
+  document.body.appendChild(node);
+
+  return node;
+}
+
+
+
+
+function show_tweets(d, node_column)  //{{{2
+{
+  // d = [{newest-tweet}, ..., {oldest-tweet}]
+  if (d.length == 0)
+    return 0;
+
+  var node_tweet_hub = $('<div></div>');
+  var node_dummy_tweet = $('<div></div>');
+  node_tweet_hub.append(node_dummy_tweet);
+
+  for (var i in d) {
+    var node_tweet = $('<div></div>');
+    node_tweet.html(html_from_tweet(d[i]));
+    node_tweet.data('json', d[i]);
+
+    node_tweet_hub.prepend(node_tweet);
+  }
+
+  node_dummy_tweet.remove();
+
+  node_column.append(node_tweet_hub);
+  return d.length;
+}
+
+
+
+
+function update()  //{{{2
 {
   if (!g_user)
     return authenticate();
@@ -89,47 +140,7 @@ function callback_update(d)
 
 
 
-function show_tweets(d, node_column)
-{
-  // d = [{newest-tweet}, ..., {oldest-tweet}]
-  if (d.length == 0)
-    return 0;
-
-  var node_tweet_hub = $('<div></div>');
-  var node_dummy_tweet = $('<div></div>');
-  node_tweet_hub.append(node_dummy_tweet);
-
-  for (var i in d) {
-    var node_tweet = $('<div></div>');
-    node_tweet.html(html_from_tweet(d[i]));
-    node_tweet.data('json', d[i]);
-
-    node_tweet_hub.prepend(node_tweet);
-  }
-
-  node_dummy_tweet.remove();
-
-  node_column.append(node_tweet_hub);
-  return d.length;
-}
-
-function html_from_tweet(tweet)
-{
-  // FIXME: More information
-  return (''
-          /* screen name */
-          + '<span class="screen_name">'
-          + tweet.user.screen_name
-          + '</span>'
-          /* text */
-          + '<span class="text">'
-          + tweet.text
-          + '</span>'
-         );
-}
-
-
-
+// Main  {{{1
 
 $(document).ready(function(){
   $('#column_home').empty();
@@ -137,5 +148,13 @@ $(document).ready(function(){
   update();
 });
 
-// __END__
+
+
+
+
+
+
+
+// __END__  {{{1
 // vim: expandtab shiftwidth=2 softtabstop=2
+// vim: foldmethod=marker
