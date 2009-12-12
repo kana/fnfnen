@@ -8,7 +8,6 @@ var TWITTER_UI_URI = 'http://twitter.com/';
 var UPDATE_AT_START_P = false;  // FIXME: Should be true for daily use.
 var UPDATE_INTERVAL = 5 * 60 * 1000;  // in milliseconds
 
-var g_seq = (new Date).getTime();
 var g_since_id = null;
 var g_update_timer = null;
 var g_user = null;
@@ -34,8 +33,7 @@ function authenticate()  //{{{2
 {
   call_twitter_api(TWITTER_UI_URI,
                    'account/verify_credentials',
-                   {'callback': 'callback_authenticate',
-                    'seq': g_seq++});
+                   {'callback': 'callback_authenticate'});
   return;
 }
 
@@ -68,8 +66,10 @@ function before_post()  //{{{2
 
 
 
-function call_twitter_api(base_uri, api_name, parameters)  //{{{2
+function call_twitter_api(base_uri, api_name, _parameters)  //{{{2
 {
+  parameters = $.extend(false, _parameters, {'seq': g_seq++});
+
   var ps = [];
   for (var key in parameters)
     ps.push(key + '=' + parameters[key]);
@@ -80,6 +80,7 @@ function call_twitter_api(base_uri, api_name, parameters)  //{{{2
  );
 }
 
+var g_seq = (new Date).getTime();
 var g_lcds_nodes = {}
 
 
@@ -188,7 +189,6 @@ function update()  //{{{2
                    'statuses/home_timeline',
                    {'callback': 'callback_update',
                     'count': MAX_COUNT,
-                    'seq': g_seq++,
                     'since_id': g_since_id || DUMMY_SINCE_ID});
   return;
 }
