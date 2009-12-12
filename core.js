@@ -5,9 +5,7 @@ var TWITTER_UI_URI = 'http://twitter.com/';
 var TWITTER_API_URI = 'http://api.twitter.com/1/';
 var MAX_COUNT = 200;
 
-var g_authentication_element = null;
 var g_seq = (new Date).getTime();
-var g_update_element = null;
 var g_user = null;
 var g_since_id = null;
 
@@ -21,11 +19,10 @@ var g_since_id = null;
 // Code  {{{1
 function authenticate()  //{{{2
 {
-  g_authentication_element = load_cross_domain_script(
-    (TWITTER_API_URI
-     + "account/verify_credentials.json?callback=callback_authenticate&seq="
-     + (g_seq++)),
-    g_authentication_element);
+  call_twitter_api(TWITTER_UI_URI,
+                   'account/verify_credentials',
+                   {'callback': 'callback_authenticate',
+                    'seq': g_seq++});
   return;
 }
 
@@ -39,6 +36,23 @@ function callback_authenticate(d)
   update();
   return;
 }
+
+
+
+
+function call_twitter_api(base_uri, api_name, parameters)  //{{{2
+{
+  var ps = [];
+  for (var key in parameters)
+    ps.push(key + '=' + parameters[key]);
+
+  g_lcds_nodes[api_name] = load_cross_domain_script(
+    base_uri + api_name + '.json' + '?' + ps.join('&'),
+    g_lcds_nodes[api_name]
+ );
+}
+
+var g_lcds_nodes = {}
 
 
 
@@ -112,15 +126,12 @@ function update()  //{{{2
   if (!g_user)
     return authenticate();
 
-  g_update_element = load_cross_domain_script(
-    (TWITTER_API_URI
-     + 'statuses/home_timeline.json?seq='
-     + (g_seq++)
-     + '&count='
-     + MAX_COUNT
-     + '&callback=callback_update'
-     + (g_since_id ? '&since_id=' + g_since_id : '')),
-    g_update_element);
+  call_twitter_api(TWITTER_API_URI,
+                   'statuses/home_timeline',
+                   {'callback': 'callback_update',
+                    'count': MAX_COUNT,
+                    'seq': g_seq++,
+                    'since_id': g_since_id || 0});
   return;
 }
 
