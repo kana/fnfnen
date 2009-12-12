@@ -126,7 +126,11 @@ function callback_update(d)
   $('#i_last_updated_time').text('Last updated: ' + new Date().toString());
 
   if (d.error)
-    return alert(d.error);
+  {
+    $('#i_error_message').text(d.error);
+    alert(d.error);
+    return;
+  }
 
   if (g_since_id) {
     for (var i = 0; i < d.length; i++) {
@@ -146,6 +150,8 @@ function callback_update(d)
 
 $(document).ready(function(){
   $('#column_home').empty();
+  $('#i_error_message').empty();
+
   $('#update_button').click(function(){
     update();
   });
