@@ -4,7 +4,7 @@
 var TWITTER_UI_URI = 'http://twitter.com/';
 var TWITTER_API_URI = 'http://api.twitter.com/1/';
 var MAX_COUNT = 200;
-var DUMMY_SINCE_ID = 0;
+var DUMMY_SINCE_ID = 1;
 
 var g_seq = (new Date).getTime();
 var g_user = null;
