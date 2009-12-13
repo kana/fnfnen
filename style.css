@@ -17,4 +17,10 @@ body {
   background-color: #eee;
 }
 
+#tweet_content_counter {font-weight: bolder;  padding: 0 0.5ex;}
+#tweet_content_counter.no-content {color: #fff;  background-color: #333;}
+#tweet_content_counter.some-content {color: #fff;  background-color: #666;}
+#tweet_content_counter.full-content {color: #fff;  background-color: #f90;}
+#tweet_content_counter.much-content {color: #fff;  background-color: #f00;}
+
 /* __END__ */

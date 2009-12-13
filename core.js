@@ -3,6 +3,7 @@
 
 var DUMMY_SINCE_ID = 1;
 var MAX_COUNT = 200;
+var MAX_TWEET_CONTENT = 140;
 var TWITTER_API_URI = 'http://api.twitter.com/1/';
 var TWITTER_UI_URI = 'http://twitter.com/';
 var UPDATE_AT_START_P = false;  // FIXME: Should be true for daily use.
@@ -83,6 +84,30 @@ call_twitter_api = (function(){  //{{{2
    );
   }
 })();
+
+
+
+
+function count_tweet_content(e)  //{{{2
+{
+  var remain = MAX_TWEET_CONTENT - $('#tweet_box').val().length;
+
+  $('#tweet_content_counter').text(remain);
+
+  $('#tweet_content_counter').removeClass();
+  if (remain < 0)
+    $('#tweet_content_counter').addClass('much-content');
+  else if (remain == 0)
+    $('#tweet_content_counter').addClass('full-content');
+  else if (remain < MAX_TWEET_CONTENT)
+    $('#tweet_content_counter').addClass('some-content');
+  else if (remain == MAX_TWEET_CONTENT)
+    $('#tweet_content_counter').addClass('no-content');
+  else
+    ;
+
+  return true;
+}
 
 
 
@@ -246,6 +271,14 @@ $(document).ready(function(){
     // Event handlers.
   $('#post_form').submit(before_post);
   $('#post_iframe').load(after_post);
+  $('#tweet_box').keyup(count_tweet_content);
+  $('#tweet_box').focus(function(){
+                          $('#tweet_content_counter').css('display', 'inline');
+                        });
+  $('#tweet_box').blur(function(){
+                         $('#tweet_content_counter').css('display', 'none');
+                       });
+  $('#tweet_box').blur();
 
   // To update.
   g_update_timer = setInterval(update, UPDATE_INTERVAL);
