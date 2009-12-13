@@ -139,7 +139,6 @@ function html_from_tweet(tweet)  //{{{2
   // FIXME: Add a button to retweet a tweet.
   // FIXME: Expand abbreviated URIs in a tweet.
   // FIXME: Make links for hashtags in a tweet.
-  // FIXME: Make links for URIs in a tweet.
   return (''
           /* user icon */
           + '<a class="user_icon"'
@@ -160,7 +159,7 @@ function html_from_tweet(tweet)  //{{{2
           + '</a>'
           /* text */
           + '<span class="text">'
-          + tweet.text
+          + make_links_in_text(tweet.text)
           + '</span>'
           /* posted time */
           + '<span class="posted_time">'
@@ -224,6 +223,35 @@ function load_cross_domain_script(uri, node)  //{{{2
   document.body.appendChild(node);
 
   return node;
+}
+
+
+
+
+function make_links_in_text(text)  //{{{2
+{
+  // FIXME: Regular expression for URI.
+  return text.replace(
+    /https?:\/\/[\w!#$%&'*+,.\/:;=?@~-]+|@(\w+)/g,
+    function(matched_string, screen_name){
+      if (screen_name) {
+        return ('<a class="screen_name"'
+                + ' href="'
+                + TWITTER_UI_URI
+                + screen_name
+                + '">'
+                + matched_string
+                + '</a>');
+      } else {
+        return ('<a class="link"'
+                + ' href="'
+                + matched_string
+                + '">'
+                + matched_string
+                + '</a>');
+      }
+    }
+  );
 }
 
 

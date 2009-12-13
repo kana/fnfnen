@@ -27,6 +27,10 @@ body {
   font-weight: bolder;
   text-decoration: none;
 }
+.tweet .text .screen_name {
+  color: #00f;
+  font-weight: normal;
+}
 .tweet .button {
   background-color: #666;
   color: #fff;
