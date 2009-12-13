@@ -1,57 +1,124 @@
 /* Basic stylesheet for fnfnen */
+/* Structure  {{{1*/
 
-/* FIXME: Rewrite a proper stylesheet.  The following is just for a test. */
+*
+{
+  margin: 0;
+  padding: 0;
+}
 
-body {
+body
+{
   background-color: #eee;
-}
-
-.tweet-hub {
-  margin: 1em auto;
-  border-bottom: thin gray solid;
-  padding-bottom: 1ex;
-  background-color: #ddd;
-}
-
-.tweet {
-  background-color: #eee;
-}
-
-.tweet.mine {background-color: #efe;}
-.tweet.mention {background-color: #fed;}
-
-.tweet .user_icon {display: none;}
-.tweet .posted_time {color: #666;  font-size: 80%;}
-.tweet .screen_name {
   color: #000;
-  font-weight: bolder;
-  text-decoration: none;
 }
-.tweet .text .screen_name {
-  color: #00f;
-  font-weight: normal;
+
+
+#console
+{
+  margin: 1em 2em;
 }
-.tweet .button {
-  background-color: #666;
-  color: #fff;
-  border: thin solid #ccc;
-  font-size: 80%;
-  font-weight: bolder;
+#console #tweet_box
+{
+  font-size: medium;
+  width: 80%;
+}
+#information_bar
+{
+  margin: 1em 2em;
+}
+
+
+#tweet_content_counter
+{
   padding: 0 0.5ex;
-  text-decoration: none;
+}
+
+
+#column_home
+{
+  border: 1em solid;
+  padding: 0 1em;
+}
+
+
+.tweet-hub
+{
+  border-top: 1ex solid;
+  margin: 1em 0;
+  padding-top: 1em;
+}
+
+
+.tweet {padding: 0.25ex;}
+.tweet .posted_time {font-size: 80%;}
+.tweet .posted_time,
+.tweet .text {margin: 0 1ex;}
+.tweet .user_icon {display: none;}
+
+.tweet .button
+{
+  border: thin solid;
+  font-size: 64%;
+  padding: 0 0.5ex;
 }
 .tweet .button:active,
 .tweet .button:focus,
-.tweet .button:hover {
-  color: #000;
-  background-color: #ff3;
-  border: thin solid #990;
+.tweet .button:hover
+{
+  border: thin solid;
 }
 
-#tweet_content_counter {font-weight: bolder;  padding: 0 0.5ex;}
-#tweet_content_counter.no-content {color: #fff;  background-color: #333;}
-#tweet_content_counter.some-content {color: #fff;  background-color: #666;}
-#tweet_content_counter.full-content {color: #fff;  background-color: #f90;}
-#tweet_content_counter.much-content {color: #fff;  background-color: #f00;}
 
-/* __END__ */
+
+
+/* Decoration  {{{1*/
+
+#console #tweet_box {font-family: sans-serif;}
+
+
+.tweet .screen_name {font-weight: bolder; text-decoration: none;}
+.tweet .text .screen_name {font-weight: normal;}
+
+.tweet .button {font-weight: bolder; text-decoration: none;}
+
+
+#tweet_content_counter {font-weight: bolder;}
+
+
+
+
+/* Color  {{{1*/
+
+#column_home {border-color: #ddd;}
+
+
+.tweet-hub {border-color: #ddd;}
+
+.tweet {}
+.tweet.mention {background-color: #fed;}
+.tweet.mine {background-color: #efe;}
+
+.tweet .posted_time {color: #666;}
+.tweet .screen_name {color: #000;}
+.tweet .text .screen_name {color: #00f;}
+
+.tweet .button {background-color: #666; border-color: #ccc; color: #fff;}
+.tweet .button:active,
+.tweet .button:focus,
+.tweet .button:hover {background-color: #ff3; border-color: #990; color: #000;}
+
+
+#tweet_content_counter {color: #fff;}
+#tweet_content_counter,
+#tweet_content_counter.no-content {background-color: #333;}
+#tweet_content_counter.some-content {background-color: #666;}
+#tweet_content_counter.full-content {background-color: #f90;}
+#tweet_content_counter.much-content {background-color: #f00;}
+
+
+
+
+/* __END__ {{{1*/
+/* vim: foldmethod=marker
+ */
