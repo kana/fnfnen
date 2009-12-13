@@ -27,6 +27,22 @@ body {
   font-weight: bolder;
   text-decoration: none;
 }
+.tweet .button {
+  background-color: #666;
+  color: #fff;
+  border: thin solid #ccc;
+  font-size: 80%;
+  font-weight: bolder;
+  padding: 0 0.5ex;
+  text-decoration: none;
+}
+.tweet .button:active,
+.tweet .button:focus,
+.tweet .button:hover {
+  color: #000;
+  background-color: #ff3;
+  border: thin solid #990;
+}
 
 #tweet_content_counter {font-weight: bolder;  padding: 0 0.5ex;}
 #tweet_content_counter.no-content {color: #fff;  background-color: #333;}

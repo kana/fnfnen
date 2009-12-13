@@ -122,7 +122,6 @@ function create_element(element_name)  //{{{2
 
 function html_from_tweet(tweet)  //{{{2
 {
-  // FIXME: Add a button to reply on a tweet.
   // FIXME: Add a button to retweet a tweet.
   // FIXME: Add a button to toggle "favorite".
   // FIXME: Expand abbreviated URIs in a tweet.
@@ -150,6 +149,15 @@ function html_from_tweet(tweet)  //{{{2
           + '<span class="text">'
           + tweet.text
           + '</span>'
+          /* button to reply */
+          + '<a class="button reply"'
+          + ' href="javascript:set_up_to_reply('
+          +   "'" + tweet.user.screen_name + "'" + ','
+          +   tweet.id
+          + ')"'
+          + '>'
+          + '&#x21b5;'  // Carriage return symbol
+          + '</a>'
           /* posted time */
           + '<span class="posted_time">'
           + human_readable_format_from_date(new Date(tweet.created_at))
@@ -197,6 +205,15 @@ function load_cross_domain_script(uri, node)  //{{{2
 function scroll(y_coordinate)  //{{{2
 {
   scrollTo(0, y_coordinate);
+  return;
+}
+
+
+
+
+function set_up_to_reply(screen_name, tweet_id)  //{{{2
+{
+  // FIXME: NIY
   return;
 }
 
