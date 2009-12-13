@@ -137,6 +137,7 @@ function create_element(element_name)  //{{{2
 function html_from_tweet(tweet)  //{{{2
 {
   // FIXME: Add a button to retweet a tweet.
+  // FIXME: Add a button to show the conversation including a tweet.
   // FIXME: Add a button to toggle "favorite".
   // FIXME: Expand abbreviated URIs in a tweet.
   // FIXME: Make links for hashtags in a tweet.
