@@ -126,8 +126,8 @@ function html_from_tweet(tweet)  //{{{2
   // FIXME: Add a button to retweet a tweet.
   // FIXME: Add a button to toggle "favorite".
   // FIXME: Add a link to the user of a tweet.
-  // FIXME: Add the posted time of a tweet.
   // FIXME: Expand abbreviated URIs in a tweet.
+  // FIXME: Fix format of the posted time of a tweet -- 'YYYY-MM-DD HH:MM:SS'.
   // FIXME: Make links for hashtags in a tweet.
   // FIXME: Make links for URIs in a tweet.
   return (''
@@ -145,6 +145,10 @@ function html_from_tweet(tweet)  //{{{2
           /* text */
           + '<span class="text">'
           + tweet.text
+          + '</span>'
+          /* posted time */
+          + '<span class="posted_time">'
+          + tweet.created_at
           + '</span>'
          );
 }
