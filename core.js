@@ -127,11 +127,17 @@ function html_from_tweet(tweet)  //{{{2
   // FIXME: Add a button to toggle "favorite".
   // FIXME: Add a link to the user of a tweet.
   // FIXME: Add the posted time of a tweet.
-  // FIXME: Add the user's icon of a tweet.
   // FIXME: Expand abbreviated URIs in a tweet.
   // FIXME: Make links for hashtags in a tweet.
   // FIXME: Make links for URIs in a tweet.
   return (''
+          /* user icon */
+          + '<img class="user_icon"'
+          + ' alt="' + '@' + tweet.user.screen_name + '"'
+          + ' height="48"'
+          + ' src="' + tweet.user.profile_image_url + '"'
+          + ' width="48"'
+          + '/>'
           /* screen name */
           + '<span class="screen_name">'
           + tweet.user.screen_name
