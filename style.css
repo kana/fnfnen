@@ -22,6 +22,11 @@ body {
 
 .tweet .user_icon {display: none;}
 .tweet .posted_time {color: #666;  font-size: 80%;}
+.tweet .screen_name {
+  color: #000;
+  font-weight: bolder;
+  text-decoration: none;
+}
 
 #tweet_content_counter {font-weight: bolder;  padding: 0 0.5ex;}
 #tweet_content_counter.no-content {color: #fff;  background-color: #333;}

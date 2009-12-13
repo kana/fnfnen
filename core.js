@@ -125,22 +125,27 @@ function html_from_tweet(tweet)  //{{{2
   // FIXME: Add a button to reply on a tweet.
   // FIXME: Add a button to retweet a tweet.
   // FIXME: Add a button to toggle "favorite".
-  // FIXME: Add a link to the user of a tweet.
   // FIXME: Expand abbreviated URIs in a tweet.
   // FIXME: Make links for hashtags in a tweet.
   // FIXME: Make links for URIs in a tweet.
   return (''
           /* user icon */
-          + '<img class="user_icon"'
+          + '<a class="user_icon"'
+          + ' href="' + TWITTER_UI_URI + tweet.user.screen_name + '"'
+          + '>'
+          + '<img'
           + ' alt="' + '@' + tweet.user.screen_name + '"'
           + ' height="48"'
           + ' src="' + tweet.user.profile_image_url + '"'
           + ' width="48"'
           + '/>'
+          + '</a>'
           /* screen name */
-          + '<span class="screen_name">'
+          + '<a class="screen_name"'
+          + ' href="' + TWITTER_UI_URI + tweet.user.screen_name + '"'
+          + '>'
           + tweet.user.screen_name
-          + '</span>'
+          + '</a>'
           /* text */
           + '<span class="text">'
           + tweet.text
