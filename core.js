@@ -137,7 +137,6 @@ function create_element(element_name)  //{{{2
 function html_from_tweet(tweet)  //{{{2
 {
   // FIXME: Add a button to retweet a tweet.
-  // FIXME: Add a button to show the conversation including a tweet.
   // FIXME: Add a button to toggle "favorite".
   // FIXME: Expand abbreviated URIs in a tweet.
   // FIXME: Make links for hashtags in a tweet.
@@ -173,6 +172,15 @@ function html_from_tweet(tweet)  //{{{2
           + '>'
           + '&#x21b5;'  // Carriage return symbol
           + '</a>'
+          /* button to show the conversation */
+          + (tweet.in_reply_to_status_id
+             ? (''
+                + '<a class="button conversation"'
+                + ' href="javascript:show_conversation(' + tweet.id + ')"'
+                + '>'
+                + '&#x267b;'  // Black universal recycling symbol
+                + '</a>')
+             : '')
           /* posted time */
           + '<span class="posted_time">'
           + human_readable_format_from_date(new Date(tweet.created_at))
@@ -235,6 +243,15 @@ function set_up_to_reply(screen_name, tweet_id)  //{{{2
   $('#tweet_box').focus();
 
   scroll(active_column.attr('scrollHeight'));
+  return;
+}
+
+
+
+
+function show_conversation(tweet_id)  //{{{2
+{
+  // FIXME: NIY
   return;
 }
 
