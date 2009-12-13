@@ -191,7 +191,8 @@ function show_tweets(d, node_column)  //{{{2
 
     node_tweet.addClass('tweet');
     // FIXME: node_tweet.addClass('mention');
-    // FIXME: node_tweet.addClass('mine');
+    if (tweet_mine_p(d[i]))
+      node_tweet.addClass('mine');
     // FIXME: node_tweet.addClass('censored censored-{kind}');
 
     node_tweet_hub.prepend(node_tweet);
@@ -206,6 +207,14 @@ function show_tweets(d, node_column)  //{{{2
   scroll(node_column.attr('scrollHeight')
          - node_tweet_hub.attr('scrollHeight'));
   return d.length;
+}
+
+
+
+
+function tweet_mine_p(tweet)  //{{{2
+{
+  return tweet.user.id == g_user.id;
 }
 
 
