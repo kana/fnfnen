@@ -127,7 +127,6 @@ function html_from_tweet(tweet)  //{{{2
   // FIXME: Add a button to toggle "favorite".
   // FIXME: Add a link to the user of a tweet.
   // FIXME: Expand abbreviated URIs in a tweet.
-  // FIXME: Fix format of the posted time of a tweet -- 'YYYY-MM-DD HH:MM:SS'.
   // FIXME: Make links for hashtags in a tweet.
   // FIXME: Make links for URIs in a tweet.
   return (''
@@ -148,9 +147,27 @@ function html_from_tweet(tweet)  //{{{2
           + '</span>'
           /* posted time */
           + '<span class="posted_time">'
-          + tweet.created_at
+          + human_readable_format_from_date(new Date(tweet.created_at))
           + '</span>'
          );
+}
+
+
+
+
+function human_readable_format_from_date(date)  //{{{2
+{
+  return (date.getFullYear()
+          + '-' + pad(date.getMonth() + 1)
+          + '-' + pad(date.getDate())
+          + ' ' + pad(date.getHours())
+          + ':' + pad(date.getMinutes())
+          + ':' + pad(date.getSeconds()));
+}
+
+function pad(n)
+{
+  return n < 10 ? '0' + n : n;
 }
 
 
