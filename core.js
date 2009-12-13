@@ -162,6 +162,10 @@ function html_from_tweet(tweet)  //{{{2
           + '<span class="text">'
           + tweet.text
           + '</span>'
+          /* posted time */
+          + '<span class="posted_time">'
+          + human_readable_format_from_date(new Date(tweet.created_at))
+          + '</span>'
           /* button to reply */
           + '<a class="button reply"'
           + ' href="javascript:set_up_to_reply('
@@ -180,10 +184,6 @@ function html_from_tweet(tweet)  //{{{2
                 + '&#x267b;'  // Black universal recycling symbol
                 + '</a>')
              : '')
-          /* posted time */
-          + '<span class="posted_time">'
-          + human_readable_format_from_date(new Date(tweet.created_at))
-          + '</span>'
           /* button to toggle favorite */
           + '<a class="button favorite"'
           + ' href="javascript:toggle_favorite(' + tweet.id + ')">'
