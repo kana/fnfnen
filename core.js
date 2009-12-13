@@ -10,6 +10,7 @@ var UPDATE_AT_START_P = false;  // FIXME: Should be true for daily use.
 var UPDATE_INTERVAL = 5 * 60 * 1000;  // in milliseconds
 
 var g_since_id = null;
+var g_tweet_id_to_reply = null;
 var g_update_timer = null;
 var g_user = null;
 
@@ -24,6 +25,10 @@ var g_user = null;
 function after_post()  //{{{2
 {
   $('#tweet_box').val('');
+
+  g_tweet_id_to_reply = null;
+  $('#in_reply_to_status_id').remove();
+
   return;
 }
 
@@ -58,6 +63,15 @@ function before_post()  //{{{2
   if ($('#tweet_box').val() == '') {
     update();
     return false;
+  }
+
+  if (g_tweet_id_to_reply) {
+    var node_reply_id = create_element('input');
+    node_reply_id.attr('id', 'in_reply_to_status_id');
+    node_reply_id.attr('name', 'in_reply_to_status_id');
+    node_reply_id.attr('type', 'hidden');
+    node_reply_id.val(g_tweet_id_to_reply);
+    $('#post_form').append(node_reply_id);
   }
 
   // FIXME: Disable or warn too long tweet.
@@ -213,7 +227,13 @@ function scroll(y_coordinate)  //{{{2
 
 function set_up_to_reply(screen_name, tweet_id)  //{{{2
 {
-  // FIXME: NIY
+  var active_column = $('#column_home');  // FIXME: Use the active column.
+
+  g_tweet_id_to_reply = tweet_id;
+  $('#tweet_box').val('@' + screen_name + ' ' + $('#tweet_box').val());
+  $('#tweet_box').focus();
+
+  scroll(active_column.attr('scrollHeight'));
   return;
 }
 
