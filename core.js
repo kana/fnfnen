@@ -137,7 +137,6 @@ function create_element(element_name)  //{{{2
 function html_from_tweet(tweet)  //{{{2
 {
   // FIXME: Add a button to retweet a tweet.
-  // FIXME: Add a button to toggle "favorite".
   // FIXME: Expand abbreviated URIs in a tweet.
   // FIXME: Make links for hashtags in a tweet.
   // FIXME: Make links for URIs in a tweet.
@@ -185,6 +184,11 @@ function html_from_tweet(tweet)  //{{{2
           + '<span class="posted_time">'
           + human_readable_format_from_date(new Date(tweet.created_at))
           + '</span>'
+          /* button to toggle favorite */
+          + '<a class="button favorite"'
+          + ' href="javascript:toggle_favorite(' + tweet.id + ')">'
+          + (tweet.favorited ? '&#x2605;' : '&#x2606;')
+          + '</a>'
          );
 }
 
@@ -295,6 +299,16 @@ function show_tweets(d, node_column)  //{{{2
   scroll(node_column.attr('scrollHeight')
          - node_tweet_hub.attr('scrollHeight'));
   return d.length;
+}
+
+
+
+
+function toggle_favorite(tweet)  //{{{2
+{
+  // FIXME: NIY
+  alert(tweet);
+  return;
 }
 
 
