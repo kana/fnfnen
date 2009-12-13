@@ -18,6 +18,7 @@ body {
 }
 
 .tweet.mine {background-color: #efe;}
+.tweet.mention {background-color: #fed;}
 
 #tweet_content_counter {font-weight: bolder;  padding: 0 0.5ex;}
 #tweet_content_counter.no-content {color: #fff;  background-color: #333;}
