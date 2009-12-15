@@ -212,6 +212,27 @@ function pad(n)
 
 
 
+function initialize_parameters()  //{{{2
+{
+  var ss = window.location.href.split('?', 2);
+  var parameters = (ss[1] ? ss[1] : '').split('&');
+  parameters = ((1 <= parameters.length) && (parameters[0] != '')
+                ? parameters
+                : []);
+
+  for (var i in parameters) {
+    var key_value = parameters[i].split('=', 2);
+    var key = decodeURIComponent(key_value[0]);
+    var value = eval(decodeURIComponent(key_value[1]));  // FIXME: eval?
+
+    g_parameters[key] = value;
+  }
+  return;
+}
+
+
+
+
 function load_cross_domain_script(uri, node)  //{{{2
 {
   if (node && node.parentNode)
@@ -403,6 +424,7 @@ function callback_update(d)
 
 $(document).ready(function(){
   // Misc.
+  initialize_parameters();
   $('#column_home').empty();
   $('#i_error_message').empty();
   $('#tweet_box').val('');
