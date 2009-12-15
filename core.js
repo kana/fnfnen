@@ -332,9 +332,66 @@ function nop()  //{{{2
 
 function process_queued_api_request()  //{{{2
 {
+  if (g_api_request_queue.length < 1)
+    return;
+
   request_info = g_api_request_queue.shift();
 
-  // FIXME: NIY - Do request
+  //// Construct form to post API request.
+  var TARGET_NAME = 'target_' + (new Date).getTime();
+
+  var node_post_block = create_element('div');
+  node_post_block.css('display', 'none');
+
+  var node_form = create_element('form');
+  node_form.attr('action',
+                 (request_info.base_uri + request_info.api_name + '.json'));
+  node_form.attr('method', 'post');
+  node_form.attr('target', TARGET_NAME);
+  node_post_block.append(node_form);
+
+  // FIXME: Append <input> for request_info.parameters.
+
+  var node_iframe = create_element('iframe');
+  node_iframe.attr('name', TARGET_NAME);
+  node_iframe.attr('src', 'about:blank');
+  node_post_block.append(node_iframe);
+
+  //// Set up event handlers.
+  var settle = function(){
+    node_post_block.remove();
+    process_queued_api_request();
+    return;
+  }
+
+  // FIXME: Check the result of a request, not only request timeout.
+  var error_timer = setTimeout(
+    function(){
+      request_info.callback_on_error();
+      settle();
+    },
+    10 * 1000
+  );
+
+  var submitted_p = false;
+  node_iframe.load(function(){
+    if (!submitted_p) {
+      setTimeout(
+        function(){
+          node_form.submit();
+        },
+        0
+      );
+      submitted_p = true;
+    } else {
+      clearTimeout(error_timer);
+      request_info.callback_on_success();
+      setTimeout(settle, 0);
+    }
+  });
+
+  //// Load the form.
+  $('body').append(node_post_block);
 
   return;
 }
