@@ -102,6 +102,14 @@ call_twitter_api = (function(){  //{{{2
 
 
 
+function class_name_from_tweet_id(tweet_id)  //{{{2
+{
+    return 'tweet_id_' + tweet_id;
+}
+
+
+
+
 function count_tweet_content(e)  //{{{2
 {
   var remain = MAX_TWEET_CONTENT - $('#tweet_box').val().length;
@@ -340,7 +348,7 @@ function show_tweets(d, node_column)  //{{{2
     node_tweet.html(html_from_tweet(d[i]));
 
     node_tweet.addClass('tweet');
-    node_tweet.addClass('tweet_id_' + d[i].id);
+    node_tweet.addClass(class_name_from_tweet_id(d[i].id));
     if (tweet_mention_p(d[i]))
       node_tweet.addClass('mention');
     if (tweet_mine_p(d[i]))
