@@ -336,11 +336,11 @@ function show_tweets(d, node_column)  //{{{2
 
   for (var i in d) {
     var node_tweet = create_element('div');
-    node_tweet.attr('id', node_column.attr('id') + '-' + d[i].id);
     node_tweet.data('json', d[i]);
     node_tweet.html(html_from_tweet(d[i]));
 
     node_tweet.addClass('tweet');
+    node_tweet.addClass('tweet_id_' + d[i].id);
     if (tweet_mention_p(d[i]))
       node_tweet.addClass('mention');
     if (tweet_mine_p(d[i]))
