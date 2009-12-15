@@ -1,4 +1,9 @@
 // Core of fnfnen.
+// FIXME: Add "mentions" board.
+// FIXME: Add "preferences" board.
+// FIXME: Merge "mentions" into "home".
+// FIXME: Multiple columns.
+// FIXME: Multiple tabpages.
 // Variables  {{{1
 
 var DUMMY_SINCE_ID = 1;
