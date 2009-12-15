@@ -134,6 +134,17 @@ function create_element(element_name)  //{{{2
 
 
 
+function favorite_symbol(favorite_p)  //{{{2
+{
+  return (favorite_p
+          ? '&#x2605;'  // black (filled) star
+          : '&#x2606;'  // white (empty) star
+          );
+}
+
+
+
+
 function html_from_tweet(tweet)  //{{{2
 {
   // FIXME: Add a button to retweet a tweet.
@@ -186,7 +197,7 @@ function html_from_tweet(tweet)  //{{{2
           /* button to toggle favorite */
           + '<a class="button favorite"'
           + ' href="javascript:toggle_favorite(' + tweet.id + ')">'
-          + (tweet.favorited ? '&#x2605;' : '&#x2606;')
+          + favorite_symbol(tweet.favorited)
           + '</a>'
          );
 }
