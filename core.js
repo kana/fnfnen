@@ -142,6 +142,15 @@ function create_element(element_name)  //{{{2
 
 
 
+function enqueue_api_request(base_uri, api_name, parameters, callback)  //{{{2
+{
+  // FIXME: NIY
+  return;
+}
+
+
+
+
 function favorite_symbol(favorite_p)  //{{{2
 {
   return (favorite_p
