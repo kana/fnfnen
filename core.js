@@ -322,6 +322,14 @@ function make_links_in_text(text)  //{{{2
 
 
 
+function nop()  //{{{2
+{
+  return;
+}
+
+
+
+
 function process_queued_api_request()  //{{{2
 {
   request_info = g_api_request_queue.shift();
@@ -430,7 +438,7 @@ function toggle_favorite(tweet_id)  //{{{2
                        + '/' + tweet_id),
                       {},
                       update_views,
-                      null);
+                      nop);
   return;
 }
 
