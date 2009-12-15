@@ -8,6 +8,7 @@ var TWITTER_API_URI = 'http://api.twitter.com/1/';
 var TWITTER_UI_URI = 'http://twitter.com/';
 var UPDATE_INTERVAL = 5 * 60 * 1000;  // in milliseconds
 
+var g_api_request_queue = [];
 var g_parameters = {'automatic_update': true};
 var g_since_id = null;
 var g_tweet_id_to_reply = null;
@@ -142,9 +143,22 @@ function create_element(element_name)  //{{{2
 
 
 
-function enqueue_api_request(base_uri, api_name, parameters, callback)  //{{{2
+function enqueue_api_request(  //{{{2
+  base_uri,
+  api_name,
+  parameters,
+  callback_on_success
+)
 {
-  // FIXME: NIY
+  g_api_request_queue.push({
+    'base_uri': base_uri,
+    'api_name': api_name,
+    'parameters': parameters,
+    'callback_on_success': callback_on_success
+  });
+
+  if (g_api_request_queue.length <= 1)
+    process_queued_api_request();
   return;
 }
 
@@ -301,6 +315,18 @@ function make_links_in_text(text)  //{{{2
       }
     }
   );
+}
+
+
+
+
+function process_queued_api_request()  //{{{2
+{
+  request_info = g_api_request_queue.shift();
+
+  // FIXME: NIY - Do request
+
+  return;
 }
 
 
