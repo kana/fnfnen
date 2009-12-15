@@ -374,8 +374,26 @@ function show_tweets(d, node_column)  //{{{2
 
 function toggle_favorite(tweet_id)  //{{{2
 {
-  // FIXME: NIY
-  alert(tweet);
+  var nodes_tweet = $("." + class_name_from_tweet_id(tweet_id));
+  var tweet = nodes_tweet.data('json');
+  var currently_favorited_p = tweet.favorited;
+  var new_favorited_p = !currently_favorited_p;
+  var update_views = function(){
+    tweet.favorited = new_favorited_p;
+    $(nodes_tweet).children('.button.favorite').
+      text(favorite_symbol(new_favorited_p)).
+      data('json', tweet);
+  };
+
+  // FIXME: Enqueue POST request.
+  // FIXME: Animate while waiting result of a request.
+  // call_twitter_api(TWITTER_UI_URI,
+  //                  ((currently_favorited_p
+  //                    ? 'favorites/destroy'
+  //                    : 'favorites/create')
+  //                   + '/' + tweet_id),
+  //                  {},
+  //                  update_views);
   return;
 }
 
