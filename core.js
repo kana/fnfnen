@@ -1,6 +1,8 @@
 // Core of fnfnen.
 // FIXME: Add "mentions" board.
 // FIXME: Add "preferences" board.
+// FIXME: Add plug-in mechanism.
+// FIXME: Fix usage/definition of terms - board/column/tabpage.
 // FIXME: Merge "mentions" into "home".
 // FIXME: Multiple columns.
 // FIXME: Multiple tabpages.
