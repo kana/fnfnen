@@ -429,10 +429,10 @@ $(document).ready(function(){
   $('#tweet_box').blur();
 
   // To update.
-  g_update_timer = setInterval(update, UPDATE_INTERVAL);
-
-  if (g_parameters['automatic_update'])
+  if (g_parameters['automatic_update']) {
+    g_update_timer = setInterval(update, UPDATE_INTERVAL);
     update();
+  }
 });
 
 
