@@ -182,6 +182,7 @@ function html_from_tweet(tweet)  //{{{2
 {
   // FIXME: Add a button to retweet a tweet.
   // FIXME: Expand abbreviated URIs in a tweet.
+  // FIXME: Fix the style of comments.
   // FIXME: Make links for hashtags in a tweet.
   return (''
           /* user icon */
@@ -206,6 +207,7 @@ function html_from_tweet(tweet)  //{{{2
           + make_links_in_text(tweet.text)
           + '</span>'
           /* posted time */
+            // FIXME: Link to the permanent URI of the tweet.
           + '<span class="posted_time">'
           + human_readable_format_from_date(new Date(tweet.created_at))
           + '</span>'
@@ -343,6 +345,9 @@ function process_queued_api_request()  //{{{2
   var node_post_block = create_element('div');
   node_post_block.css('display', 'none');
 
+  // FIXME: Use '.xml' instead of '.json'.
+  // Because some web browsers (such as Safari) may download result of '.json'
+  // request instead of showing the result in <iframe>.
   var node_form = create_element('form');
   node_form.attr('action',
                  (request_info.base_uri + request_info.api_name + '.json'));
