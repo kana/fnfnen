@@ -147,14 +147,16 @@ function enqueue_api_request(  //{{{2
   base_uri,
   api_name,
   parameters,
-  callback_on_success
+  callback_on_success,
+  callback_on_error
 )
 {
   g_api_request_queue.push({
     'base_uri': base_uri,
     'api_name': api_name,
     'parameters': parameters,
-    'callback_on_success': callback_on_success
+    'callback_on_success': callback_on_success,
+    'callback_on_error': callback_on_error
   });
 
   if (g_api_request_queue.length <= 1)
@@ -427,7 +429,8 @@ function toggle_favorite(tweet_id)  //{{{2
                         : 'favorites/create')
                        + '/' + tweet_id),
                       {},
-                      update_views);
+                      update_views,
+                      null);
   return;
 }
 
