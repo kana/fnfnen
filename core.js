@@ -145,8 +145,8 @@ function create_element(element_name)  //{{{2
 function favorite_symbol(favorite_p)  //{{{2
 {
   return (favorite_p
-          ? '&#x2605;'  // black (filled) star
-          : '&#x2606;'  // white (empty) star
+          ? '\u2605'  // black (filled) star
+          : '\u2606'  // white (empty) star
           );
 }
 
