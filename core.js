@@ -394,15 +394,14 @@ function toggle_favorite(tweet_id)  //{{{2
       data('json', tweet);
   };
 
-  // FIXME: Enqueue POST request.
   // FIXME: Animate while waiting result of a request.
-  // call_twitter_api(TWITTER_UI_URI,
-  //                  ((currently_favorited_p
-  //                    ? 'favorites/destroy'
-  //                    : 'favorites/create')
-  //                   + '/' + tweet_id),
-  //                  {},
-  //                  update_views);
+  enqueue_api_request(TWITTER_UI_URI,
+                      ((currently_favorited_p
+                        ? 'favorites/destroy'
+                        : 'favorites/create')
+                       + '/' + tweet_id),
+                      {},
+                      update_views);
   return;
 }
 
