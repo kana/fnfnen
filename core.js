@@ -110,13 +110,13 @@ function count_tweet_content(e)  //{{{2
 
   $('#tweet_content_counter').removeClass();
   if (remain < 0)
-    $('#tweet_content_counter').addClass('much-content');
+    $('#tweet_content_counter').addClass('much_content');
   else if (remain == 0)
-    $('#tweet_content_counter').addClass('full-content');
+    $('#tweet_content_counter').addClass('full_content');
   else if (remain < MAX_TWEET_CONTENT)
-    $('#tweet_content_counter').addClass('some-content');
+    $('#tweet_content_counter').addClass('some_content');
   else if (remain == MAX_TWEET_CONTENT)
-    $('#tweet_content_counter').addClass('no-content');
+    $('#tweet_content_counter').addClass('no_content');
   else
     ;
 
@@ -332,7 +332,7 @@ function show_tweets(d, node_column)  //{{{2
   var node_dummy_tweet = create_element('div');
 
   node_tweet_hub.append(node_dummy_tweet);
-  node_tweet_hub.addClass('tweet-hub');
+  node_tweet_hub.addClass('tweet_hub');
 
   for (var i in d) {
     var node_tweet = create_element('div');
@@ -345,7 +345,7 @@ function show_tweets(d, node_column)  //{{{2
       node_tweet.addClass('mention');
     if (tweet_mine_p(d[i]))
       node_tweet.addClass('mine');
-    // FIXME: node_tweet.addClass('censored censored-{kind}');
+    // FIXME: node_tweet.addClass('censored censored_{kind}');
 
     node_tweet_hub.prepend(node_tweet);
   }

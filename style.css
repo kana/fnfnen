@@ -42,7 +42,7 @@ body
 }
 
 
-.tweet-hub
+.tweet_hub
 {
   border-top: 1ex solid;
   margin: 1em 0;
@@ -93,7 +93,7 @@ body
 #column_home {border-color: #ddd;}
 
 
-.tweet-hub {border-color: #ddd;}
+.tweet_hub {border-color: #ddd;}
 
 .tweet {}
 .tweet.mention {background-color: #fed;}
@@ -111,10 +111,10 @@ body
 
 #tweet_content_counter {color: #fff;}
 #tweet_content_counter,
-#tweet_content_counter.no-content {background-color: #333;}
-#tweet_content_counter.some-content {background-color: #666;}
-#tweet_content_counter.full-content {background-color: #f90;}
-#tweet_content_counter.much-content {background-color: #f00;}
+#tweet_content_counter.no_content {background-color: #333;}
+#tweet_content_counter.some_content {background-color: #666;}
+#tweet_content_counter.full_content {background-color: #f90;}
+#tweet_content_counter.much_content {background-color: #f00;}
 
 
 
