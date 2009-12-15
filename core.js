@@ -6,9 +6,9 @@ var MAX_COUNT = 200;
 var MAX_TWEET_CONTENT = 140;
 var TWITTER_API_URI = 'http://api.twitter.com/1/';
 var TWITTER_UI_URI = 'http://twitter.com/';
-var UPDATE_AT_START_P = false;  // FIXME: Should be true for daily use.
 var UPDATE_INTERVAL = 5 * 60 * 1000;  // in milliseconds
 
+var g_parameters = {'automatic_update': true};
 var g_since_id = null;
 var g_tweet_id_to_reply = null;
 var g_update_timer = null;
@@ -431,7 +431,7 @@ $(document).ready(function(){
   // To update.
   g_update_timer = setInterval(update, UPDATE_INTERVAL);
 
-  if (UPDATE_AT_START_P)
+  if (g_parameters['automatic_update'])
     update();
 });
 
