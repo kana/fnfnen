@@ -364,7 +364,7 @@ function show_tweets(d, node_column)  //{{{2
 
 
 
-function toggle_favorite(tweet)  //{{{2
+function toggle_favorite(tweet_id)  //{{{2
 {
   // FIXME: NIY
   alert(tweet);
