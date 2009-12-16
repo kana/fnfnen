@@ -189,10 +189,9 @@ function html_from_tweet(tweet)  //{{{2
 {
   // FIXME: Add a button to retweet a tweet.
   // FIXME: Expand abbreviated URIs in a tweet.
-  // FIXME: Fix the style of comments.
   // FIXME: Make links for hashtags in a tweet.
   return (''
-          /* user icon */
+          // user icon
           + '<a class="user_icon"'
           + ' href="' + TWITTER_UI_URI + tweet.user.screen_name + '"'
           + '>'
@@ -203,22 +202,22 @@ function html_from_tweet(tweet)  //{{{2
           + ' width="48"'
           + '/>'
           + '</a>'
-          /* screen name */
+          // screen name
           + '<a class="screen_name"'
           + ' href="' + TWITTER_UI_URI + tweet.user.screen_name + '"'
           + '>'
           + tweet.user.screen_name
           + '</a>'
-          /* text */
+          // text
           + '<span class="text">'
           + make_links_in_text(tweet.text)
           + '</span>'
-          /* posted time */
+          // posted time
             // FIXME: Link to the permanent URI of the tweet.
           + '<span class="posted_time">'
           + human_readable_format_from_date(new Date(tweet.created_at))
           + '</span>'
-          /* button to reply */
+          // button to reply
           + '<a class="button reply"'
           + ' href="javascript:set_up_to_reply('
           +   "'" + tweet.user.screen_name + "'" + ','
@@ -227,7 +226,7 @@ function html_from_tweet(tweet)  //{{{2
           + '>'
           + '&#x21b5;'  // Carriage return symbol
           + '</a>'
-          /* button to show the conversation */
+          // button to show the conversation
           + (tweet.in_reply_to_status_id
              ? (''
                 + '<a class="button conversation"'
@@ -236,7 +235,7 @@ function html_from_tweet(tweet)  //{{{2
                 + '&#x267b;'  // Black universal recycling symbol
                 + '</a>')
              : '')
-          /* button to toggle favorite */
+          // button to toggle favorite
           + '<a class="button favorite"'
           + ' href="javascript:toggle_favorite(' + tweet.id + ')">'
           + favorite_symbol(tweet.favorited)
