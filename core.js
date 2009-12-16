@@ -213,10 +213,16 @@ function html_from_tweet(tweet)  //{{{2
           + make_links_in_text(tweet.text)
           + '</span>'
           // posted time
-            // FIXME: Link to the permanent URI of the tweet.
-          + '<span class="posted_time">'
+          + '<a class="posted_time"'
+          + ' href="'
+          +    TWITTER_UI_URI
+          +    tweet.user.screen_name
+          +    '/status/'
+          +    tweet.id
+          +    '"'
+          + '>'
           + human_readable_format_from_date(new Date(tweet.created_at))
-          + '</span>'
+          + '</a>'
           // button to reply
           + '<a class="button reply"'
           + ' href="javascript:set_up_to_reply('

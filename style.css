@@ -79,6 +79,7 @@ body
 
 .tweet .screen_name {font-weight: bolder; text-decoration: none;}
 .tweet .text .screen_name {font-weight: normal;}
+.tweet .posted_time {text-decoration: none;}
 
 .tweet .button {font-weight: bolder; text-decoration: none;}
 
