@@ -486,15 +486,15 @@ function show_tweets(d, node_column)  //{{{2
 function toggle_favorite(tweet_id)  //{{{2
 {
   var nodes_tweet = $("." + class_name_from_tweet_id(tweet_id));
+  var nodes_buttons = nodes_tweet.children('.button.favorite');
   var tweet = nodes_tweet.data('json');
   var currently_favorited_p = tweet.favorited;
   var new_favorited_p = !currently_favorited_p;
   function update_views()
   {
     tweet.favorited = new_favorited_p;
-    nodes_tweet.children('.button.favorite').
-      text(favorite_symbol(new_favorited_p));
     nodes_tweet.data('json', tweet);
+    nodes_buttons.text(favorite_symbol(new_favorited_p));
   }
 
   // FIXME: Animate while waiting result of a request.
