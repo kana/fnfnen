@@ -352,12 +352,9 @@ function process_queued_api_request()  //{{{2
   var node_post_block = create_element('div');
   node_post_block.css('display', 'none');
 
-  // FIXME: Use '.xml' instead of '.json'.
-  // Because some web browsers (such as Safari) may download result of '.json'
-  // request instead of showing the result in <iframe>.
   var node_form = create_element('form');
   node_form.attr('action',
-                 (request_info.base_uri + request_info.api_name + '.json'));
+                 (request_info.base_uri + request_info.api_name + '.xml'));
   node_form.attr('method', 'post');
   node_form.attr('target', TARGET_NAME);
   node_post_block.append(node_form);
