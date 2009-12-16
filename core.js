@@ -490,14 +490,19 @@ function toggle_favorite(tweet_id)  //{{{2
   var tweet = nodes_tweet.data('json');
   var currently_favorited_p = tweet.favorited;
   var new_favorited_p = !currently_favorited_p;
+
+  function fade_in() {nodes_buttons.fadeIn('slow', fade_out);}
+  function fade_out() {nodes_buttons.fadeOut('slow', fade_in);}
+  function start_fading() {fade_out();}
+  function stop_fading() {fade_out = nop;}
   function update_views()
   {
     tweet.favorited = new_favorited_p;
     nodes_tweet.data('json', tweet);
     nodes_buttons.text(favorite_symbol(new_favorited_p));
+    stop_fading();
   }
 
-  // FIXME: Animate while waiting result of a request.
   enqueue_api_request(TWITTER_UI_URI,
                       ((currently_favorited_p
                         ? 'favorites/destroy'
@@ -505,7 +510,8 @@ function toggle_favorite(tweet_id)  //{{{2
                        + '/' + tweet_id),
                       {},
                       update_views,
-                      nop);
+                      stop_fading);
+  start_fading();
   return;
 }
 
