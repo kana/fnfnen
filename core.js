@@ -493,8 +493,8 @@ function toggle_favorite(tweet_id)  //{{{2
   {
     tweet.favorited = new_favorited_p;
     nodes_tweet.children('.button.favorite').
-      text(favorite_symbol(new_favorited_p)).
-      data('json', tweet);
+      text(favorite_symbol(new_favorited_p));
+    nodes_tweet.data('json', tweet);
   }
 
   // FIXME: Animate while waiting result of a request.
