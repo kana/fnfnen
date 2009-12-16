@@ -491,7 +491,7 @@ function toggle_favorite(tweet_id)  //{{{2
   var new_favorited_p = !currently_favorited_p;
   var update_views = function(){
     tweet.favorited = new_favorited_p;
-    $(nodes_tweet).children('.button.favorite').
+    nodes_tweet.children('.button.favorite').
       text(favorite_symbol(new_favorited_p)).
       data('json', tweet);
   };
