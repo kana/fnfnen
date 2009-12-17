@@ -68,8 +68,8 @@ function callback_authenticate(d)
 function before_post()  //{{{2
 {
   var text = $('#tweet_box').val();
-  // Update timeline manually.
   if (text == '') {
+    // Update timeline manually.
     update();
     return false;
   }
