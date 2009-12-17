@@ -83,7 +83,19 @@ function before_post()  //{{{2
     $('#post_form').append(node_reply_id);
   }
 
-  // FIXME: Disable or warn too long tweet.
+  if (MAX_TWEET_CONTENT < text.length) {
+    // Warn about too long tweet.
+    for (var i = 0; i < 3; i++) {
+      $('#tweet_content_counter').fadeOut('fast');
+      $('#tweet_content_counter').fadeIn('fast');
+    }
+
+    // FIXME: Send a long tweet if user tries posting it twice.
+
+    // And disable posting.
+    return false;
+  }
+
   return true;
 }
 
