@@ -623,6 +623,10 @@ $(document).ready(function(){
   $('#i_error_message').empty();
   $('#tweet_box').val('');
 
+  // Columns.
+  $('.column').hide();
+  $('.active.column').show();
+
   // Preferences.
   $('#form_preferences').submit(apply_preferences);
 
