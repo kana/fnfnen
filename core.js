@@ -28,12 +28,12 @@ var MAX_COUNT = 200;
 var MAX_TWEET_CONTENT = 140;
 var TWITTER_API_URI = 'http://api.twitter.com/1/';
 var TWITTER_UI_URI = 'http://twitter.com/';
-var UPDATE_INTERVAL_MS = DEFAULT_UPDATE_INTERVAL_MS;
 
 var g_api_request_queue = [];
 var g_parameters = {'automatic_update': true};
 var g_since_id = null;
 var g_tweet_id_to_reply = null;
+var g_update_interval_ms = DEFAULT_UPDATE_INTERVAL_MS;
 var g_update_timer = null;
 var g_user = null;
 
@@ -656,7 +656,7 @@ $(document).ready(function(){
 
   // To update.
   if (g_parameters['automatic_update']) {
-    g_update_timer = setInterval(update, UPDATE_INTERVAL_MS);
+    g_update_timer = setInterval(update, g_update_interval_ms);
     update();
   }
 });
