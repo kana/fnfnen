@@ -35,7 +35,7 @@ body
 }
 
 
-#column_home
+.column
 {
   border: 1em solid;
   padding: 0 1em;
@@ -91,7 +91,7 @@ body
 
 /* Color  {{{1*/
 
-#column_home {border-color: #ddd;}
+.column {border-color: #ddd;}
 
 
 .tweet_hub {border-color: #ddd;}
