@@ -47,6 +47,20 @@ body
 .column_selector:first-child {margin-left: 0;}
 
 
+#balloon_container
+{
+  position: fixed;
+  right: 0;
+  top: 0;
+}
+.balloon
+{
+  margin: 1em;
+  padding: 0.5ex;
+  border: 0.5ex solid;
+}
+
+
 .tweet_hub
 {
   border-top: 1ex solid;
@@ -124,6 +138,9 @@ body
 #tweet_content_counter.some_content {background-color: #666;}
 #tweet_content_counter.full_content {background-color: #f90;}
 #tweet_content_counter.much_content {background-color: #f00;}
+
+
+.balloon {background-color: #fff; border-color: #666;}
 
 
 

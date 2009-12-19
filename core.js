@@ -511,8 +511,11 @@ function set_up_to_reply(screen_name, tweet_id)  //{{{2
 
 function show_balloon(text)  //{{{2
 {
-  // FIXME: NIY
-  alert(text);
+  var node_balloon = create_element('div');
+  node_balloon.addClass('balloon');
+  node_balloon.text(text);
+  $('#balloon_container').append(node_balloon);
+  node_balloon.fadeOut(10 * 1000, function(){$(this).remove();});
   return;
 }
 
@@ -671,6 +674,7 @@ $(document).ready(function(){
   $('#i_error_message').empty();
   $('#tweet_box').val('');
   $('#column_selectors').empty();
+  $('#balloon_container').empty();
 
   // Columns.
   $('.column').each(function(){
