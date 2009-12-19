@@ -693,13 +693,6 @@ $(document).ready(function(){
   $('#post_form').submit(before_post);
   $('#post_iframe').load(after_post);
   $('#tweet_box').keyup(count_tweet_content);
-  $('#tweet_box').focus(function(){
-                          $('#tweet_content_counter').css('display', 'inline');
-                        });
-  $('#tweet_box').blur(function(){
-                         $('#tweet_content_counter').css('display', 'none');
-                       });
-  $('#tweet_box').blur();
 
   // To update.
   if (g_parameters['automatic_update']) {
