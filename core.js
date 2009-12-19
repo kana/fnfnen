@@ -73,7 +73,7 @@ function apply_preferences()  //{{{2
   g_update_interval_ms =  v;
   node_updated_interval.val(v);
 
-  // FIXME: Inform about application.
+  show_balloon('Preferences have been saved.');
   return false;
 }
 
@@ -503,6 +503,16 @@ function set_up_to_reply(screen_name, tweet_id)  //{{{2
   $('#tweet_box').focus();
 
   scroll(active_column.attr('scrollHeight'));
+  return;
+}
+
+
+
+
+function show_balloon(text)  //{{{2
+{
+  // FIXME: NIY
+  alert(text);
   return;
 }
 
