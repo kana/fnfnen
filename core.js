@@ -26,6 +26,7 @@ var DEFAULT_UPDATE_INTERVAL_MS = 5 * 60 * 1000;
 var DUMMY_SINCE_ID = 1;
 var MAX_COUNT = 200;
 var MAX_TWEET_CONTENT = 140;
+var MINIMUM_UPDATE_INTERVAL_MS = 1 * 60 * 1000;
 var TWITTER_API_URI = 'http://api.twitter.com/1/';
 var TWITTER_UI_URI = 'http://twitter.com/';
 
@@ -60,7 +61,19 @@ function after_post()  //{{{2
 
 function apply_preferences()  //{{{2
 {
-  // FIXME: NIY
+  // update_interval
+  node_updated_interval = $('input[name="update_interval"]');
+
+  var v = parseInt(node_updated_interval.val());
+  if (isNaN(v))
+    v = g_update_interval_ms;
+  if (v < MINIMUM_UPDATE_INTERVAL_MS)
+    v = MINIMUM_UPDATE_INTERVAL_MS;
+
+  g_update_interval_ms =  v;
+  node_updated_interval.val(v);
+
+  // FIXME: Inform about application.
   return false;
 }
 
@@ -632,6 +645,7 @@ $(document).ready(function(){
 
   // Preferences.
   $('#form_preferences').submit(apply_preferences);
+  $('input[name="update_interval"]').val(g_update_interval_ms);
 
   // To post.
     // Add a secret iframe to hide interaction with Twitter.
