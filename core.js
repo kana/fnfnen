@@ -1,6 +1,5 @@
 // Core of fnfnen.
 // FIXME: Add "mentions" column.
-// FIXME: Add "preferences" column.
 // FIXME: Add plug-in mechanism.
 // FIXME: Merge "mentions" into "home".
 // FIXME: Multiple columns.
@@ -51,6 +50,15 @@ function after_post()  //{{{2
   $('#in_reply_to_status_id').remove();
 
   return;
+}
+
+
+
+
+function apply_preferences()  //{{{2
+{
+  // FIXME: NIY
+  return false;
 }
 
 
@@ -614,6 +622,9 @@ $(document).ready(function(){
   $('#column_home').empty();
   $('#i_error_message').empty();
   $('#tweet_box').val('');
+
+  // Preferences.
+  $('#form_preferences').submit(apply_preferences);
 
   // To post.
     // Add a secret iframe to hide interaction with Twitter.
