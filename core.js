@@ -73,6 +73,9 @@ function apply_preferences()  //{{{2
   g_update_interval_ms =  v;
   node_updated_interval.val(v);
 
+  // FIXME: Save preferences into cookie.
+
+  // Notify to user.
   show_balloon('Preferences have been saved.');
   return false;
 }
