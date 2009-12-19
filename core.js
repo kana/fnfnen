@@ -1,11 +1,24 @@
 // Core of fnfnen.
-// FIXME: Add "mentions" board.
-// FIXME: Add "preferences" board.
+// FIXME: Add "mentions" column.
+// FIXME: Add "preferences" column.
 // FIXME: Add plug-in mechanism.
-// FIXME: Fix usage/definition of terms - board/column/tabpage.
 // FIXME: Merge "mentions" into "home".
 // FIXME: Multiple columns.
 // FIXME: Multiple tabpages.
+// Notes  {{{1
+//
+// - A tabpage contains 1 or more columns.
+// - A column is to show tweets or other information.
+// - Currently, a tabpage contains only 1 column.  There is no distinction
+//   between column and tabpage.  Use term "column" at this moment.
+
+
+
+
+
+
+
+
 // Variables  {{{1
 
 var DUMMY_SINCE_ID = 1;
