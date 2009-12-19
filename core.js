@@ -472,6 +472,28 @@ function scroll(y_coordinate)  //{{{2
 
 
 
+function select_column(column_name)  //{{{2
+{
+  $('.column')
+    .removeClass('active')
+    .hide();
+  $('.column')
+    .filter(function(){return $(this).attr('title') == column_name;})
+    .addClass('active')
+    .show();
+
+  $('.column_selector')
+    .removeClass('active');
+  $('.column_selector')
+    .filter(function(){return $(this).text() == column_name;})
+    .addClass('active');
+
+  return;
+}
+
+
+
+
 function set_up_to_reply(screen_name, tweet_id)  //{{{2
 {
   var active_column = $('#column_home');  // FIXME: Use the active column.
@@ -638,10 +660,21 @@ $(document).ready(function(){
   $('#column_home').empty();
   $('#i_error_message').empty();
   $('#tweet_box').val('');
+  $('#column_selectors').empty();
 
   // Columns.
-  $('.column').hide();
-  $('.active.column').show();
+  $('.column').each(function(){
+    var node_a = create_element('a');
+    var column_name = $(this).attr('title');
+    node_a.attr('class', 'column_selector');
+    node_a.text(column_name);
+    node_a.click(function(){
+      select_column(column_name);
+      return;
+    });
+    $('#column_selectors').append(node_a);
+  });
+  select_column('Home');
 
   // Preferences.
   $('#form_preferences').submit(apply_preferences);

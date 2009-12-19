@@ -42,6 +42,11 @@ body
 }
 
 
+#column_selectors {margin: 1em 2em;}
+.column_selector {margin-left: 1em;}
+.column_selector:first-child {margin-left: 0;}
+
+
 .tweet_hub
 {
   border-top: 1ex solid;
@@ -75,6 +80,9 @@ body
 /* Decoration  {{{1*/
 
 #console #tweet_box {font-family: sans-serif;}
+
+
+.active.column_selector {font-weight: bolder;}
 
 
 .tweet .screen_name {font-weight: bolder; text-decoration: none;}
