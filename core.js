@@ -10,6 +10,8 @@
 // - A column is to show tweets or other information.
 // - Currently, a tabpage contains only 1 column.  There is no distinction
 //   between column and tabpage.  Use term "column" at this moment.
+//
+// - Variables suffixed with "_ms" and "_MS" contain an integer as millisecond.
 
 
 
@@ -25,7 +27,7 @@ var MAX_COUNT = 200;
 var MAX_TWEET_CONTENT = 140;
 var TWITTER_API_URI = 'http://api.twitter.com/1/';
 var TWITTER_UI_URI = 'http://twitter.com/';
-var UPDATE_INTERVAL = 5 * 60 * 1000;  // in milliseconds
+var UPDATE_INTERVAL_MS = 5 * 60 * 1000;
 
 var g_api_request_queue = [];
 var g_parameters = {'automatic_update': true};
@@ -653,7 +655,7 @@ $(document).ready(function(){
 
   // To update.
   if (g_parameters['automatic_update']) {
-    g_update_timer = setInterval(update, UPDATE_INTERVAL);
+    g_update_timer = setInterval(update, UPDATE_INTERVAL_MS);
     update();
   }
 });
