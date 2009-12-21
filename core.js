@@ -668,6 +668,56 @@ function callback_update(d)
 
 
 
+// Cookie  {{{2
+
+if (!window.localStorage) {
+  window.localStorage = (window.globalStorage
+                         && window.globalStorage[location.hostname]);
+}
+
+
+function cookie_key(key)
+{
+  return 'fnfnen_' + key;
+}
+
+
+function read_cookie(key, default_value)
+{
+  if (window.localStorage && window.localStorage[cookie_key(key)])
+    return new String(window.localStorage[cookie_key(key)]);
+
+  var pkey = key + '=';
+  var normalizezd_cookie = document.cookie + ';';
+  var start = normalizezd_cookie.indexOf(pkey);
+  if (0 <= start) {
+    var end = normalizezd_cookie.indexOf(';', start);
+    return unescape(normalizezd_cookie.substring(start + pkey.length, end));
+  } else {
+    return default_value;
+  }
+}
+
+
+function write_cookie(key, value)
+{
+  if (window.localStorage) {
+    window.localStorage[cookie_key(key)] = value;
+  } else {
+    var expired_date = new Date();
+    expired_date.setTime(expired_date.getTime() + (100 * 24 * 60 * 60 * 1000));
+    document.cookie = (key + '=' + escape(value) + ';'
+                       + 'expires=' + expired_date.toGMTString());
+  }
+}
+
+
+
+
+
+
+
+
 // Main  {{{1
 
 $(document).ready(function(){
