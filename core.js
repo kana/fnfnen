@@ -34,7 +34,8 @@ var g_api_request_queue = [];
 var g_parameters = {'automatic_update': true};
 var g_since_id = null;
 var g_tweet_id_to_reply = null;
-var g_update_interval_ms = DEFAULT_UPDATE_INTERVAL_MS;
+var g_update_interval_ms = read_cookie('update_interval',
+                                       DEFAULT_UPDATE_INTERVAL_MS);
 var g_update_timer = null;
 var g_user = null;
 
@@ -72,8 +73,7 @@ function apply_preferences()  //{{{2
 
   g_update_interval_ms =  v;
   node_updated_interval.val(v);
-
-  // FIXME: Save preferences into cookie.
+  write_cookie('update_interval', g_update_interval_ms);
 
   // Notify to user.
   show_balloon('Preferences have been saved.');
