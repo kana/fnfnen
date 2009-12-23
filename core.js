@@ -736,7 +736,7 @@ function Preference(name, default_value, _kw)
   }
 
   this.get_form = function() {
-    var v = $('input[name="' + this.name + '"]').val();
+    var v = this.node().val();
     if (this.type == 'number') {
       if (isNaN(v))
         v = this.current_value;
@@ -748,12 +748,16 @@ function Preference(name, default_value, _kw)
     this.current_value = v;
   };
 
+  this.node = function() {
+    return $('input[name="' + this.name + '"]');
+  }
+
   this.save = function() {
     write_cookie(this.name, this.current_value);
   }
 
   this.set_form = function() {
-    $('input[name="' + this.name + '"]').val(this.current_value);
+    this.node().val(this.current_value);
   };
 
   // FIXME: Replace existing code with this.
