@@ -191,6 +191,27 @@ function create_element(element_name)  //{{{2
 
 
 
+function englishize(name)  //{{{2
+{
+  // 'foo_bar_baz' ==> 'Foo bar baz'
+  // 'foo_bar_sec' ==> 'Foo bar (sec.)'
+
+  var words = name.split('_');
+
+  if (1 <= words.length) {
+    words[0] = words[0].substring(0, 1).toUpperCase() + words[0].substring(1);
+
+    var i = words.length - 1;
+    if (words[i] == 'sec')
+      words[i] = '(sec.)';
+  }
+
+  return words.join(' ');
+}
+
+
+
+
 function enqueue_api_request(  //{{{2
   base_uri,
   api_name,
@@ -738,7 +759,7 @@ function Preference(name, default_value, _kw)
 
   this.initialize_form = function() {
     var node_dt = create_element('dt');
-    node_dt.text(this.name);  // FIXME: Englishize.
+    node_dt.text(englishize(this.name));
 
     var node_input = create_element('input');
     node_input.attr('name', this.name);
