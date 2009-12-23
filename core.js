@@ -720,13 +720,13 @@ function Preference(name, default_value, _kw)
 {
   var kw = _kw || {};
 
-  this.name = name;
-  this.current_value = read_cookie(this.name, default_value);
+  this.current_value = read_cookie(name, default_value);
   this.default_value = default_value;
-  this.minimum_value = kw.minimum_value || Number.MIN_VALUE;
   this.maximum_value = kw.maximum_value || Number.MAX_VALUE;
-  this.type = typeof(default_value);
+  this.minimum_value = kw.minimum_value || Number.MIN_VALUE;
+  this.name = name;
   this.on_apply = kw.on_apply || nop;
+  this.type = typeof(default_value);
 
   this.get_form = function() {
     var v = $('input[name="' + this.name + '"]').val();
