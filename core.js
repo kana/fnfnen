@@ -12,6 +12,7 @@
 //   between column and tabpage.  Use term "column" at this moment.
 //
 // - Variables suffixed with "_ms" and "_MS" contain an integer as millisecond.
+// - Variables suffixed with "_sec" and "_SEC" contain an integer as second.
 
 
 
@@ -22,17 +23,17 @@
 
 // Variables  {{{1
 
-var DEFAULT_UPDATE_INTERVAL_MS = 5 * 60 * 1000;
+var DEFAULT_UPDATE_INTERVAL_SEC = 5 * 60;
 var DUMMY_SINCE_ID = 1;
 var MAX_COUNT = 200;
 var MAX_TWEET_CONTENT = 140;
-var MINIMUM_UPDATE_INTERVAL_MS = 1 * 60 * 1000;
+var MINIMUM_UPDATE_INTERVAL_SEC = 1 * 60;
 var TWITTER_API_URI = 'http://api.twitter.com/1/';
 var TWITTER_UI_URI = 'http://twitter.com/';
 
 var g_api_request_queue = [];
 var g_parameters = {'automatic_update': true};
-var g_pref_update_interval_ms = null;
+var g_pref_update_interval_sec = null;
 var g_since_id = null;
 var g_tweet_id_to_reply = null;
 var g_update_timer = null;
@@ -61,7 +62,7 @@ function after_post()  //{{{2
 
 function apply_preferences()  //{{{2
 {
-  g_pref_update_interval_ms.apply();
+  g_pref_update_interval_sec.apply();
 
   // Notify to user.
   show_balloon('Preferences have been saved.');
@@ -822,10 +823,10 @@ $(document).ready(function(){
 
   // Preferences.
   $('#form_preferences').submit(apply_preferences);
-  g_pref_update_interval_ms = new Preference(
-    'update_interval',
-    DEFAULT_UPDATE_INTERVAL_MS,
-    {minimum_value: MINIMUM_UPDATE_INTERVAL_MS}
+  g_pref_update_interval_sec = new Preference(
+    'update_interval_sec',
+    DEFAULT_UPDATE_INTERVAL_SEC,
+    {minimum_value: MINIMUM_UPDATE_INTERVAL_SEC}
   );
 
   // To post.
@@ -845,7 +846,8 @@ $(document).ready(function(){
   // To update.
   if (g_parameters['automatic_update']) {
     g_update_timer = setInterval(update,
-                                 g_pref_update_interval_ms.current_value);
+                                 (g_pref_update_interval_sec.current_value
+                                  * 1000));
     update();
   }
 });
