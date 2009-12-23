@@ -728,6 +728,13 @@ function Preference(name, default_value, _kw)
   this.on_apply = kw.on_apply || nop;
   this.type = typeof(default_value);
 
+  this.apply = function() {
+    this.get_form();
+    this.set_form();
+    this.save();
+    this.on_apply();
+  }
+
   this.get_form = function() {
     var v = $('input[name="' + this.name + '"]').val();
     if (this.type == 'number') {
@@ -740,21 +747,14 @@ function Preference(name, default_value, _kw)
     }
     this.current_value = v;
   };
-  this.set_form = function() {
-    $('input[name="' + this.name + '"]').val(this.current_value);
-  };
 
   this.save = function() {
     write_cookie(this.name, this.current_value);
   }
 
-  this.apply = function() {
-    this.get_form();
-    this.set_form();
-    this.save();
-
-    this.on_apply();
-  }
+  this.set_form = function() {
+    $('input[name="' + this.name + '"]').val(this.current_value);
+  };
 
   // FIXME: Replace existing code with this.
 }
