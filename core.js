@@ -833,7 +833,18 @@ $(document).ready(function(){
   g_pref_update_interval_sec = new Preference(
     'update_interval_sec',
     DEFAULT_UPDATE_INTERVAL_SEC,
-    {minimum_value: MINIMUM_UPDATE_INTERVAL_SEC}
+    {
+      minimum_value: MINIMUM_UPDATE_INTERVAL_SEC,
+      on_application: function() {
+        if (g_parameters['automatic_update']) {
+          clearInterval(g_update_timer);
+          g_update_timer = setInterval(
+            update,
+            g_pref_update_interval_sec.current_value * 1000
+          );
+        }
+      }
+    }
   );
 
   // To post.
@@ -851,12 +862,8 @@ $(document).ready(function(){
   $('#tweet_box').keyup(count_tweet_content);
 
   // To update.
-  if (g_parameters['automatic_update']) {
-    g_update_timer = setInterval(update,
-                                 (g_pref_update_interval_sec.current_value
-                                  * 1000));
+  if (g_parameters['automatic_update'])
     update();
-  }
 });
 
 
