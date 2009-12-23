@@ -760,6 +760,8 @@ function Preference(name, default_value, _kw)
     this.node().val(this.current_value);
   };
 
+  this.set_form();
+
   // FIXME: Replace existing code with this.
 }
 
