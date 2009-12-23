@@ -721,9 +721,17 @@ function Preference(name, default_value)
   this.name = name;
   this.current_value = read_cookie(this.name, default_value);
   this.default_value = default_value;
+  this.type = typeof(default_value);
 
   this.get_form = function() {
-    this.current_value = $('input[name="' + this.name + '"]').val();
+    var v = $('input[name="' + this.name + '"]').val();
+    if (this.type == 'number') {
+      // FIXME: minimum_value for number
+      // FIXME: maximum_value for number
+      if (isNaN(v))
+        v = this.current_value;
+    }
+    this.current_value = v;
   };
   this.set_form = function() {
     $('input[name="' + this.name + '"]').val(this.current_value);
@@ -733,9 +741,6 @@ function Preference(name, default_value)
     write_cookie(this.name, this.current_value);
   }
 
-  // FIXME: type - number or string
-  // FIXME: minimum_value for number
-  // FIXME: maximum_value for number
   // FIXME: Replace existing code with this.
 }
 
