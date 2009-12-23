@@ -32,10 +32,9 @@ var TWITTER_UI_URI = 'http://twitter.com/';
 
 var g_api_request_queue = [];
 var g_parameters = {'automatic_update': true};
+var g_pref_update_interval_ms = null;
 var g_since_id = null;
 var g_tweet_id_to_reply = null;
-var g_update_interval_ms = read_cookie('update_interval',
-                                       DEFAULT_UPDATE_INTERVAL_MS);
 var g_update_timer = null;
 var g_user = null;
 
@@ -62,18 +61,7 @@ function after_post()  //{{{2
 
 function apply_preferences()  //{{{2
 {
-  // update_interval
-  node_updated_interval = $('input[name="update_interval"]');
-
-  var v = parseInt(node_updated_interval.val());
-  if (isNaN(v))
-    v = g_update_interval_ms;
-  if (v < MINIMUM_UPDATE_INTERVAL_MS)
-    v = MINIMUM_UPDATE_INTERVAL_MS;
-
-  g_update_interval_ms =  v;
-  node_updated_interval.val(v);
-  write_cookie('update_interval', g_update_interval_ms);
+  g_pref_update_interval_ms.apply();
 
   // Notify to user.
   show_balloon('Preferences have been saved.');
@@ -761,8 +749,6 @@ function Preference(name, default_value, _kw)
   };
 
   this.set_form();
-
-  // FIXME: Replace existing code with this.
 }
 
 
@@ -799,7 +785,11 @@ $(document).ready(function(){
 
   // Preferences.
   $('#form_preferences').submit(apply_preferences);
-  $('input[name="update_interval"]').val(g_update_interval_ms);
+  g_pref_update_interval_ms = new Preference(
+    'update_interval',
+    DEFAULT_UPDATE_INTERVAL_MS,
+    {minimum_value: MINIMUM_UPDATE_INTERVAL_MS}
+  );
 
   // To post.
     // Add a secret iframe to hide interaction with Twitter.
@@ -817,7 +807,8 @@ $(document).ready(function(){
 
   // To update.
   if (g_parameters['automatic_update']) {
-    g_update_timer = setInterval(update, g_update_interval_ms);
+    g_update_timer = setInterval(update,
+                                 g_pref_update_interval_ms.current_value);
     update();
   }
 });
