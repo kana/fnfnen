@@ -724,6 +724,7 @@ function Preference(name, default_value, _kw)
   this.current_value = read_cookie(this.name, default_value);
   this.default_value = default_value;
   this.minimum_value = kw.minimum_value || Number.MIN_VALUE;
+  this.maximum_value = kw.maximum_value || Number.MAX_VALUE;
   this.type = typeof(default_value);
   this.on_apply = kw.on_apply || nop;
 
@@ -734,6 +735,8 @@ function Preference(name, default_value, _kw)
         v = this.current_value;
       if (v < this.minimum_value)
         v = this.minimum_value;
+      if (this.maximum_value < v)
+        v = this.maximum_value;
     }
     this.current_value = v;
   };
