@@ -736,6 +736,22 @@ function Preference(name, default_value, _kw)
     this.current_value = v;
   };
 
+  this.initialize_form = function() {
+    var node_dt = create_element('dt');
+    node_dt.text(this.name);  // FIXME: Englishize.
+
+    var node_input = create_element('input');
+    node_input.attr('name', this.name);
+
+    var node_dd = create_element('dd');
+    node_dd.append(node_input);
+
+    $('#form_preferences > dl').prepend(node_dd);
+    $('#form_preferences > dl').prepend(node_dt);
+
+    this.set_form();
+  }
+
   this.node = function() {
     return $('input[name="' + this.name + '"]');
   }
@@ -748,7 +764,7 @@ function Preference(name, default_value, _kw)
     this.node().val(this.current_value);
   };
 
-  this.set_form();
+  this.initialize_form();
 }
 
 
