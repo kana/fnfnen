@@ -716,20 +716,21 @@ function write_cookie(key, value)
 
 // Preference  {{{2
 
-function Preference(name, default_value)
+function Preference(name, default_value, minimum_value)
 {
   this.name = name;
   this.current_value = read_cookie(this.name, default_value);
   this.default_value = default_value;
+  this.minimum_value = minimum_value;
   this.type = typeof(default_value);
 
   this.get_form = function() {
     var v = $('input[name="' + this.name + '"]').val();
     if (this.type == 'number') {
-      // FIXME: minimum_value for number
-      // FIXME: maximum_value for number
       if (isNaN(v))
         v = this.current_value;
+      if (v < this.minimum_value)
+        v = this.minimum_value;
     }
     this.current_value = v;
   };
