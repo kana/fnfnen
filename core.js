@@ -725,14 +725,14 @@ function Preference(name, default_value, _kw)
   this.maximum_value = kw.maximum_value || Number.MAX_VALUE;
   this.minimum_value = kw.minimum_value || Number.MIN_VALUE;
   this.name = name;
-  this.on_apply = kw.on_apply || nop;
+  this.on_application = kw.on_application || nop;
   this.type = typeof(default_value);
 
   this.apply = function() {
     this.get_form();
     this.set_form();
     this.save();
-    this.on_apply();
+    this.on_application();
   }
 
   this.get_form = function() {
