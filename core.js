@@ -716,13 +716,16 @@ function write_cookie(key, value)
 
 // Preference  {{{2
 
-function Preference(name, default_value, minimum_value)
+function Preference(name, default_value, _kw)
 {
+  var kw = _kw || {};
+
   this.name = name;
   this.current_value = read_cookie(this.name, default_value);
   this.default_value = default_value;
-  this.minimum_value = minimum_value;
+  this.minimum_value = kw.minimum_value || Number.MIN_VALUE;
   this.type = typeof(default_value);
+  this.on_apply = kw.on_apply || nop;
 
   this.get_form = function() {
     var v = $('input[name="' + this.name + '"]').val();
@@ -746,6 +749,8 @@ function Preference(name, default_value, minimum_value)
     this.get_form();
     this.set_form();
     this.save();
+
+    this.on_apply();
   }
 
   // FIXME: Replace existing code with this.
