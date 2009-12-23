@@ -742,6 +742,12 @@ function Preference(name, default_value, minimum_value)
     write_cookie(this.name, this.current_value);
   }
 
+  this.apply = function() {
+    this.get_form();
+    this.set_form();
+    this.save();
+  }
+
   // FIXME: Replace existing code with this.
 }
 
