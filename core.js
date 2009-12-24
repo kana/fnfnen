@@ -1,6 +1,6 @@
 // Core of fnfnen.
-// FIXME: Add "mentions" column.
 // FIXME: Add plug-in mechanism.
+// FIXME: Implement "mentions" column.
 // FIXME: Merge "mentions" into "home".
 // FIXME: Multiple columns.
 // FIXME: Multiple tabpages.
@@ -808,7 +808,7 @@ function Preference(name, default_value, _kw)
 $(document).ready(function(){
   // Misc.
   initialize_parameters();
-  $('#column_home').empty();
+  $('#column_home, #column_mentions').empty();
   $('#i_error_message').empty();
   $('#tweet_box').val('');
   $('#column_selectors').empty();
