@@ -772,6 +772,8 @@ function Preference(name, default_value, _kw)
     $('#form_preferences > dl').prepend(node_dt);
 
     this.set_form();
+    this.save();
+    this.on_application();
   }
 
   this.node = function() {
