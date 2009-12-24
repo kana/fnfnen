@@ -62,7 +62,12 @@ function after_post()  //{{{2
 
 function apply_preferences()  //{{{2
 {
-  g_pref_update_interval_sec.apply();
+  var global_variables = window;
+  for (var variable_name in global_variables) {
+    if (/^g_pref_.+/.test(variable_name)) {
+      global_variables[variable_name].apply();
+    }
+  }
 
   // Notify to user.
   show_balloon('Preferences have been saved.');
