@@ -767,6 +767,7 @@ function Preference(name, default_value, _kw)
     var node_dt = create_element('dt');
     node_dt.text(englishize(this.name));
 
+    // FIXME: Support <textarea>.
     var node_input = create_element('input');
     node_input.attr('name', this.name);
 
