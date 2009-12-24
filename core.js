@@ -514,13 +514,13 @@ function select_column(column_name)  //{{{2
 
 function set_up_to_reply(screen_name, tweet_id)  //{{{2
 {
-  var active_column = $('#column_home');  // FIXME: Use the active column.
-
   g_tweet_id_to_reply = tweet_id;
   $('#tweet_box').val('@' + screen_name + ' ' + $('#tweet_box').val());
   $('#tweet_box').focus();
 
-  scroll(active_column.attr('scrollHeight'));
+  // Scroll to #console.
+  // FIXME: Isn't there more proper way to do it?
+  scroll($('#columns').attr('scrollHeight'));
   return;
 }
 
