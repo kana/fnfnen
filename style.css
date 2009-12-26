@@ -89,6 +89,11 @@ body
 }
 
 
+#form_preferences {margin: 1em  0;}
+dd {margin-left: 5%;  margin-bottom: 1em;}
+dd.submit {margin: 0;}
+
+
 
 
 /* Decoration  {{{1*/
