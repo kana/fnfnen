@@ -751,7 +751,7 @@ function Preference(name, default_value, _kw)
     this.set_form();
     this.save();
     this.on_application();
-  }
+  };
 
   this.get_form = function() {
     var v = this.node().val();
@@ -790,15 +790,15 @@ function Preference(name, default_value, _kw)
     this.set_form();
     this.save();
     this.on_application();
-  }
+  };
 
   this.node = function() {
     return $(':input[name="' + this.name + '"]');
-  }
+  };
 
   this.save = function() {
     write_cookie(this.name, this.current_value);
-  }
+  };
 
   this.set_form = function() {
     this.node().val(this.current_value);
