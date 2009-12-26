@@ -4,6 +4,7 @@
 // FIXME: Merge "mentions" into "home".
 // FIXME: Multiple columns.
 // FIXME: Multiple tabpages.
+// FIXME: Warn about some preferences require to reload fnfnen to take effect.
 // Notes  {{{1
 //
 // - A tabpage contains 1 or more columns.
