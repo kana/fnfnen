@@ -735,6 +735,7 @@ function Preference(name, default_value, _kw)
 {
   var kw = _kw || {};
 
+  this.columns = kw.columns || 80;
   this.current_value = read_cookie(name, default_value);
   this.default_value = default_value;
   this.form_type = kw.form_type || 'text';
@@ -742,6 +743,7 @@ function Preference(name, default_value, _kw)
   this.minimum_value = kw.minimum_value || Number.MIN_VALUE;
   this.name = name;
   this.on_application = kw.on_application || nop;
+  this.rows = kw.rows || 25;
   this.value_type = typeof(default_value);
 
   this.apply = function() {
@@ -768,10 +770,16 @@ function Preference(name, default_value, _kw)
     var node_dt = create_element('dt');
     node_dt.text(englishize(this.name));
 
-    // FIXME: Support <textarea>.
-    var node_input = create_element('input');
+    var node_input;
+    if (this.form_type == 'textarea') {
+      node_input = create_element('textarea');
+      node_input.attr('cols', this.columns);
+      node_input.attr('rows', this.rows);
+    } else {
+      node_input = create_element('input');
+      node_input.attr('type', this.form_type);
+    }
     node_input.attr('name', this.name);
-    node_input.attr('type', this.form_type);
 
     var node_dd = create_element('dd');
     node_dd.append(node_input);
@@ -785,7 +793,7 @@ function Preference(name, default_value, _kw)
   }
 
   this.node = function() {
-    return $('input[name="' + this.name + '"]');
+    return $(':input[name="' + this.name + '"]');
   }
 
   this.save = function() {
