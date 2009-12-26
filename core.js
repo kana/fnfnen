@@ -841,6 +841,21 @@ $(document).ready(function(){
 
   // Preferences.
   $('#form_preferences').submit(apply_preferences);
+  g_pref_custom_stylesheet = new Preference(
+    'custom_stylesheet',
+    '/* .user_icon {display: inline;} ... */',
+    {
+      form_type: 'textarea',
+      on_application: function() {
+        $('#custom_stylesheet').remove();
+
+        var node_style = create_element('style');
+        node_style.attr('type', 'text/css');
+        node_style.text(this.current_value);
+        $('body').append(node_style);
+      }
+    }
+  );
   g_pref_update_interval_sec = new Preference(
     'update_interval_sec',
     DEFAULT_UPDATE_INTERVAL_SEC,
