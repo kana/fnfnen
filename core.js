@@ -151,7 +151,7 @@ call_twitter_api = (function(){  //{{{2
       base_uri + api_name + '.json' + '?' + ps.join('&'),
       s_lcds_nodes[api_name]
    );
-  }
+  };
 })();
 
 
@@ -444,7 +444,7 @@ function process_queued_api_request()  //{{{2
     node_post_block.remove();
     process_queued_api_request();
     return;
-  }
+  };
 
   // FIXME: Check the result of a request, not only request timeout.
   var error_timer = setTimeout(
