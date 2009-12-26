@@ -5,6 +5,9 @@ register_plugin((function(){
     ready: function(){
       alert('i sasara <Esc>g?b');
     },
+    new_tweets: function(kw){
+      alert(kw.tweets.length + ' tweets!');
+    },
   };
 })());
 

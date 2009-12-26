@@ -587,6 +587,9 @@ function show_tweets(d, node_column)  //{{{2
   // FIXME: Customize behavior on this autoscroll.
   scroll(node_column.attr('scrollHeight')
          - node_tweet_hub.attr('scrollHeight'));
+
+  raise_event('new_tweets', {tweets: d});
+
   return d.length;
 }
 
