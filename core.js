@@ -741,7 +741,7 @@ function Preference(name, default_value, _kw)
   this.minimum_value = kw.minimum_value || Number.MIN_VALUE;
   this.name = name;
   this.on_application = kw.on_application || nop;
-  this.type = typeof(default_value);
+  this.value_type = typeof(default_value);
 
   this.apply = function() {
     this.get_form();
@@ -752,7 +752,7 @@ function Preference(name, default_value, _kw)
 
   this.get_form = function() {
     var v = this.node().val();
-    if (this.type == 'number') {
+    if (this.value_type == 'number') {
       if (isNaN(v))
         v = this.current_value;
       if (v < this.minimum_value)
