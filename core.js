@@ -737,6 +737,7 @@ function Preference(name, default_value, _kw)
 
   this.current_value = read_cookie(name, default_value);
   this.default_value = default_value;
+  this.form_type = kw.form_type || 'text';
   this.maximum_value = kw.maximum_value || Number.MAX_VALUE;
   this.minimum_value = kw.minimum_value || Number.MIN_VALUE;
   this.name = name;
@@ -770,6 +771,7 @@ function Preference(name, default_value, _kw)
     // FIXME: Support <textarea>.
     var node_input = create_element('input');
     node_input.attr('name', this.name);
+    node_input.attr('type', this.form_type);
 
     var node_dd = create_element('dd');
     node_dd.append(node_input);
