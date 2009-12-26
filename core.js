@@ -735,24 +735,27 @@ function Preference(name, default_value, _kw)
 {
   var kw = _kw || {};
 
+  this.columns = kw.columns || 80;
   this.current_value = read_cookie(name, default_value);
   this.default_value = default_value;
+  this.form_type = kw.form_type || 'text';
   this.maximum_value = kw.maximum_value || Number.MAX_VALUE;
   this.minimum_value = kw.minimum_value || Number.MIN_VALUE;
   this.name = name;
   this.on_application = kw.on_application || nop;
-  this.type = typeof(default_value);
+  this.rows = kw.rows || 25;
+  this.value_type = typeof(default_value);
 
   this.apply = function() {
     this.get_form();
     this.set_form();
     this.save();
     this.on_application();
-  }
+  };
 
   this.get_form = function() {
     var v = this.node().val();
-    if (this.type == 'number') {
+    if (this.value_type == 'number') {
       if (isNaN(v))
         v = this.current_value;
       if (v < this.minimum_value)
@@ -767,7 +770,15 @@ function Preference(name, default_value, _kw)
     var node_dt = create_element('dt');
     node_dt.text(englishize(this.name));
 
-    var node_input = create_element('input');
+    var node_input;
+    if (this.form_type == 'textarea') {
+      node_input = create_element('textarea');
+      node_input.attr('cols', this.columns);
+      node_input.attr('rows', this.rows);
+    } else {
+      node_input = create_element('input');
+      node_input.attr('type', this.form_type);
+    }
     node_input.attr('name', this.name);
 
     var node_dd = create_element('dd');
@@ -779,15 +790,15 @@ function Preference(name, default_value, _kw)
     this.set_form();
     this.save();
     this.on_application();
-  }
+  };
 
   this.node = function() {
-    return $('input[name="' + this.name + '"]');
-  }
+    return $(':input[name="' + this.name + '"]');
+  };
 
   this.save = function() {
     write_cookie(this.name, this.current_value);
-  }
+  };
 
   this.set_form = function() {
     this.node().val(this.current_value);
