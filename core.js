@@ -1,5 +1,5 @@
 // Core of fnfnen.
-// FIXME: Add plug-in mechanism.
+// FIXME: Add raise_event() for several places.
 // FIXME: Implement "mentions" column.
 // FIXME: Merge "mentions" into "home".
 // FIXME: Multiple columns.
@@ -34,6 +34,7 @@ var TWITTER_UI_URI = 'http://twitter.com/';
 
 var g_api_request_queue = [];
 var g_parameters = {'automatic_update': true};
+var g_plugins = [/* plugin = {event_name: function, ...}, ... */];
 var g_pref_update_interval_sec = null;
 var g_since_id = null;
 var g_tweet_id_to_reply = null;
@@ -811,6 +812,42 @@ function Preference(name, default_value, _kw)
 
 
 
+// Plugins  {{{2
+// FIXME: Be reloadable.
+
+function load_plugins(plugin_uris)
+{
+  for (var i in plugin_uris) {
+    var uri = plugin_uris[i];
+
+    if (/^\s*$/.test(uri))  // Skip blank lines.
+      continue;
+
+    var node_script = create_element('script');
+    node_script.attr('src', uri);
+    node_script.attr('type', 'text/javascript');
+    $('body').append(node_script);
+  }
+}
+
+
+function raise_event(event_name, kw)
+{
+  for (var i in g_plugins) {
+    var event_handler = g_plugins[i][event_name] || nop;
+    event_handler(kw);
+  }
+}
+
+
+function register_plugin(plugin)
+{
+  g_plugins.push(plugin);
+}
+
+
+
+
 
 
 
@@ -857,6 +894,18 @@ $(document).ready(function(){
       }
     }
   );
+  g_pref_plugins = new Preference(
+    'plugins',
+    '',
+    {
+      form_type: 'textarea',
+      on_application: function() {
+        var plugin_uris = this.current_value.split('\n');
+        load_plugins(plugin_uris);
+      },
+      rows: 10
+    }
+  );
   g_pref_update_interval_sec = new Preference(
     'update_interval_sec',
     DEFAULT_UPDATE_INTERVAL_SEC,
@@ -891,6 +940,8 @@ $(document).ready(function(){
   // To update.
   if (g_parameters['automatic_update'])
     update();
+
+  raise_event('ready');
 });
 
 
