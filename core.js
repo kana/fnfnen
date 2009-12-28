@@ -162,8 +162,24 @@ call_twitter_api = (function(){  //{{{2
 
 function censorship_classes_from_tweet(tweet)  //{{{2
 {
-  // FIXME: NIY
-  return [];
+  var classes = [];
+
+  for (var i in g_censorship_law) {
+    var rule = g_censorship_law[i];
+
+    var keys = rule.property.split('.');
+    var value = tweet;
+    for (var j in keys) {
+      if (value == null || value == undefined)
+        break;
+      var value = value[keys[j]];
+    }
+
+    if (rule.pattern.test(to_string(value)))
+      classes.push(rule.classes);
+  }
+
+  return classes;
 }
 
 
@@ -638,6 +654,19 @@ function show_tweets(d, node_column)  //{{{2
          - node_tweet_hub.attr('scrollHeight'));
 
   return d.length;
+}
+
+
+
+
+function to_string(value)  //{{{2
+{
+  if (value == null)
+    return 'null';
+  else if (value == undefined)
+    return 'undefined';
+  else
+    return value.toString();
 }
 
 
