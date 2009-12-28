@@ -557,8 +557,11 @@ function set_up_censorship_law(rule_text)  //{{{2
 
     var re_pattern;
     try {
-       var pattern = fields.slice(2).join(FIELD_SEPARATOR);
-       re_pattern = new RegExp(pattern);
+       var _ = fields.slice(2).join(FIELD_SEPARATOR);
+       var ignore_case_p = _.indexOf('?') == 0;
+       var pattern = ignore_case_p ? _.substring(1) : _;
+       var flags = ignore_case_p ? 'i' : '';
+       re_pattern = new RegExp(pattern, flags);
     } catch (e) {
       show_balloon('Error in pattern: "' + line + '"');
       continue;
