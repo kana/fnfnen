@@ -784,8 +784,8 @@ function Preference(name, default_value, _kw)
     var node_dd = create_element('dd');
     node_dd.append(node_input);
 
-    $('#form_preferences > dl').prepend(node_dd);
-    $('#form_preferences > dl').prepend(node_dt);
+    $('#form_preferences > dl > dd.submit').before(node_dt);
+    $('#form_preferences > dl > dd.submit').before(node_dd);
 
     this.set_form();
     this.save();
