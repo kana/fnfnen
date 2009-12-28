@@ -160,6 +160,15 @@ call_twitter_api = (function(){  //{{{2
 
 
 
+function censorship_classes_from_tweet(tweet)  //{{{2
+{
+  // FIXME: NIY
+  return [];
+}
+
+
+
+
 function class_name_from_tweet_id(tweet_id)  //{{{2
 {
     return 'tweet_id_' + tweet_id;
@@ -614,7 +623,7 @@ function show_tweets(d, node_column)  //{{{2
       node_tweet.addClass('mention');
     if (tweet_mine_p(d[i]))
       node_tweet.addClass('mine');
-    // FIXME: node_tweet.addClass('censored censored_{kind}');
+    node_tweet.addClass(censorship_classes_from_tweet(d[i]).join(' '));
 
     node_tweet_hub.prepend(node_tweet);
   }
