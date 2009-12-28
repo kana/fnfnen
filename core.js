@@ -747,7 +747,6 @@ function callback_update(d)
 
   if (d.error)
   {
-    $('#i_error_message').text(d.error);
     show_balloon(d.error);
     return;
   }
@@ -942,7 +941,6 @@ $(document).ready(function(){
   // Misc.
   initialize_parameters();
   $('#column_home, #column_mentions').empty();
-  $('#i_error_message').empty();
   $('#tweet_box').val('');
   $('#column_selectors').empty();
   $('#balloon_container').empty();
