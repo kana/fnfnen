@@ -883,6 +883,22 @@ $(document).ready(function(){
 
   // Preferences.
   $('#form_preferences').submit(apply_preferences);
+  g_pref_update_interval_sec = new Preference(
+    'update_interval_sec',
+    DEFAULT_UPDATE_INTERVAL_SEC,
+    {
+      minimum_value: MINIMUM_UPDATE_INTERVAL_SEC,
+      on_application: function() {
+        if (g_parameters['automatic_update']) {
+          clearInterval(g_update_timer);
+          g_update_timer = setInterval(
+            update,
+            g_pref_update_interval_sec.current_value * 1000
+          );
+        }
+      }
+    }
+  );
   g_pref_custom_stylesheet = new Preference(
     'custom_stylesheet',
     '/* .user_icon {display: inline;} ... */',
@@ -909,22 +925,6 @@ $(document).ready(function(){
         load_plugins(plugin_uris);
       },
       rows: 10
-    }
-  );
-  g_pref_update_interval_sec = new Preference(
-    'update_interval_sec',
-    DEFAULT_UPDATE_INTERVAL_SEC,
-    {
-      minimum_value: MINIMUM_UPDATE_INTERVAL_SEC,
-      on_application: function() {
-        if (g_parameters['automatic_update']) {
-          clearInterval(g_update_timer);
-          g_update_timer = setInterval(
-            update,
-            g_pref_update_interval_sec.current_value * 1000
-          );
-        }
-      }
     }
   );
 
