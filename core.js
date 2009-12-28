@@ -1032,6 +1032,12 @@ $(document).ready(function(){
      + '#   censored retweet:text:\\bRT @\n'
      + '#   censored user:user.screen_name:?_bot$\n'
      + '#   interested keyword:text:?\\bgit\\b\n'
+     + '#\n'
+     + '# Note that you also have to customize stylesheet to use censored\n'
+     + '# results.  For example, add the following:\n'
+     + '#\n'
+     + '#   .censored.tweet {text-decoration: line-through;}\n'
+     + '#   .interested.tweet {font-weight: bolder;}\n'
      + ''),
     {
       form_type: 'textarea',
