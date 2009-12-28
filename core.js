@@ -555,9 +555,10 @@ function set_up_censorship_law(rule_text)  //{{{2
     if (fields.length < 3)
       continue;
 
-    var pattern;
+    var re_pattern;
     try {
-       pattern = new RegExp(fields.slice(2).join(FIELD_SEPARATOR));
+       var pattern = fields.slice(2).join(FIELD_SEPARATOR);
+       re_pattern = new RegExp(pattern);
     } catch (e) {
       show_balloon('Error in pattern: "' + line + '"');
       continue;
@@ -566,7 +567,7 @@ function set_up_censorship_law(rule_text)  //{{{2
     g_censorship_law.push({
       classes: fields[0],
       property: fields[1],
-      pattern: pattern,
+      pattern: re_pattern,
     });
   }
 
