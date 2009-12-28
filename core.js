@@ -730,6 +730,7 @@ function write_cookie(key, value)
 
 
 // Preference  {{{2
+// FIXME: Add online help.
 
 function Preference(name, default_value, _kw)
 {
