@@ -895,7 +895,8 @@ $(document).ready(function(){
         node_style.attr('type', 'text/css');
         node_style.text(this.current_value);
         $('body').append(node_style);
-      }
+      },
+      rows: 10
     }
   );
   g_pref_plugins = new Preference(
