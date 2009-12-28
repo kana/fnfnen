@@ -92,7 +92,7 @@ function authenticate()  //{{{2
 function callback_authenticate(d)
 {
   if (d.error)
-    return alert(d.error);
+    return show_balloon(d.error);
 
   g_user = d;
 
@@ -748,7 +748,7 @@ function callback_update(d)
   if (d.error)
   {
     $('#i_error_message').text(d.error);
-    alert(d.error);
+    show_balloon(d.error);
     return;
   }
 
