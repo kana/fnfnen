@@ -1,4 +1,5 @@
 // Core of fnfnen.
+// FIXME: Add custom column to show censored tweets.
 // FIXME: Add raise_event() for several places.
 // FIXME: Implement "mentions" column.
 // FIXME: Merge "mentions" into "home".
@@ -40,6 +41,7 @@ var g_since_id = null;
 var g_tweet_id_to_reply = null;
 var g_update_timer = null;
 var g_user = null;
+var g_censorship_law = [/* {classes, property, pattern}, ... */];
 
 
 
@@ -155,6 +157,31 @@ call_twitter_api = (function(){  //{{{2
    );
   };
 })();
+
+
+
+
+function censorship_classes_from_tweet(tweet)  //{{{2
+{
+  var classes = [];
+
+  for (var i in g_censorship_law) {
+    var rule = g_censorship_law[i];
+
+    var keys = rule.property.split('.');
+    var value = tweet;
+    for (var j in keys) {
+      if (value == null || value == undefined)
+        break;
+      var value = value[keys[j]];
+    }
+
+    if (rule.pattern.test(to_string(value)))
+      classes.push(rule.classes);
+  }
+
+  return classes;
+}
 
 
 
@@ -514,6 +541,46 @@ function select_column(column_name)  //{{{2
 
 
 
+function set_up_censorship_law(rule_text)  //{{{2
+{
+  g_censorship_law = [];
+
+  var lines = rule_text.split('\n');
+  for (var i in lines) {
+    var line = lines[i];
+    if (/^\s*#/.test(line))
+      continue;
+
+    var FIELD_SEPARATOR = ':'
+    var fields = line.split(FIELD_SEPARATOR);
+    if (fields.length < 3)
+      continue;
+
+    var re_pattern;
+    try {
+       var _ = fields.slice(2).join(FIELD_SEPARATOR);
+       var ignore_case_p = _.indexOf('?') == 0;
+       var pattern = ignore_case_p ? _.substring(1) : _;
+       var flags = ignore_case_p ? 'i' : '';
+       re_pattern = new RegExp(pattern, flags);
+    } catch (e) {
+      show_balloon('Error in pattern: "' + line + '"');
+      continue;
+    }
+
+    g_censorship_law.push({
+      classes: fields[0],
+      property: fields[1],
+      pattern: re_pattern,
+    });
+  }
+
+  return;
+}
+
+
+
+
 function set_up_to_reply(screen_name, tweet_id)  //{{{2
 {
   g_tweet_id_to_reply = tweet_id;
@@ -577,7 +644,7 @@ function show_tweets(d, node_column)  //{{{2
       node_tweet.addClass('mention');
     if (tweet_mine_p(d[i]))
       node_tweet.addClass('mine');
-    // FIXME: node_tweet.addClass('censored censored_{kind}');
+    node_tweet.addClass(censorship_classes_from_tweet(d[i]).join(' '));
 
     node_tweet_hub.prepend(node_tweet);
   }
@@ -592,6 +659,19 @@ function show_tweets(d, node_column)  //{{{2
          - node_tweet_hub.attr('scrollHeight'));
 
   return d.length;
+}
+
+
+
+
+function to_string(value)  //{{{2
+{
+  if (value == null)
+    return 'null';
+  else if (value == undefined)
+    return 'undefined';
+  else
+    return value.toString();
 }
 
 
@@ -920,6 +1000,47 @@ $(document).ready(function(){
       on_application: function() {
         var plugin_uris = this.current_value.split('\n');
         load_plugins(plugin_uris);
+      },
+      rows: 10
+    }
+  );
+  g_pref_censorship_law = new Preference(
+    'censorship_law',
+    (''
+     + '# Lines start with "#" are comments, so that they are ignored.\n'
+     + '# Blank lines are also ignored.\n'
+     + '#\n'
+     + '# Format: "{classes}:{property}:{pattern}"\n'
+     + '#\n'
+     + '#  {classes}\n'
+     + '#    Names to be added value of "class" attribute of a tweet.\n'
+     + '#\n'
+     + '#  {property}\n'
+     + '#    The name of property to be censored.\n'
+     + '#    Examples: "text", "source", "user.screen_name".\n'
+     + '#\n'
+     + '#  {pattern}\n'
+     + '#    Regular expression to test whether a tweet is censored or not.\n'
+     + '#    A tweet is censored if {pattern} is matched to the value of\n'
+     + '#    {property}.  If {pattern} starts with "?", pattern matching is\n'
+     + '#    case-insensitive.\n'
+     + '#\n'
+     + '# Examples:\n'
+     + '#\n'
+     + '#   censored retweet:text:\\bRT @\n'
+     + '#   censored user:user.screen_name:?_bot$\n'
+     + '#   interested keyword:text:?\\bgit\\b\n'
+     + '#\n'
+     + '# Note that you also have to customize stylesheet to use censored\n'
+     + '# results.  For example, add the following:\n'
+     + '#\n'
+     + '#   .censored.tweet {text-decoration: line-through;}\n'
+     + '#   .interested.tweet {font-weight: bolder;}\n'
+     + ''),
+    {
+      form_type: 'textarea',
+      on_application: function() {
+        set_up_censorship_law(this.current_value);
       },
       rows: 10
     }
