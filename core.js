@@ -91,8 +91,10 @@ function authenticate()  //{{{2
 
 function callback_authenticate(d)
 {
-  if (d.error)
-    return show_balloon(d.error);
+  if (d.error) {
+    show_balloon(d.error);
+    return;
+  }
 
   g_user = d;
 
