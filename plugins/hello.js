@@ -8,6 +8,7 @@ register_plugin((function(){
     },
     new_tweets: function(kw){
       // Raised when new tweets have been fetched.
+      // Each tweet may be modified.
       alert(kw.tweets.length + ' tweets!');
     },
   };
