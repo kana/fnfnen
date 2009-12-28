@@ -514,6 +514,15 @@ function select_column(column_name)  //{{{2
 
 
 
+function set_up_censorship_law(rule_text)  //{{{2
+{
+  // FIXME: NIY
+  return;
+}
+
+
+
+
 function set_up_to_reply(screen_name, tweet_id)  //{{{2
 {
   g_tweet_id_to_reply = tweet_id;
@@ -923,6 +932,41 @@ $(document).ready(function(){
       on_application: function() {
         var plugin_uris = this.current_value.split('\n');
         load_plugins(plugin_uris);
+      },
+      rows: 10
+    }
+  );
+  g_pref_censorship_law = new Preference(
+    'censorship_law',
+    (''
+     + '# Lines start with "#" are comments, so that they are ignored.\n'
+     + '# Blank lines are also ignored.\n'
+     + '#\n'
+     + '# Format: "{classes}:{property}:{pattern}"\n'
+     + '#\n'
+     + '#  {classes}\n'
+     + '#    Names to be added value of "class" attribute of a tweet.\n'
+     + '#\n'
+     + '#  {property}\n'
+     + '#    The name of property to be censored.\n'
+     + '#    Examples: "text", "source", "user.screen_name".\n'
+     + '#\n'
+     + '#  {pattern}\n'
+     + '#    Regular expression to test whether a tweet is censored or not.\n'
+     + '#    A tweet is censored if {pattern} is matched to the value of\n'
+     + '#    {property}.  If {pattern} starts with "?", pattern matching is\n'
+     + '#    case-insensitive.\n'
+     + '#\n'
+     + '# Examples:\n'
+     + '#\n'
+     + '#   censored retweet:text:\\bRT @\n'
+     + '#   censored user:user.screen_name:?_bot$\n'
+     + '#   interested keyword:text:?\\bgit\\b\n'
+     + ''),
+    {
+      form_type: 'textarea',
+      on_application: function() {
+        set_up_censorship_law(this.current_value);
       },
       rows: 10
     }
