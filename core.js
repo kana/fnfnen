@@ -40,6 +40,7 @@ var g_since_id = null;
 var g_tweet_id_to_reply = null;
 var g_update_timer = null;
 var g_user = null;
+var g_censorship_law = [/* {classes, property, pattern}, ... */];
 
 
 
@@ -516,7 +517,34 @@ function select_column(column_name)  //{{{2
 
 function set_up_censorship_law(rule_text)  //{{{2
 {
-  // FIXME: NIY
+  g_censorship_law = [];
+
+  var lines = rule_text.split('\n');
+  for (var i in lines) {
+    var line = lines[i];
+    if (/^\s*#/.test(line))
+      continue;
+
+    var FIELD_SEPARATOR = ':'
+    var fields = line.split(FIELD_SEPARATOR);
+    if (fields.length < 3)
+      continue;
+
+    var pattern;
+    try {
+       pattern = new RegExp(fields.slice(2).join(FIELD_SEPARATOR));
+    } catch (e) {
+      show_balloon('Error in pattern: "' + line + '"');
+      continue;
+    }
+
+    g_censorship_law.push({
+      classes: fields[0],
+      property: fields[1],
+      pattern: pattern,
+    });
+  }
+
   return;
 }
 
