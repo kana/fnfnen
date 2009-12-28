@@ -891,10 +891,7 @@ $(document).ready(function(){
       on_application: function() {
         if (g_parameters['automatic_update']) {
           clearInterval(g_update_timer);
-          g_update_timer = setInterval(
-            update,
-            g_pref_update_interval_sec.current_value * 1000
-          );
+          g_update_timer = setInterval(update, this.current_value * 1000);
         }
       }
     }
