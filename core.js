@@ -1148,7 +1148,7 @@ $(document).ready(function(){
   $('#balloon_container').empty();
 
   // Columns.
-  $('.column').each(function(){
+  $('.predefined.column').each(function(){
     var node_a = create_element('a');
     var column_name = $(this).attr('title');
     node_a.attr('class', 'column_selector');
