@@ -570,6 +570,14 @@ function tweet_mine_p(tweet)  //{{{2
 
 
 // Update  {{{2
+// Variables  {{{3
+
+var QUEUE_ID_HOME = 'home';
+var VALID_QUEUE_IDS = [QUEUE_ID_HOME];
+
+var g_tweet_queues = {/* queue_id: tweets = [newest, ..., oldest] */};
+
+
 function callback_update(d)  //{{{3
 {
   // d = [{newest-tweet}, ..., {oldest-tweet}]
@@ -592,8 +600,51 @@ function callback_update(d)  //{{{3
     return;
   }
 
-  show_tweets(new_tweets, $("#column_home"));
+  queue_tweets(new_tweets, QUEUE_ID_HOME);
   return;
+}
+
+
+function merge_tweets(tweet_sets)  //{{{3
+{
+  // Assumption - There is no duplicate in tweet_sets.
+  var merged_tweets = [];  // newest, ..., oldest
+
+  for (var i in tweet_sets)
+    merged_tweets.push.apply(merged_tweets, tweet_sets[i]);
+
+  merged_tweets.sort(function(l,r){
+    if (l.id < r.id)
+      return -1;
+    else if (l.id == r.id)
+      return 0;
+    else
+      return 1;
+  });
+  merged_tweets.reverse();
+
+  return merged_tweets;
+}
+
+
+function queue_tweets(tweets, queue_id)  //{{{3
+{
+  // Prepend tweets into a queue.
+  if (g_tweet_queues[queue_id] == null)
+    g_tweet_queues[queue_id] = [];
+  var queue = g_tweet_queues[queue_id];
+  var args = [0, 0];
+  args.push.apply(args, tweets);
+  queue.splice.apply(queue, args);
+
+  // Show tweets if all queues are filled.
+  var full_p = true;
+  for (var i in VALID_QUEUE_IDS)
+    full_p = full_p && (g_tweet_queues[VALID_QUEUE_IDS[i]] != null);
+  if (full_p) {
+    show_tweets(merge_tweets(g_tweet_queues), $('#column_home'));
+    g_tweet_queues = {};
+  }
 }
 
 
