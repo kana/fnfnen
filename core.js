@@ -53,7 +53,7 @@
 
 var DEFAULT_UPDATE_INTERVAL_SEC = 5 * 60;
 var DUMMY_SINCE_ID = 1;
-var MAX_COUNT = 200;
+var MAX_COUNT_HOME = 200;
 var MAX_TWEET_CONTENT = 140;
 var MINIMUM_UPDATE_INTERVAL_SEC = 1 * 60;
 var TWITTER_API_URI = 'http://api.twitter.com/1/';
@@ -68,7 +68,7 @@ var g_api_request_queue = [];
 var g_parameters = {'automatic_update': true};
 var g_plugins = [/* plugin = {event_name: function, ...}, ... */];
 var g_preferences = {/* name: preference, ... */};
-var g_since_id = DUMMY_SINCE_ID;  // BUGS: Tweet #1 cannot be shown.
+var g_since_id_home = DUMMY_SINCE_ID;  // BUGS: Tweet #1 cannot be shown.
 var g_tweet_db = {/* tweet_id: tweet */};
 var g_tweet_id_to_reply = null;
 var g_update_timer = null;
@@ -589,7 +589,8 @@ function callback_update(d)  //{{{3
 
     if (0 < new_tweets.length) {
       var NEWEST_TWEET_INDEX = 0;
-      g_since_id = Math.max(g_since_id, new_tweets[NEWEST_TWEET_INDEX].id);
+      g_since_id_home = Math.max(g_since_id_home,
+                                 new_tweets[NEWEST_TWEET_INDEX].id);
     }
     for (i in new_tweets) {
       var tweet = new_tweets[i];
@@ -656,8 +657,8 @@ function update()  //{{{3
   call_twitter_api(TWITTER_API_URI,
                    'statuses/home_timeline',
                    {'callback': 'callback_update',
-                    'count': MAX_COUNT,
-                    'since_id': g_since_id});
+                    'count': MAX_COUNT_HOME,
+                    'since_id': g_since_id_home});
   return;
 }
 
