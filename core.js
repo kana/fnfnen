@@ -465,8 +465,31 @@ function show_balloon(text)  //{{{2
 
 function show_conversation(tweet_id)  //{{{2
 {
+  var tweets_in_conoversation = list_tweets_in_conversation(tweet_id);
+
   // FIXME: NIY
-  return;
+  // Add #column_conversation if it does not exist.
+  // Remove all content in #column_conversation.
+  // Add tweets_in_conoversation into #column_conversation.
+}
+
+
+function list_tweets_in_conversation(tweet_id)
+{
+  var tweets_in_conoversation = [];  // newest_tweet, ..., oldest_tweet
+
+  var id = tweet_id;
+  while (id != null) {
+    var tweet = tweet_db.get(id);
+    if (tweet == null)  // FIXME: Fetch tweet.
+      break;
+
+    tweets_in_conoversation.push(tweet);
+
+    id = tweet.in_reply_to_status_id;
+  }
+
+  return tweets_in_conoversation;
 }
 
 
@@ -1008,6 +1031,10 @@ function TweetDatabase()  //{{{2
   };
 
   this.db = {};  // tweet_id: tweet
+
+  this.get = function(id){
+    return this.db[id];
+  };
 
   this.has_p = function(_){
     var id = typeof(_) == 'string' ? _ : _.id;
