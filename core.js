@@ -413,28 +413,6 @@ function process_queued_api_request()  //{{{2
 
 
 
-function select_column(column_name)  //{{{2
-{
-  $('.column')
-    .removeClass('active')
-    .hide();
-  $('.column')
-    .filter(function(){return $(this).attr('title') == column_name;})
-    .addClass('active')
-    .show();
-
-  $('.column_selector')
-    .removeClass('active');
-  $('.column_selector')
-    .filter(function(){return $(this).text() == column_name;})
-    .addClass('active');
-
-  return;
-}
-
-
-
-
 function set_up_to_reply(screen_name, tweet_id)  //{{{2
 {
   g_tweet_id_to_reply = tweet_id;
@@ -804,6 +782,29 @@ function set_up_censorship_law(rule_text)  //{{{2
 
 
 
+
+
+
+
+// Columns  {{{1
+function select_column(column_name)  //{{{2
+{
+  $('.column')
+    .removeClass('active')
+    .hide();
+  $('.column')
+    .filter(function(){return $(this).attr('title') == column_name;})
+    .addClass('active')
+    .show();
+
+  $('.column_selector')
+    .removeClass('active');
+  $('.column_selector')
+    .filter(function(){return $(this).text() == column_name;})
+    .addClass('active');
+
+  return;
+}
 
 
 
