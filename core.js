@@ -583,21 +583,20 @@ function callback_update(d)
 {
   $('#i_last_updated_time').text('Last updated: ' + new Date().toString());
 
-  if (d.error)
-  {
+  if (d.error == null) {
+    if (g_since_id) {
+      for (var i = 0; i < d.length; i++) {
+        if (d[i].id <= g_since_id)
+          d.splice(i--, 1);
+      }
+    }
+
+    var NEWEST_TWEET_INDEX = 0;
+    g_since_id = d[NEWEST_TWEET_INDEX].id;
+  } else {
     show_balloon(d.error);
     return;
   }
-
-  if (g_since_id) {
-    for (var i = 0; i < d.length; i++) {
-      if (d[i].id <= g_since_id)
-        d.splice(i--, 1);
-    }
-  }
-
-  var NEWEST_TWEET_INDEX = 0;
-  g_since_id = d[NEWEST_TWEET_INDEX].id;
 
   show_tweets(d, $("#column_home"));
   return;
