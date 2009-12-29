@@ -53,6 +53,7 @@
 
 var DEFAULT_UPDATE_INTERVAL_SEC = 5 * 60;
 var DUMMY_SINCE_ID = 1;
+var GLOBAL_VARIABLES = window;
 var MAX_COUNT_HOME = 200;
 var MAX_TWEET_CONTENT = 140;
 var MINIMUM_UPDATE_INTERVAL_SEC = 1 * 60;
@@ -578,7 +579,7 @@ var VALID_QUEUE_IDS = [QUEUE_ID_HOME];
 var g_tweet_queues = {/* queue_id: tweets = [newest, ..., oldest] */};
 
 
-function callback_update(d)  //{{{3
+function callback_update(d, name_since_id, queue_id)  //{{{3
 {
   // d = [{newest-tweet}, ..., {oldest-tweet}]
   $('#i_last_updated_time').text('Last updated: ' + new Date().toString());
@@ -589,8 +590,10 @@ function callback_update(d)  //{{{3
 
     if (0 < new_tweets.length) {
       var NEWEST_TWEET_INDEX = 0;
-      g_since_id_home = Math.max(g_since_id_home,
-                                 new_tweets[NEWEST_TWEET_INDEX].id);
+      GLOBAL_VARIABLES[name_since_id] = Math.max(
+        GLOBAL_VARIABLES[name_since_id],
+        new_tweets[NEWEST_TWEET_INDEX].id
+      );
     }
     for (i in new_tweets) {
       var tweet = new_tweets[i];
@@ -601,7 +604,14 @@ function callback_update(d)  //{{{3
     return;
   }
 
-  queue_tweets(new_tweets, QUEUE_ID_HOME);
+  queue_tweets(new_tweets, queue_id);
+  return;
+}
+
+
+function callback_update_home(d)  //{{{3
+{
+  callback_update(d, 'g_since_id_home', QUEUE_ID_HOME);
   return;
 }
 
@@ -656,7 +666,7 @@ function update()  //{{{3
 
   call_twitter_api(TWITTER_API_URI,
                    'statuses/home_timeline',
-                   {'callback': 'callback_update',
+                   {'callback': 'callback_update_home',
                     'count': MAX_COUNT_HOME,
                     'since_id': g_since_id_home});
   return;
