@@ -72,7 +72,6 @@ var g_plugins = [/* plugin = {event_name: function, ...}, ... */];
 var g_preferences = {/* name: preference, ... */};
 var g_since_id_home = DUMMY_SINCE_ID;  // BUGS: Tweet #1 cannot be shown.
 var g_since_id_mentions = DUMMY_SINCE_ID;  // BUGS: Tweet #1 cannot be shown.
-var g_tweet_db = {/* tweet_id: tweet */};
 var g_tweet_id_to_reply = null;
 var g_update_timer = null;
 var g_user = null;
@@ -589,7 +588,7 @@ function callback_update(d, name_since_id, queue_id)  //{{{3
 
   var new_tweets = [];
   if (d.error == null) {
-    new_tweets = filter(d, function(t){return g_tweet_db[t.id] == null;});
+    new_tweets = filter(d, function(tweet){return !tweet_db.has_p(tweet);});
 
     if (0 < new_tweets.length) {
       var NEWEST_TWEET_INDEX = 0;
@@ -598,10 +597,7 @@ function callback_update(d, name_since_id, queue_id)  //{{{3
         new_tweets[NEWEST_TWEET_INDEX].id
       );
     }
-    for (i in new_tweets) {
-      var tweet = new_tweets[i];
-      g_tweet_db[tweet.id] = tweet;
-    }
+    tweet_db.add(new_tweets);
   } else {
     show_balloon(d.error);
     return;
@@ -991,6 +987,38 @@ function Preference(name, default_value, _kw)  //{{{2
 
   this.initialize_form();
 }
+
+
+
+
+
+
+
+
+// Tweet Database  {{{1
+function TweetDatabase()  //{{{2
+{
+  this.add = function(new_tweets){
+    for (i in new_tweets) {
+      var tweet = new_tweets[i];
+      if (!this.has_p(tweet))
+        this.db[tweet.id] = tweet;
+    }
+    return;
+  };
+
+  this.db = {};  // tweet_id: tweet
+
+  this.has_p = function(_){
+    var id = typeof(_) == 'string' ? _ : _.id;
+    return this.db[id] != null;
+  };
+}
+
+
+
+
+var tweet_db = new TweetDatabase();  //{{{2
 
 
 
