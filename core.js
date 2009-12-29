@@ -23,7 +23,8 @@
 //     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 //     OTHER DEALINGS IN THE SOFTWARE.
 // }}}
-// Core of fnfnen.
+// Notes  {{{1
+//
 // FIXME: Add custom column to show censored tweets.
 // FIXME: Add raise_event() for several places.
 // FIXME: Implement "mentions" column.
@@ -31,7 +32,6 @@
 // FIXME: Multiple columns.
 // FIXME: Multiple tabpages.
 // FIXME: Warn about some preferences require to reload fnfnen to take effect.
-// Notes  {{{1
 //
 // - A tabpage contains 1 or more columns.
 // - A column is to show tweets or other information.
@@ -49,6 +49,7 @@
 
 
 // Variables  {{{1
+// Constants  {{{2
 
 var DEFAULT_UPDATE_INTERVAL_SEC = 5 * 60;
 var DUMMY_SINCE_ID = 1;
@@ -58,6 +59,11 @@ var MINIMUM_UPDATE_INTERVAL_SEC = 1 * 60;
 var TWITTER_API_URI = 'http://api.twitter.com/1/';
 var TWITTER_UI_URI = 'http://twitter.com/';
 
+
+
+
+// Global  {{{2
+
 var g_api_request_queue = [];
 var g_parameters = {'automatic_update': true};
 var g_plugins = [/* plugin = {event_name: function, ...}, ... */];
@@ -66,7 +72,6 @@ var g_since_id = null;
 var g_tweet_id_to_reply = null;
 var g_update_timer = null;
 var g_user = null;
-var g_censorship_law = [/* {classes, property, pattern}, ... */];
 
 
 
@@ -75,7 +80,7 @@ var g_censorship_law = [/* {classes, property, pattern}, ... */];
 
 
 
-// Code  {{{1
+// Core  {{{1
 function after_post()  //{{{2
 {
   $('#tweet_box').val('');
@@ -167,52 +172,6 @@ function before_post()  //{{{2
 
 
 
-call_twitter_api = (function(){  //{{{2
-  var s_seq = (new Date).getTime();  // To avoid browser-side caching.
-  var s_lcds_nodes = {};  // {api_name: node_script, ...}
-
-  return function(base_uri, api_name, _parameters) {
-    parameters = $.extend(false, _parameters, {'seq': s_seq++});
-
-    var ps = [];
-    for (var key in parameters)
-      ps.push(key + '=' + parameters[key]);
-
-    s_lcds_nodes[api_name] = load_cross_domain_script(
-      base_uri + api_name + '.json' + '?' + ps.join('&'),
-      s_lcds_nodes[api_name]
-   );
-  };
-})();
-
-
-
-
-function censorship_classes_from_tweet(tweet)  //{{{2
-{
-  var classes = [];
-
-  for (var i in g_censorship_law) {
-    var rule = g_censorship_law[i];
-
-    var keys = rule.property.split('.');
-    var value = tweet;
-    for (var j in keys) {
-      if (value == null || value == undefined)
-        break;
-      var value = value[keys[j]];
-    }
-
-    if (rule.pattern.test(to_string(value)))
-      classes.push(rule.classes);
-  }
-
-  return classes;
-}
-
-
-
-
 function class_name_from_tweet_id(tweet_id)  //{{{2
 {
     return 'tweet_id_' + tweet_id;
@@ -245,35 +204,6 @@ function count_tweet_content(e)  //{{{2
 
 
 
-function create_element(element_name)  //{{{2
-{
-  return $(document.createElement(element_name));
-}
-
-
-
-
-function englishize(name)  //{{{2
-{
-  // 'foo_bar_baz' ==> 'Foo bar baz'
-  // 'foo_bar_sec' ==> 'Foo bar (sec.)'
-
-  var words = name.split('_');
-
-  if (1 <= words.length) {
-    words[0] = words[0].substring(0, 1).toUpperCase() + words[0].substring(1);
-
-    var i = words.length - 1;
-    if (words[i] == 'sec')
-      words[i] = '(sec.)';
-  }
-
-  return words.join(' ');
-}
-
-
-
-
 function enqueue_api_request(  //{{{2
   base_uri,
   api_name,
@@ -293,17 +223,6 @@ function enqueue_api_request(  //{{{2
   if (g_api_request_queue.length <= 1)
     process_queued_api_request();
   return;
-}
-
-
-
-
-function favorite_symbol(favorite_p)  //{{{2
-{
-  return (favorite_p
-          ? '\u2605'  // black (filled) star
-          : '\u2606'  // white (empty) star
-          );
 }
 
 
@@ -376,24 +295,6 @@ function html_from_tweet(tweet)  //{{{2
 
 
 
-function human_readable_format_from_date(date)  //{{{2
-{
-  return (date.getFullYear()
-          + '-' + pad(date.getMonth() + 1)
-          + '-' + pad(date.getDate())
-          + ' ' + pad(date.getHours())
-          + ':' + pad(date.getMinutes())
-          + ':' + pad(date.getSeconds()));
-}
-
-function pad(n)
-{
-  return n < 10 ? '0' + n : n;
-}
-
-
-
-
 function initialize_parameters()  //{{{2
 {
   var ss = window.location.href.split('?', 2);
@@ -410,22 +311,6 @@ function initialize_parameters()  //{{{2
     g_parameters[key] = value;
   }
   return;
-}
-
-
-
-
-function load_cross_domain_script(uri, node)  //{{{2
-{
-  if (node && node.parentNode)
-    node.parentNode.removeChild(node);
-
-  node = document.createElement("script");
-  node.src = uri;
-  node.type = "text/javascript";
-  document.body.appendChild(node);
-
-  return node;
 }
 
 
@@ -455,14 +340,6 @@ function make_links_in_text(text)  //{{{2
       }
     }
   );
-}
-
-
-
-
-function nop()  //{{{2
-{
-  return;
 }
 
 
@@ -537,15 +414,6 @@ function process_queued_api_request()  //{{{2
 
 
 
-function scroll(y_coordinate)  //{{{2
-{
-  scrollTo(0, y_coordinate);
-  return;
-}
-
-
-
-
 function select_column(column_name)  //{{{2
 {
   $('.column')
@@ -561,46 +429,6 @@ function select_column(column_name)  //{{{2
   $('.column_selector')
     .filter(function(){return $(this).text() == column_name;})
     .addClass('active');
-
-  return;
-}
-
-
-
-
-function set_up_censorship_law(rule_text)  //{{{2
-{
-  g_censorship_law = [];
-
-  var lines = rule_text.split('\n');
-  for (var i in lines) {
-    var line = lines[i];
-    if (/^\s*#/.test(line))
-      continue;
-
-    var FIELD_SEPARATOR = ':'
-    var fields = line.split(FIELD_SEPARATOR);
-    if (fields.length < 3)
-      continue;
-
-    var re_pattern;
-    try {
-       var _ = fields.slice(2).join(FIELD_SEPARATOR);
-       var ignore_case_p = _.indexOf('?') == 0;
-       var pattern = ignore_case_p ? _.substring(1) : _;
-       var flags = ignore_case_p ? 'i' : '';
-       re_pattern = new RegExp(pattern, flags);
-    } catch (e) {
-      show_balloon('Error in pattern: "' + line + '"');
-      continue;
-    }
-
-    g_censorship_law.push({
-      classes: fields[0],
-      property: fields[1],
-      pattern: re_pattern,
-    });
-  }
 
   return;
 }
@@ -686,19 +514,6 @@ function show_tweets(d, node_column)  //{{{2
          - node_tweet_hub.attr('scrollHeight'));
 
   return d.length;
-}
-
-
-
-
-function to_string(value)  //{{{2
-{
-  if (value == null)
-    return 'null';
-  else if (value == undefined)
-    return 'undefined';
-  else
-    return value.toString();
 }
 
 
@@ -795,21 +610,152 @@ function callback_update(d)
 
 
 
-// Cookie  {{{2
 
+
+
+
+// API  {{{1
+call_twitter_api = (function(){  //{{{2
+  var s_seq = (new Date).getTime();  // To avoid browser-side caching.
+  var s_lcds_nodes = {};  // {api_name: node_script, ...}
+
+  return function(base_uri, api_name, _parameters) {
+    parameters = $.extend(false, _parameters, {'seq': s_seq++});
+
+    var ps = [];
+    for (var key in parameters)
+      ps.push(key + '=' + parameters[key]);
+
+    s_lcds_nodes[api_name] = load_cross_domain_script(
+      base_uri + api_name + '.json' + '?' + ps.join('&'),
+      s_lcds_nodes[api_name]
+   );
+  };
+})();
+
+
+
+
+function load_cross_domain_script(uri, node)  //{{{2
+{
+  if (node && node.parentNode)
+    node.parentNode.removeChild(node);
+
+  node = document.createElement("script");
+  node.src = uri;
+  node.type = "text/javascript";
+  document.body.appendChild(node);
+
+  return node;
+}
+
+
+
+
+
+
+
+
+// Censorship  {{{1
+// Variables  {{{2
+
+var g_censorship_law = [/* {classes, property, pattern}, ... */];
+
+
+
+
+function censorship_classes_from_tweet(tweet)  //{{{2
+{
+  var classes = [];
+
+  for (var i in g_censorship_law) {
+    var rule = g_censorship_law[i];
+
+    var keys = rule.property.split('.');
+    var value = tweet;
+    for (var j in keys) {
+      if (value == null || value == undefined)
+        break;
+      var value = value[keys[j]];
+    }
+
+    if (rule.pattern.test(to_string(value)))
+      classes.push(rule.classes);
+  }
+
+  return classes;
+}
+
+
+
+
+function set_up_censorship_law(rule_text)  //{{{2
+{
+  g_censorship_law = [];
+
+  var lines = rule_text.split('\n');
+  for (var i in lines) {
+    var line = lines[i];
+    if (/^\s*#/.test(line))
+      continue;
+
+    var FIELD_SEPARATOR = ':'
+    var fields = line.split(FIELD_SEPARATOR);
+    if (fields.length < 3)
+      continue;
+
+    var re_pattern;
+    try {
+       var _ = fields.slice(2).join(FIELD_SEPARATOR);
+       var ignore_case_p = _.indexOf('?') == 0;
+       var pattern = ignore_case_p ? _.substring(1) : _;
+       var flags = ignore_case_p ? 'i' : '';
+       re_pattern = new RegExp(pattern, flags);
+    } catch (e) {
+      show_balloon('Error in pattern: "' + line + '"');
+      continue;
+    }
+
+    g_censorship_law.push({
+      classes: fields[0],
+      property: fields[1],
+      pattern: re_pattern,
+    });
+  }
+
+  return;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+// Cookie  {{{1
+// Initialization  {{{2
 if (!window.localStorage) {
   window.localStorage = (window.globalStorage
                          && window.globalStorage[location.hostname]);
 }
 
 
-function cookie_key(key)
+
+
+function cookie_key(key)  //{{{2
 {
   return 'fnfnen_' + key;
 }
 
 
-function read_cookie(key, default_value)
+
+
+function read_cookie(key, default_value)  //{{{2
 {
   if (window.localStorage && window.localStorage[cookie_key(key)])
     return new String(window.localStorage[cookie_key(key)]);
@@ -826,7 +772,9 @@ function read_cookie(key, default_value)
 }
 
 
-function write_cookie(key, value)
+
+
+function write_cookie(key, value)  //{{{2
 {
   if (window.localStorage) {
     window.localStorage[cookie_key(key)] = value;
@@ -841,9 +789,55 @@ function write_cookie(key, value)
 
 
 
-// Preference  {{{2
 
-function Preference(name, default_value, _kw)
+
+
+
+// Plugins  {{{1
+// FIXME: Be reloadable.
+function load_plugins(plugin_uris)  //{{{2
+{
+  for (var i in plugin_uris) {
+    var uri = plugin_uris[i];
+
+    if (/^\s*$/.test(uri))  // Skip blank lines.
+      continue;
+
+    var node_script = create_element('script');
+    node_script.attr('src', uri);
+    node_script.attr('type', 'text/javascript');
+    $('body').append(node_script);
+  }
+}
+
+
+
+
+function raise_event(event_name, kw)  //{{{2
+{
+  for (var i in g_plugins) {
+    var event_handler = g_plugins[i][event_name] || nop;
+    event_handler(kw);
+  }
+}
+
+
+
+
+function register_plugin(plugin)  //{{{2
+{
+  g_plugins.push(plugin);
+}
+
+
+
+
+
+
+
+
+// Preference  {{{1
+function Preference(name, default_value, _kw)  //{{{2
 {
   var kw = _kw || {};
 
@@ -922,37 +916,94 @@ function Preference(name, default_value, _kw)
 
 
 
-// Plugins  {{{2
-// FIXME: Be reloadable.
 
-function load_plugins(plugin_uris)
+
+
+
+// Misc.  {{{1
+function create_element(element_name)  //{{{2
 {
-  for (var i in plugin_uris) {
-    var uri = plugin_uris[i];
-
-    if (/^\s*$/.test(uri))  // Skip blank lines.
-      continue;
-
-    var node_script = create_element('script');
-    node_script.attr('src', uri);
-    node_script.attr('type', 'text/javascript');
-    $('body').append(node_script);
-  }
+  return $(document.createElement(element_name));
 }
 
 
-function raise_event(event_name, kw)
+
+
+function englishize(name)  //{{{2
 {
-  for (var i in g_plugins) {
-    var event_handler = g_plugins[i][event_name] || nop;
-    event_handler(kw);
+  // 'foo_bar_baz' ==> 'Foo bar baz'
+  // 'foo_bar_sec' ==> 'Foo bar (sec.)'
+
+  var words = name.split('_');
+
+  if (1 <= words.length) {
+    words[0] = words[0].substring(0, 1).toUpperCase() + words[0].substring(1);
+
+    var i = words.length - 1;
+    if (words[i] == 'sec')
+      words[i] = '(sec.)';
   }
+
+  return words.join(' ');
 }
 
 
-function register_plugin(plugin)
+
+
+function favorite_symbol(favorite_p)  //{{{2
 {
-  g_plugins.push(plugin);
+  return (favorite_p
+          ? '\u2605'  // black (filled) star
+          : '\u2606'  // white (empty) star
+          );
+}
+
+
+
+
+function human_readable_format_from_date(date)  //{{{2
+{
+  return (date.getFullYear()
+          + '-' + pad(date.getMonth() + 1)
+          + '-' + pad(date.getDate())
+          + ' ' + pad(date.getHours())
+          + ':' + pad(date.getMinutes())
+          + ':' + pad(date.getSeconds()));
+}
+
+function pad(n)
+{
+  return n < 10 ? '0' + n : n;
+}
+
+
+
+
+function nop()  //{{{2
+{
+  return;
+}
+
+
+
+
+function scroll(y_coordinate)  //{{{2
+{
+  scrollTo(0, y_coordinate);
+  return;
+}
+
+
+
+
+function to_string(value)  //{{{2
+{
+  if (value == null)
+    return 'null';
+  else if (value == undefined)
+    return 'undefined';
+  else
+    return value.toString();
 }
 
 
