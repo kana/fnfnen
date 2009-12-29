@@ -586,10 +586,7 @@ function callback_update(d)
 
   var new_tweets = [];
   if (d.error == null) {
-    for (var i = 0; i < d.length; i++) {
-      if (g_since_id < d[i].id)
-        new_tweets.push(d[i]);
-    }
+    new_tweets = filter(d, function(tweet){return g_since_id < tweet.id;});
 
     if (0 < new_tweets.length) {
       var NEWEST_TWEET_INDEX = 0;
@@ -952,6 +949,22 @@ function favorite_symbol(favorite_p)  //{{{2
           ? '\u2605'  // black (filled) star
           : '\u2606'  // white (empty) star
           );
+}
+
+
+
+
+function filter(list, predicate)  //{{{2
+{
+  var filtered_list = [];
+
+  for (var i in list) {
+    var value = list[i];
+    if (predicate(value))
+      filtered_list.push(value);
+  }
+
+  return filtered_list;
 }
 
 
