@@ -67,7 +67,7 @@ var TWITTER_UI_URI = 'http://twitter.com/';
 var g_api_request_queue = [];
 var g_parameters = {'automatic_update': true};
 var g_plugins = [/* plugin = {event_name: function, ...}, ... */];
-var g_pref_update_interval_sec = null;
+var g_preferences = {/* name: preference, ... */};
 var g_since_id = null;
 var g_tweet_id_to_reply = null;
 var g_update_timer = null;
@@ -96,12 +96,8 @@ function after_post()  //{{{2
 
 function apply_preferences()  //{{{2
 {
-  var global_variables = window;
-  for (var variable_name in global_variables) {
-    if (/^g_pref_.+/.test(variable_name)) {
-      global_variables[variable_name].apply();
-    }
-  }
+  for (var name in g_preferences)
+    g_preferences[name].apply();
 
   // Notify to user.
   show_balloon('Preferences have been saved.');
@@ -1039,7 +1035,7 @@ $(document).ready(function(){
 
   // Preferences.
   $('#form_preferences').submit(apply_preferences);
-  g_pref_update_interval_sec = new Preference(
+  g_preferences.update_interval_sec = new Preference(
     'update_interval_sec',
     DEFAULT_UPDATE_INTERVAL_SEC,
     {
@@ -1052,7 +1048,7 @@ $(document).ready(function(){
       }
     }
   );
-  g_pref_custom_stylesheet = new Preference(
+  g_preferences.custom_stylesheet = new Preference(
     'custom_stylesheet',
     '/* .user_icon {display: inline;} ... */',
     {
@@ -1068,7 +1064,7 @@ $(document).ready(function(){
       rows: 10
     }
   );
-  g_pref_plugins = new Preference(
+  g_preferences.plugins = new Preference(
     'plugins',
     '',
     {
@@ -1080,7 +1076,7 @@ $(document).ready(function(){
       rows: 10
     }
   );
-  g_pref_censorship_law = new Preference(
+  g_preferences.censorship_law = new Preference(
     'censorship_law',
     (''
      + '# Lines start with "#" are comments, so that they are ignored.\n'
