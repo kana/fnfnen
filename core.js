@@ -691,7 +691,7 @@ function update()  //{{{3
 
 
 // API  {{{1
-call_twitter_api = (function(){  //{{{2
+var call_twitter_api = (function(){  //{{{2
   var s_seq = (new Date).getTime();  // To avoid browser-side caching.
   var s_lcds_nodes = {};  // {api_name: node_script, ...}
 
