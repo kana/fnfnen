@@ -622,27 +622,26 @@ call_twitter_api = (function(){  //{{{2
     for (var key in parameters)
       ps.push(key + '=' + parameters[key]);
 
-    s_lcds_nodes[api_name] = load_cross_domain_script(
-      base_uri + api_name + '.json' + '?' + ps.join('&'),
-      s_lcds_nodes[api_name]
-   );
+    if (s_lcds_nodes[api_name])
+      s_lcds_nodes[api_name].remove();
+
+    var script_uri = base_uri + api_name + '.json' + '?' + ps.join('&');
+    s_lcds_nodes[api_name] = load_cross_domain_script(script_uri);
   };
 })();
 
 
 
 
-function load_cross_domain_script(uri, node)  //{{{2
+function load_cross_domain_script(script_uri)  //{{{2
 {
-  if (node && node.parentNode)
-    node.parentNode.removeChild(node);
+  node_script = create_element('script');
+  node_script.attr('src', script_uri);
+  node_script.attr('type', 'text/javascript');
 
-  node = document.createElement("script");
-  node.src = uri;
-  node.type = "text/javascript";
-  document.body.appendChild(node);
+  $('body').append(node_script);
 
-  return node;
+  return node_script;
 }
 
 
