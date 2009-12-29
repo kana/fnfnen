@@ -793,15 +793,15 @@ function append_column(column_node, position)  //{{{2
   if (!column_node.hasClass('predefined'))
     $('#columns').append(column_node);
 
-  var node_a = create_element('a');
+  var node_selector = create_element('span');
   var column_name = column_node.attr('title');
-  node_a.attr('class', 'column_selector');
-  node_a.text(column_name);
-  node_a.click(function(){
+  node_selector.attr('class', 'column_selector');
+  node_selector.text(column_name);
+  node_selector.click(function(){
     select_column(column_name);
     return;
   });
-  $('#column_selectors').append(node_a);
+  $('#column_selectors').append(node_selector);
   return;
 }
 
