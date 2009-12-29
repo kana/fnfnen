@@ -593,7 +593,7 @@ function callback_update(d)
 
     if (0 < new_tweets.length) {
       var NEWEST_TWEET_INDEX = 0;
-      g_since_id = new_tweets[NEWEST_TWEET_INDEX].id;
+      g_since_id = Math.max(g_since_id, new_tweets[NEWEST_TWEET_INDEX].id);
     }
   } else {
     show_balloon(d.error);
