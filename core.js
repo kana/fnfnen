@@ -822,6 +822,40 @@ function create_column(column_name)  //{{{2
 
 
 
+function delete_column(column_name_or_node, forced_p)  //{{{2
+{
+  var column_name;
+  var column_node;
+  if (typeof(column_name_or_node) == 'string') {
+    column_name = column_name_or_node;
+    column_node = $('.column').filter(function(){
+                    return $(this).attr('title') == column_name;
+                  });
+  } else {
+    column_node = column_name_or_node;
+    column_name = column_node.attr('title');
+  }
+
+  if (column_node.length != 1)
+    return;  // FIXME: Unexpected situation - raise error.
+
+  // Some kinds of columns are indestructible.
+  if (column_node.hasClass('predefined')
+      || ((!forced_p) && column_node.hasClass('censorship_result')))
+    return;
+
+  if (column_node.hasClass('active'))
+    select_column('Home');  // FIXME: Is this column better than others?
+
+  column_node.remove();
+  $('.column_selector')
+    .filter(function(){return $(this).text() == column_name;})
+    .remove();
+}
+
+
+
+
 function select_column(column_name)  //{{{2
 {
   $('.column')
