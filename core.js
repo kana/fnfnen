@@ -581,6 +581,7 @@ function update()  //{{{2
 
 function callback_update(d)
 {
+  // d = [{newest-tweet}, ..., {oldest-tweet}]
   $('#i_last_updated_time').text('Last updated: ' + new Date().toString());
 
   var new_tweets = [];
