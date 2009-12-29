@@ -68,7 +68,7 @@ var g_api_request_queue = [];
 var g_parameters = {'automatic_update': true};
 var g_plugins = [/* plugin = {event_name: function, ...}, ... */];
 var g_preferences = {/* name: preference, ... */};
-var g_since_id = null;
+var g_since_id = DUMMY_SINCE_ID;  // BUGS: Tweet #1 cannot be shown.
 var g_tweet_id_to_reply = null;
 var g_update_timer = null;
 var g_user = null;
@@ -575,7 +575,7 @@ function update()  //{{{2
                    'statuses/home_timeline',
                    {'callback': 'callback_update',
                     'count': MAX_COUNT,
-                    'since_id': g_since_id || DUMMY_SINCE_ID});
+                    'since_id': g_since_id});
   return;
 }
 
@@ -584,11 +584,9 @@ function callback_update(d)
   $('#i_last_updated_time').text('Last updated: ' + new Date().toString());
 
   if (d.error == null) {
-    if (g_since_id) {
-      for (var i = 0; i < d.length; i++) {
-        if (d[i].id <= g_since_id)
-          d.splice(i--, 1);
-      }
+    for (var i = 0; i < d.length; i++) {
+      if (d[i].id <= g_since_id)
+        d.splice(i--, 1);
     }
 
     if (0 < d.length) {
