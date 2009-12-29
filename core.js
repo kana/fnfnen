@@ -69,6 +69,7 @@ var g_parameters = {'automatic_update': true};
 var g_plugins = [/* plugin = {event_name: function, ...}, ... */];
 var g_preferences = {/* name: preference, ... */};
 var g_since_id = DUMMY_SINCE_ID;  // BUGS: Tweet #1 cannot be shown.
+var g_tweet_db = {/* tweet_id: tweet */};
 var g_tweet_id_to_reply = null;
 var g_update_timer = null;
 var g_user = null;
@@ -588,11 +589,15 @@ function callback_update(d)
 
   var new_tweets = [];
   if (d.error == null) {
-    new_tweets = filter(d, function(tweet){return g_since_id < tweet.id;});
+    new_tweets = filter(d, function(t){return g_tweet_db[t.id] == null;});
 
     if (0 < new_tweets.length) {
       var NEWEST_TWEET_INDEX = 0;
       g_since_id = Math.max(g_since_id, new_tweets[NEWEST_TWEET_INDEX].id);
+    }
+    for (i in new_tweets) {
+      var tweet = new_tweets[i];
+      g_tweet_db[tweet.id] = tweet;
     }
   } else {
     show_balloon(d.error);
