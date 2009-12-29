@@ -485,17 +485,19 @@ function show_tweets(tweets, node_column)  //{{{2
   node_tweet_hub.addClass('tweet_hub');
 
   for (var i in tweets) {
+    var t = tweets[i];
+
     var node_tweet = create_element('div');
-    node_tweet.data('json', tweets[i]);
-    node_tweet.html(html_from_tweet(tweets[i]));
+    node_tweet.data('json', t);
+    node_tweet.html(html_from_tweet(t));
 
     node_tweet.addClass('tweet');
-    node_tweet.addClass(class_name_from_tweet_id(tweets[i].id));
-    if (tweet_mention_p(tweets[i]))
+    node_tweet.addClass(class_name_from_tweet_id(t.id));
+    if (tweet_mention_p(t))
       node_tweet.addClass('mention');
-    if (tweet_mine_p(tweets[i]))
+    if (tweet_mine_p(t))
       node_tweet.addClass('mine');
-    node_tweet.addClass(censorship_classes_from_tweet(tweets[i]).join(' '));
+    node_tweet.addClass(censorship_classes_from_tweet(t).join(' '));
 
     node_tweet_hub.prepend(node_tweet);
   }
