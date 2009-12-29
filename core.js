@@ -569,7 +569,8 @@ function tweet_mine_p(tweet)  //{{{2
 
 
 
-function update()  //{{{2
+// Update  {{{2
+function update()  //{{{3
 {
   if (!g_user)
     return authenticate();
@@ -582,7 +583,8 @@ function update()  //{{{2
   return;
 }
 
-function callback_update(d)
+
+function callback_update(d)  //{{{3
 {
   // d = [{newest-tweet}, ..., {oldest-tweet}]
   $('#i_last_updated_time').text('Last updated: ' + new Date().toString());
