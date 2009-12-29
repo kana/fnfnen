@@ -469,13 +469,13 @@ function show_conversation(tweet_id)  //{{{2
 
 
 
-function show_tweets(d, node_column)  //{{{2
+function show_tweets(tweets, node_column)  //{{{2
 {
-  // d = [{newest-tweet}, ..., {oldest-tweet}]
+  // tweets = [{newest-tweet}, ..., {oldest-tweet}]
 
-  raise_event('new_tweets', {tweets: d});
+  raise_event('new_tweets', {tweets: tweets});
 
-  if (d.length == 0)
+  if (tweets.length == 0)
     return 0;
 
   var node_tweet_hub = create_element('div');
@@ -484,18 +484,18 @@ function show_tweets(d, node_column)  //{{{2
   node_tweet_hub.append(node_dummy_tweet);
   node_tweet_hub.addClass('tweet_hub');
 
-  for (var i in d) {
+  for (var i in tweets) {
     var node_tweet = create_element('div');
-    node_tweet.data('json', d[i]);
-    node_tweet.html(html_from_tweet(d[i]));
+    node_tweet.data('json', tweets[i]);
+    node_tweet.html(html_from_tweet(tweets[i]));
 
     node_tweet.addClass('tweet');
-    node_tweet.addClass(class_name_from_tweet_id(d[i].id));
-    if (tweet_mention_p(d[i]))
+    node_tweet.addClass(class_name_from_tweet_id(tweets[i].id));
+    if (tweet_mention_p(tweets[i]))
       node_tweet.addClass('mention');
-    if (tweet_mine_p(d[i]))
+    if (tweet_mine_p(tweets[i]))
       node_tweet.addClass('mine');
-    node_tweet.addClass(censorship_classes_from_tweet(d[i]).join(' '));
+    node_tweet.addClass(censorship_classes_from_tweet(tweets[i]).join(' '));
 
     node_tweet_hub.prepend(node_tweet);
   }
@@ -509,7 +509,7 @@ function show_tweets(d, node_column)  //{{{2
   scroll(node_column.attr('scrollHeight')
          - node_tweet_hub.attr('scrollHeight'));
 
-  return d.length;
+  return tweets.length;
 }
 
 
