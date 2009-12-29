@@ -583,22 +583,23 @@ function callback_update(d)
 {
   $('#i_last_updated_time').text('Last updated: ' + new Date().toString());
 
+  var new_tweets = [];
   if (d.error == null) {
     for (var i = 0; i < d.length; i++) {
-      if (d[i].id <= g_since_id)
-        d.splice(i--, 1);
+      if (g_since_id < d[i].id)
+        new_tweets.push(d[i]);
     }
 
-    if (0 < d.length) {
+    if (0 < new_tweets.length) {
       var NEWEST_TWEET_INDEX = 0;
-      g_since_id = d[NEWEST_TWEET_INDEX].id;
+      g_since_id = new_tweets[NEWEST_TWEET_INDEX].id;
     }
   } else {
     show_balloon(d.error);
     return;
   }
 
-  show_tweets(d, $("#column_home"));
+  show_tweets(new_tweets, $("#column_home"));
   return;
 }
 
