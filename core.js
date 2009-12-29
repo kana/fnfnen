@@ -808,6 +808,20 @@ function append_column(column_node, position)  //{{{2
 
 
 
+function create_column(column_name)  //{{{2
+{
+  var column_node = create_element('div');
+  column_node.attr('title', column_name);
+  column_node.addClass('column');
+
+  column_node.hide();
+
+  return column_node;
+}
+
+
+
+
 function select_column(column_name)  //{{{2
 {
   $('.column')
