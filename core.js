@@ -591,8 +591,10 @@ function callback_update(d)
       }
     }
 
-    var NEWEST_TWEET_INDEX = 0;
-    g_since_id = d[NEWEST_TWEET_INDEX].id;
+    if (0 < d.length) {
+      var NEWEST_TWEET_INDEX = 0;
+      g_since_id = d[NEWEST_TWEET_INDEX].id;
+    }
   } else {
     show_balloon(d.error);
     return;
