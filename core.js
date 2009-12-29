@@ -1113,7 +1113,7 @@ function to_string(value)  //{{{2
 $(document).ready(function(){
   // Misc.
   initialize_parameters();
-  $('#column_home, #column_mentions').empty();
+  $('#column_home').empty();
   $('#tweet_box').val('');
   $('#column_selectors').empty();
   $('#balloon_container').empty();
