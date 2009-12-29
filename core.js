@@ -570,20 +570,6 @@ function tweet_mine_p(tweet)  //{{{2
 
 
 // Update  {{{2
-function update()  //{{{3
-{
-  if (!g_user)
-    return authenticate();
-
-  call_twitter_api(TWITTER_API_URI,
-                   'statuses/home_timeline',
-                   {'callback': 'callback_update',
-                    'count': MAX_COUNT,
-                    'since_id': g_since_id});
-  return;
-}
-
-
 function callback_update(d)  //{{{3
 {
   // d = [{newest-tweet}, ..., {oldest-tweet}]
@@ -607,6 +593,20 @@ function callback_update(d)  //{{{3
   }
 
   show_tweets(new_tweets, $("#column_home"));
+  return;
+}
+
+
+function update()  //{{{3
+{
+  if (!g_user)
+    return authenticate();
+
+  call_twitter_api(TWITTER_API_URI,
+                   'statuses/home_timeline',
+                   {'callback': 'callback_update',
+                    'count': MAX_COUNT,
+                    'since_id': g_since_id});
   return;
 }
 
