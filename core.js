@@ -55,6 +55,7 @@ var DEFAULT_UPDATE_INTERVAL_SEC = 5 * 60;
 var DUMMY_SINCE_ID = 1;
 var GLOBAL_VARIABLES = window;
 var MAX_COUNT_HOME = 200;
+var MAX_COUNT_MENTIONS = 200;
 var MAX_TWEET_CONTENT = 140;
 var MINIMUM_UPDATE_INTERVAL_SEC = 1 * 60;
 var TWITTER_API_URI = 'http://api.twitter.com/1/';
@@ -70,6 +71,7 @@ var g_parameters = {'automatic_update': true};
 var g_plugins = [/* plugin = {event_name: function, ...}, ... */];
 var g_preferences = {/* name: preference, ... */};
 var g_since_id_home = DUMMY_SINCE_ID;  // BUGS: Tweet #1 cannot be shown.
+var g_since_id_mentions = DUMMY_SINCE_ID;  // BUGS: Tweet #1 cannot be shown.
 var g_tweet_db = {/* tweet_id: tweet */};
 var g_tweet_id_to_reply = null;
 var g_update_timer = null;
@@ -574,7 +576,8 @@ function tweet_mine_p(tweet)  //{{{2
 // Variables  {{{3
 
 var QUEUE_ID_HOME = 'home';
-var VALID_QUEUE_IDS = [QUEUE_ID_HOME];
+var QUEUE_ID_MENTIONS = 'mentions';
+var VALID_QUEUE_IDS = [QUEUE_ID_HOME, QUEUE_ID_MENTIONS];
 
 var g_tweet_queues = {/* queue_id: tweets = [newest, ..., oldest] */};
 
@@ -612,6 +615,13 @@ function callback_update(d, name_since_id, queue_id)  //{{{3
 function callback_update_home(d)  //{{{3
 {
   callback_update(d, 'g_since_id_home', QUEUE_ID_HOME);
+  return;
+}
+
+
+function callback_update_mentions(d)  //{{{3
+{
+  callback_update(d, 'g_since_id_mentions', QUEUE_ID_MENTIONS);
   return;
 }
 
@@ -669,6 +679,11 @@ function update()  //{{{3
                    {'callback': 'callback_update_home',
                     'count': MAX_COUNT_HOME,
                     'since_id': g_since_id_home});
+  call_twitter_api(TWITTER_UI_URI,
+                   'statuses/mentions',
+                   {'callback': 'callback_update_mentions',
+                    'count': MAX_COUNT_MENTIONS,
+                    'since_id': g_since_id_mentions});
   return;
 }
 
