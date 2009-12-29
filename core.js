@@ -787,6 +787,27 @@ function set_up_censorship_law(rule_text)  //{{{2
 
 
 // Columns  {{{1
+function append_column(column_node, position)  //{{{2
+{
+  // FIXME: NIY - position
+  if (!column_node.hasClass('predefined'))
+    $('#columns').append(column_node);
+
+  var node_a = create_element('a');
+  var column_name = column_node.attr('title');
+  node_a.attr('class', 'column_selector');
+  node_a.text(column_name);
+  node_a.click(function(){
+    select_column(column_name);
+    return;
+  });
+  $('#column_selectors').append(node_a);
+  return;
+}
+
+
+
+
 function select_column(column_name)  //{{{2
 {
   $('.column')
@@ -1148,17 +1169,7 @@ $(document).ready(function(){
   $('#balloon_container').empty();
 
   // Columns.
-  $('.predefined.column').each(function(){
-    var node_a = create_element('a');
-    var column_name = $(this).attr('title');
-    node_a.attr('class', 'column_selector');
-    node_a.text(column_name);
-    node_a.click(function(){
-      select_column(column_name);
-      return;
-    });
-    $('#column_selectors').append(node_a);
-  });
+  $('.predefined.column').each(function(){append_column($(this));});
   select_column('Home');
 
   // Preferences.
