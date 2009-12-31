@@ -134,6 +134,7 @@ input {font-size: medium;}
 
 
 .active.column_selector {font-weight: bolder;}
+.column_selector .button {vertical-align: super;}
 
 
 .tweet .screen_name {font-weight: bolder; text-decoration: none;}

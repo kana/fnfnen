@@ -413,28 +413,6 @@ function process_queued_api_request()  //{{{2
 
 
 
-function select_column(column_name)  //{{{2
-{
-  $('.column')
-    .removeClass('active')
-    .hide();
-  $('.column')
-    .filter(function(){return $(this).attr('title') == column_name;})
-    .addClass('active')
-    .show();
-
-  $('.column_selector')
-    .removeClass('active');
-  $('.column_selector')
-    .filter(function(){return $(this).text() == column_name;})
-    .addClass('active');
-
-  return;
-}
-
-
-
-
 function set_up_to_reply(screen_name, tweet_id)  //{{{2
 {
   g_tweet_id_to_reply = tweet_id;
@@ -831,6 +809,133 @@ function set_up_censorship_law(rule_text)  //{{{2
 
 
 
+// Columns  {{{1
+function append_column(node_column, position)  //{{{2
+{
+  // FIXME: NIY - position
+  if (!node_column.hasClass('predefined'))
+    $('#columns').append(node_column);
+
+  var column_name = node_column.attr('title');
+
+  var node_selector = create_element('span');
+  node_selector.attr('class', 'column_selector');
+  node_selector.attr('title', column_name);
+
+  var node_label = create_element('span');
+  node_label.text(column_name);
+  node_label.click(function(){
+    select_column(column_name);
+    return;
+  });
+
+  if (node_column.hasClass('temporary')) {
+    var node_button = create_element('span');
+    node_button.addClass('button');
+    node_button.text('\u2612');  // [X] - BALLOT BOX WITH X
+    node_button.click(function(){
+      delete_column(column_name);
+      return;
+    });
+  }
+
+  node_selector.append(node_label);
+  node_selector.append(node_button);
+  $('#column_selectors').append(node_selector);
+  return;
+}
+
+
+
+
+function column(column_name)  //{{{2
+{
+  if (column_name) {
+    return $('.column').filter(function(){
+      return $(this).attr('title') == column_name;
+    });
+  } else {
+    return $('.column');
+  }
+}
+
+
+
+
+function column_selector(column_name)  //{{{2
+{
+  if (column_name) {
+    return $('.column_selector').filter(function(){
+      return $(this).attr('title') == column_name;
+    });
+  } else {
+    return $('.column_selector');
+  }
+}
+
+
+
+
+function create_column(column_name, additional_classes)  //{{{2
+{
+  var node_column = create_element('div');
+  node_column.attr('title', column_name);
+  node_column.addClass('column');
+  if (additional_classes)
+    node_column.addClass(additional_classes);
+
+  node_column.hide();
+
+  return node_column;
+}
+
+
+
+
+function delete_column(column_name_or_node, forced_p)  //{{{2
+{
+  var column_name;
+  var node_column;
+  if (typeof(column_name_or_node) == 'string') {
+    column_name = column_name_or_node;
+    node_column = column(column_name);
+  } else {
+    node_column = column_name_or_node;
+    column_name = node_column.attr('title');
+  }
+
+  if (node_column.length != 1)
+    return;  // FIXME: Unexpected situation - raise error.
+
+  // Some kinds of columns are indestructible.
+  if (node_column.hasClass('predefined')
+      || ((!forced_p) && node_column.hasClass('censorship_result')))
+    return;
+
+  if (node_column.hasClass('active'))
+    select_column('Home');  // FIXME: Is this column better than others?
+
+  node_column.remove();
+  column_selector(column_name).remove();
+}
+
+
+
+
+function select_column(column_name)  //{{{2
+{
+  column().removeClass('active').hide();
+  column(column_name).addClass('active').show();
+
+  column_selector().removeClass('active');
+  column_selector(column_name).addClass('active');
+
+  return;
+}
+
+
+
+
 
 
 
@@ -1174,17 +1279,7 @@ $(document).ready(function(){
   $('#balloon_container').empty();
 
   // Columns.
-  $('.column').each(function(){
-    var node_a = create_element('a');
-    var column_name = $(this).attr('title');
-    node_a.attr('class', 'column_selector');
-    node_a.text(column_name);
-    node_a.click(function(){
-      select_column(column_name);
-      return;
-    });
-    $('#column_selectors').append(node_a);
-  });
+  $('.predefined.column').each(function(){append_column($(this));});
   select_column('Home');
 
   // Preferences.
