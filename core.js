@@ -931,12 +931,19 @@ function delete_column(column_name_or_node, forced_p)  //{{{2
 
 function select_column(column_name)  //{{{2
 {
+  var KEY_VIEW = 'view'
+
+  $('.active.column').data(KEY_VIEW, window.pageYOffset);
+
   column().removeClass('active').hide();
   column(column_name).addClass('active').show();
 
   column_selector().removeClass('active');
   column_selector(column_name).addClass('active');
 
+  var view = $('.active.column').data(KEY_VIEW);
+  if (view != null)
+    scroll(view);
   return;
 }
 
