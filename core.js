@@ -445,10 +445,17 @@ function show_conversation(tweet_id)  //{{{2
 {
   var tweets_in_conoversation = list_tweets_in_conversation(tweet_id);
 
-  // FIXME: NIY
-  // Add #column_conversation if it does not exist.
-  // Remove all content in #column_conversation.
-  // Add tweets_in_conoversation into #column_conversation.
+  var column_name = 'Conversation';
+  var node_column = column(column_name);
+  if (node_column.length == 0) {
+    node_column = create_column(column_name, 'temporary');
+    append_column(node_column);
+  }
+
+  select_column(column_name);
+
+  node_column.empty();
+  show_tweets(tweets_in_conoversation, node_column);
 }
 
 
