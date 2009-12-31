@@ -787,14 +787,14 @@ function set_up_censorship_law(rule_text)  //{{{2
 
 
 // Columns  {{{1
-function append_column(column_node, position)  //{{{2
+function append_column(node_column, position)  //{{{2
 {
   // FIXME: NIY - position
-  if (!column_node.hasClass('predefined'))
-    $('#columns').append(column_node);
+  if (!node_column.hasClass('predefined'))
+    $('#columns').append(node_column);
 
   var node_selector = create_element('span');
-  var column_name = column_node.attr('title');
+  var column_name = node_column.attr('title');
   node_selector.attr('class', 'column_selector');
   node_selector.attr('title', column_name);
   node_selector.text(column_name);
@@ -811,13 +811,13 @@ function append_column(column_node, position)  //{{{2
 
 function create_column(column_name)  //{{{2
 {
-  var column_node = create_element('div');
-  column_node.attr('title', column_name);
-  column_node.addClass('column');
+  var node_column = create_element('div');
+  node_column.attr('title', column_name);
+  node_column.addClass('column');
 
-  column_node.hide();
+  node_column.hide();
 
-  return column_node;
+  return node_column;
 }
 
 
@@ -826,29 +826,29 @@ function create_column(column_name)  //{{{2
 function delete_column(column_name_or_node, forced_p)  //{{{2
 {
   var column_name;
-  var column_node;
+  var node_column;
   if (typeof(column_name_or_node) == 'string') {
     column_name = column_name_or_node;
-    column_node = $('.column').filter(function(){
+    node_column = $('.column').filter(function(){
                     return $(this).attr('title') == column_name;
                   });
   } else {
-    column_node = column_name_or_node;
-    column_name = column_node.attr('title');
+    node_column = column_name_or_node;
+    column_name = node_column.attr('title');
   }
 
-  if (column_node.length != 1)
+  if (node_column.length != 1)
     return;  // FIXME: Unexpected situation - raise error.
 
   // Some kinds of columns are indestructible.
-  if (column_node.hasClass('predefined')
-      || ((!forced_p) && column_node.hasClass('censorship_result')))
+  if (node_column.hasClass('predefined')
+      || ((!forced_p) && node_column.hasClass('censorship_result')))
     return;
 
-  if (column_node.hasClass('active'))
+  if (node_column.hasClass('active'))
     select_column('Home');  // FIXME: Is this column better than others?
 
-  column_node.remove();
+  node_column.remove();
   $('.column_selector')
     .filter(function(){return $(this).attr('title') == column_name;})
     .remove();
