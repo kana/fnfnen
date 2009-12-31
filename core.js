@@ -825,11 +825,13 @@ function append_column(node_column, position)  //{{{2
 
 
 
-function create_column(column_name)  //{{{2
+function create_column(column_name, additional_classes)  //{{{2
 {
   var node_column = create_element('div');
   node_column.attr('title', column_name);
   node_column.addClass('column');
+  if (additional_classes)
+    node_column.addClass(additional_classes);
 
   node_column.hide();
 
