@@ -825,6 +825,34 @@ function append_column(node_column, position)  //{{{2
 
 
 
+function column(column_name)  //{{{2
+{
+  if (column_name) {
+    return $('.column').filter(function(){
+      return $(this).attr('title') == column_name;
+    });
+  } else {
+    return $('.column');
+  }
+}
+
+
+
+
+function column_selector(column_name)  //{{{2
+{
+  if (column_name) {
+    return $('.column_selector').filter(function(){
+      return $(this).attr('title') == column_name;
+    });
+  } else {
+    return $('.column_selector');
+  }
+}
+
+
+
+
 function create_column(column_name, additional_classes)  //{{{2
 {
   var node_column = create_element('div');
@@ -847,9 +875,7 @@ function delete_column(column_name_or_node, forced_p)  //{{{2
   var node_column;
   if (typeof(column_name_or_node) == 'string') {
     column_name = column_name_or_node;
-    node_column = $('.column').filter(function(){
-                    return $(this).attr('title') == column_name;
-                  });
+    node_column = column(column_name);
   } else {
     node_column = column_name_or_node;
     column_name = node_column.attr('title');
@@ -867,9 +893,7 @@ function delete_column(column_name_or_node, forced_p)  //{{{2
     select_column('Home');  // FIXME: Is this column better than others?
 
   node_column.remove();
-  $('.column_selector')
-    .filter(function(){return $(this).attr('title') == column_name;})
-    .remove();
+  column_selector(column_name).remove();
 }
 
 
@@ -877,19 +901,11 @@ function delete_column(column_name_or_node, forced_p)  //{{{2
 
 function select_column(column_name)  //{{{2
 {
-  $('.column')
-    .removeClass('active')
-    .hide();
-  $('.column')
-    .filter(function(){return $(this).attr('title') == column_name;})
-    .addClass('active')
-    .show();
+  column().removeClass('active').hide();
+  column(column_name).addClass('active').show();
 
-  $('.column_selector')
-    .removeClass('active');
-  $('.column_selector')
-    .filter(function(){return $(this).attr('title') == column_name;})
-    .addClass('active');
+  column_selector().removeClass('active');
+  column_selector(column_name).addClass('active');
 
   return;
 }
