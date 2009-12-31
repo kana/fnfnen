@@ -793,15 +793,31 @@ function append_column(node_column, position)  //{{{2
   if (!node_column.hasClass('predefined'))
     $('#columns').append(node_column);
 
-  var node_selector = create_element('span');
   var column_name = node_column.attr('title');
+
+  var node_selector = create_element('span');
   node_selector.attr('class', 'column_selector');
   node_selector.attr('title', column_name);
-  node_selector.text(column_name);
-  node_selector.click(function(){
+
+  var node_label = create_element('span');
+  node_label.text(column_name);
+  node_label.click(function(){
     select_column(column_name);
     return;
   });
+
+  if (node_column.hasClass('temporary')) {
+    var node_button = create_element('span');
+    node_button.addClass('button');
+    node_button.text('\u2612');  // [X] - BALLOT BOX WITH X
+    node_button.click(function(){
+      delete_column(column_name);
+      return;
+    });
+  }
+
+  node_selector.append(node_label);
+  node_selector.append(node_button);
   $('#column_selectors').append(node_selector);
   return;
 }
