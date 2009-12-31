@@ -796,6 +796,7 @@ function append_column(column_node, position)  //{{{2
   var node_selector = create_element('span');
   var column_name = column_node.attr('title');
   node_selector.attr('class', 'column_selector');
+  node_selector.attr('title', column_name);
   node_selector.text(column_name);
   node_selector.click(function(){
     select_column(column_name);
@@ -849,7 +850,7 @@ function delete_column(column_name_or_node, forced_p)  //{{{2
 
   column_node.remove();
   $('.column_selector')
-    .filter(function(){return $(this).text() == column_name;})
+    .filter(function(){return $(this).attr('title') == column_name;})
     .remove();
 }
 
@@ -869,7 +870,7 @@ function select_column(column_name)  //{{{2
   $('.column_selector')
     .removeClass('active');
   $('.column_selector')
-    .filter(function(){return $(this).text() == column_name;})
+    .filter(function(){return $(this).attr('title') == column_name;})
     .addClass('active');
 
   return;
