@@ -133,7 +133,7 @@ input {font-size: medium;}
 #console #tweet_box {font-family: sans-serif;}
 
 
-.active.column_selector {font-weight: bolder;}
+.active.column_selector .label {font-weight: bolder;}
 .column_selector .button {vertical-align: super;}
 
 

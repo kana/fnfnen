@@ -830,6 +830,7 @@ function append_column(node_column, position)  //{{{2
   node_selector.attr('title', column_name);
 
   var node_label = create_element('span');
+  node_label.addClass('label');
   node_label.text(column_name);
   node_label.click(function(){
     select_column(column_name);
