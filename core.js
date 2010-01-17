@@ -758,6 +758,7 @@ function load_cross_domain_script(script_uri)  //{{{2
 // Censorship  {{{1
 // Variables  {{{2
 
+var g_censored_columns = {/* name: class_names ... */};
 var g_censorship_law = [/* {classes, property, pattern}, ... */];
 
 
@@ -783,6 +784,68 @@ function censorship_classes_from_tweet(tweet)  //{{{2
   }
 
   return classes;
+}
+
+
+
+
+function fill_column_with_censored_tweets(node_column, class_names)  //{{{2
+{
+  // FIXME: NIY
+  return;
+}
+
+
+
+
+function set_up_censored_columns(rule_text)  //{{{2
+{
+  var old_censored_columns = g_censored_columns;
+
+  // Parse settings on "censored" columns.
+  g_censored_columns = {};
+  var lines = rule_text.split('\n');
+  for (var i in lines) {
+    var line = lines[i];
+    if (/^\s*#/.test(line))
+      continue;
+
+    var FIELD_SEPARATOR = ':';
+    var REQUIRED_FIELDS_COUNT = 2;
+    var fields = line.split(FIELD_SEPARATOR);
+    if (fields.length < REQUIRED_FIELDS_COUNT)
+      continue;
+
+    var name = fields[0];
+    var class_names;
+    try {
+       class_names = (fields
+                      .slice(REQUIRED_FIELDS_COUNT - 1)
+                      .join(FIELD_SEPARATOR)
+                      .split());
+    } catch (e) {
+      show_balloon('Error in rule: "' + line + '"');
+      continue;
+    }
+
+    g_censored_columns[name] = class_names;
+  }
+
+  // Remove existing "censored" columns.
+  for (var column_name in old_censored_columns)
+    delete_column(column_name, true);
+
+  // Add "censored" columns.
+  for (var column_name in g_censored_columns) {
+    var node_column = create_column(column_name, 'censorship_result');
+    fill_column_with_censored_tweets(node_column,
+                                     g_censored_columns[column_name]);
+    append_column(node_column);
+  }
+
+  // FIXME: Update "censored" columns whenever new tweets are fetched.
+
+  return;
 }
 
 
@@ -1393,6 +1456,34 @@ $(document).ready(function(){
       form_type: 'textarea',
       on_application: function() {
         set_up_censorship_law(this.current_value);
+      },
+      rows: 10
+    }
+  );
+  g_preferences.censored_columns = new Preference(
+    'censored_columns',
+    (''
+     + '# Lines start with "#" are comments, so that they are ignored.\n'
+     + '# Blank lines are also ignored.\n'
+     + '#\n'
+     + '# Format: "{column_name}:{classes}"\n'
+     + '#\n'
+     + '#  {column_name}\n'
+     + '#    The name of column to show censored tweets.\n'
+     + '#\n'
+     + '#  {classes}\n'
+     + '#    Space-separated names of classes.  If a tweet has all classes\n'
+     + '#    as specified by {classes}, the tweet is shown in the column.\n'
+     + '#\n'
+     + '# Examples:\n'
+     + '#\n'
+     + '#   retweets:retweet\n'
+     + '#   git:git\n'
+     + ''),
+    {
+      form_type: 'textarea',
+      on_application: function() {
+        set_up_censored_columns(this.current_value);
       },
       rows: 10
     }
