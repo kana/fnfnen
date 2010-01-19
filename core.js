@@ -343,6 +343,27 @@ function make_links_in_text(text)  //{{{2
 
 
 
+function node_from_tweet(tweet)  //{{{2
+{
+    var node_tweet = create_element('div');
+
+    node_tweet.data('json', tweet);
+    node_tweet.html(html_from_tweet(tweet));
+
+    node_tweet.addClass('tweet');
+    node_tweet.addClass(class_name_from_tweet_id(tweet.id));
+    if (tweet_mention_p(tweet))
+      node_tweet.addClass('mention');
+    if (tweet_mine_p(tweet))
+      node_tweet.addClass('mine');
+    node_tweet.addClass(censorship_classes_from_tweet(tweet).join(' '));
+
+    return node_tweet;
+}
+
+
+
+
 function process_queued_api_request()  //{{{2
 {
   if (g_api_request_queue.length < 1)
@@ -494,23 +515,8 @@ function show_tweets(tweets, node_column)  //{{{2
   node_tweet_hub.append(node_dummy_tweet);
   node_tweet_hub.addClass('tweet_hub');
 
-  for (var i in tweets) {
-    var t = tweets[i];
-
-    var node_tweet = create_element('div');
-    node_tweet.data('json', t);
-    node_tweet.html(html_from_tweet(t));
-
-    node_tweet.addClass('tweet');
-    node_tweet.addClass(class_name_from_tweet_id(t.id));
-    if (tweet_mention_p(t))
-      node_tweet.addClass('mention');
-    if (tweet_mine_p(t))
-      node_tweet.addClass('mine');
-    node_tweet.addClass(censorship_classes_from_tweet(t).join(' '));
-
-    node_tweet_hub.prepend(node_tweet);
-  }
+  for (var i in tweets)
+    node_tweet_hub.prepend(node_from_tweet(tweets[i]));
 
   node_dummy_tweet.remove();
 
