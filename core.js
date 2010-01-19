@@ -364,6 +364,25 @@ function node_from_tweet(tweet)  //{{{2
 
 
 
+function node_from_tweets(tweets)  //{{{2
+{
+  var node_tweet_hub = create_element('div');
+  var node_dummy_tweet = create_element('div');
+
+  node_tweet_hub.append(node_dummy_tweet);
+  node_tweet_hub.addClass('tweet_hub');
+
+  for (var i in tweets)
+    node_tweet_hub.prepend(node_from_tweet(tweets[i]));
+
+  node_dummy_tweet.remove();
+
+  return node_tweet_hub;
+}
+
+
+
+
 function process_queued_api_request()  //{{{2
 {
   if (g_api_request_queue.length < 1)
@@ -509,17 +528,7 @@ function show_tweets(tweets, node_column)  //{{{2
   if (tweets.length == 0)
     return 0;
 
-  var node_tweet_hub = create_element('div');
-  var node_dummy_tweet = create_element('div');
-
-  node_tweet_hub.append(node_dummy_tweet);
-  node_tweet_hub.addClass('tweet_hub');
-
-  for (var i in tweets)
-    node_tweet_hub.prepend(node_from_tweet(tweets[i]));
-
-  node_dummy_tweet.remove();
-
+  var node_tweet_hub = node_from_tweets(tweets);
   node_column.append(node_tweet_hub);
 
   // Scroll to the head of the latest tweet hub.
