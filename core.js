@@ -924,7 +924,17 @@ function set_up_censorship_law(rule_text)  //{{{2
 
 function update_censored_columns(tweets_n2o) //{{{2
 {
-  // FIXME: NIY
+  for (var column_name in g_censored_columns) {
+    var node_column = column(column_name);
+    var required_classes = g_censored_columns[column_name];
+    var matches_p = function(t){return censored_tweet_p(t, required_classes);}
+
+    var censored_tweets_n2o = filter(tweets_n2o, matches_p);
+
+    if (0 < censored_tweets_n2o.length)
+      node_column.append(node_from_tweets_n2o(censored_tweets_n2o));
+  }
+
   return;
 }
 
