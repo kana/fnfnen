@@ -758,7 +758,7 @@ function load_cross_domain_script(script_uri)  //{{{2
 // Censorship  {{{1
 // Variables  {{{2
 
-var g_censored_columns = {/* name: class_names ... */};
+var g_censored_columns = {/* name: required_classes, ... */};
 var g_censorship_law = [/* {classes, property, pattern}, ... */];
 
 
@@ -803,7 +803,7 @@ function censorship_classes_from_tweet(tweet)  //{{{2
 
 
 
-function fill_column_with_censored_tweets(node_column, class_names)  //{{{2
+function fill_column_with_censored_tweets(node_column, required_classes) //{{{2
 {
   var ids = [];
   for (var id in tweet_db.db)
@@ -815,7 +815,7 @@ function fill_column_with_censored_tweets(node_column, class_names)  //{{{2
   var tweets_n2o = [];
   for (var _ in ids_n2o) {
     var tweet = tweet_db.get(ids_n2o[_]);
-    if (censored_tweet_p(tweet, class_names))
+    if (censored_tweet_p(tweet, required_classes))
       tweets_n2o.push(tweet);
   }
 
@@ -847,18 +847,18 @@ function set_up_censored_columns(rule_text)  //{{{2
       continue;
 
     var name = fields[0];
-    var class_names;
+    var required_classes;
     try {
-       class_names = (fields
-                      .slice(REQUIRED_FIELDS_COUNT - 1)
-                      .join(FIELD_SEPARATOR)
-                      .split());
+      required_classes = (fields
+                          .slice(REQUIRED_FIELDS_COUNT - 1)
+                          .join(FIELD_SEPARATOR)
+                          .split());
     } catch (e) {
       show_balloon('Error in rule: "' + line + '"');
       continue;
     }
 
-    g_censored_columns[name] = class_names;
+    g_censored_columns[name] = required_classes;
   }
 
   // Remove existing "censored" columns.
