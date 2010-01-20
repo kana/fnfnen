@@ -1378,6 +1378,21 @@ function pad(n)
 
 
 
+function map(list, f)  //{{{2
+{
+  var mapped_list = [];
+
+  for (var i in list) {
+    var value = list[i];
+    mapped_list.push(f(value));
+  }
+
+  return mapped_list;
+}
+
+
+
+
 function nop()  //{{{2
 {
   return;
