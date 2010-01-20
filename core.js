@@ -25,9 +25,7 @@
 // }}}
 // Notes  {{{1
 //
-// FIXME: Add custom column to show censored tweets.
 // FIXME: Add raise_event() for several places.
-// FIXME: Implement "mentions" column.
 // FIXME: Multiple columns.
 // FIXME: Multiple tabpages.
 // FIXME: Warn about some preferences require to reload fnfnen to take effect.
