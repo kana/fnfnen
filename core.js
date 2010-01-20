@@ -764,6 +764,20 @@ var g_censorship_law = [/* {classes, property, pattern}, ... */];
 
 
 
+function censored_tweet_p(tweet, required_classes)  //{{{2
+{
+  var actual_classes = censorship_classes_from_tweet(tweet);
+
+  var ok_p = true;
+  for (var _ in required_classes)
+    ok_p = ok_p && (0 <= actual_classes.indexOf(required_classes[_]));
+
+  return ok_p;
+}
+
+
+
+
 function censorship_classes_from_tweet(tweet)  //{{{2
 {
   var classes = [];
@@ -801,13 +815,7 @@ function fill_column_with_censored_tweets(node_column, class_names)  //{{{2
   var tweets_n2o = [];
   for (var _ in ids_n2o) {
     var tweet = tweet_db.get(ids_n2o[_]);
-    var cs = censorship_classes_from_tweet(tweet);
-
-    var ok_p = true;
-    for (var _ in class_names)
-      ok_p = ok_p && (0 <= cs.indexOf(class_names[_]));
-
-    if (ok_p)
+    if (censored_tweet_p(tweet, class_names))
       tweets_n2o.push(tweet);
   }
 
