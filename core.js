@@ -814,16 +814,13 @@ function fill_column_with_censored_tweets(node_column, required_classes) //{{{2
   ids.sort();  // BUGS: This doesn't work for ids with different length.
   ids.reverse();
   var ids_n2o = ids;
+  var tweets_n2o = map(ids_n2o, function(_){return tweet_db.get(_);});
 
-  var tweets_n2o = [];
-  for (var _ in ids_n2o) {
-    var tweet = tweet_db.get(ids_n2o[_]);
-    if (censored_tweet_p(tweet, required_classes))
-      tweets_n2o.push(tweet);
-  }
+  var matches_p = function(t){return censored_tweet_p(t, required_classes);}
+  var censored_tweets_n2o = filter(tweets_n2o, matches_p);
 
-  if (0 < tweets_n2o.length)
-    node_column.append(node_from_tweets_n2o(tweets_n2o));
+  if (0 < censored_tweets_n2o.length)
+    node_column.append(node_from_tweets_n2o(censored_tweets_n2o));
 
   return;
 }
