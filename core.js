@@ -366,7 +366,7 @@ function node_from_tweet(tweet)  //{{{2
 
 
 
-function node_from_tweets(tweets_n2o)  //{{{2
+function node_from_tweets_n2o(tweets_n2o)  //{{{2
 {
   var node_tweet_hub = create_element('div');
   var node_dummy_tweet = create_element('div');
@@ -484,7 +484,7 @@ function show_balloon(text)  //{{{2
 
 function show_conversation(tweet_id)  //{{{2
 {
-  var tweets_in_conoversation_n2o = list_tweets_in_conversation(tweet_id);
+  var tweets_in_conoversation_n2o = list_tweets_in_conversation_n2o(tweet_id);
 
   var column_name = 'Conversation';
   var node_column = column(column_name);
@@ -496,11 +496,11 @@ function show_conversation(tweet_id)  //{{{2
   select_column(column_name);
 
   node_column.empty();
-  show_tweets(tweets_in_conoversation_n2o, node_column);
+  show_tweets_n2o(tweets_in_conoversation_n2o, node_column);
 }
 
 
-function list_tweets_in_conversation(tweet_id)
+function list_tweets_in_conversation_n2o(tweet_id)
 {
   var tweets_in_conoversation_n2o = [];  // newest_tweet, ..., oldest_tweet
 
@@ -521,7 +521,7 @@ function list_tweets_in_conversation(tweet_id)
 
 
 
-function show_tweets(tweets_n2o, node_column)  //{{{2
+function show_tweets_n2o(tweets_n2o, node_column)  //{{{2
 {
   // tweets_n2o = [{newest-tweet}, ..., {oldest-tweet}]
 
@@ -530,7 +530,7 @@ function show_tweets(tweets_n2o, node_column)  //{{{2
   if (tweets_n2o.length == 0)
     return 0;
 
-  var node_tweet_hub = node_from_tweets(tweets_n2o);
+  var node_tweet_hub = node_from_tweets_n2o(tweets_n2o);
   node_column.append(node_tweet_hub);
 
   // Scroll to the head of the latest tweet hub.
@@ -627,7 +627,7 @@ function callback_update(d, name_since_id, queue_id)  //{{{3
     return;
   }
 
-  queue_tweets(new_tweets_n2o, queue_id);
+  queue_tweets_n2o(new_tweets_n2o, queue_id);
   return;
 }
 
@@ -646,7 +646,7 @@ function callback_update_mentions(d)  //{{{3
 }
 
 
-function merge_tweets(tweet_sets)  //{{{3
+function merge_tweets_n2o(tweet_sets)  //{{{3
 {
   // Assumption - There is no duplicate in tweet_sets.
   var merged_tweets_n2o = [];  // newest, ..., oldest
@@ -668,7 +668,7 @@ function merge_tweets(tweet_sets)  //{{{3
 }
 
 
-function queue_tweets(tweets_n2o, queue_id)  //{{{3
+function queue_tweets_n2o(tweets_n2o, queue_id)  //{{{3
 {
   // Prepend tweets into a queue.
   if (g_tweet_queues[queue_id] == null)
@@ -683,7 +683,7 @@ function queue_tweets(tweets_n2o, queue_id)  //{{{3
   for (var i in VALID_QUEUE_IDS)
     full_p = full_p && (g_tweet_queues[VALID_QUEUE_IDS[i]] != null);
   if (full_p) {
-    show_tweets(merge_tweets(g_tweet_queues), $('#column_home'));
+    show_tweets_n2o(merge_tweets_n2o(g_tweet_queues), $('#column_home'));
     g_tweet_queues = {};
   }
 }
