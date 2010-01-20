@@ -39,6 +39,8 @@
 //
 // - Variables suffixed with "_ms" and "_MS" contain an integer as millisecond.
 // - Variables suffixed with "_sec" and "_SEC" contain an integer as second.
+// - Suffix "_n2o"/"_o2n" means an array of values which are sorted from newest
+//   to oldest or from oldest to newest.
 
 
 
@@ -364,7 +366,7 @@ function node_from_tweet(tweet)  //{{{2
 
 
 
-function node_from_tweets(tweets)  //{{{2
+function node_from_tweets(tweets_n2o)  //{{{2
 {
   var node_tweet_hub = create_element('div');
   var node_dummy_tweet = create_element('div');
@@ -372,8 +374,8 @@ function node_from_tweets(tweets)  //{{{2
   node_tweet_hub.append(node_dummy_tweet);
   node_tweet_hub.addClass('tweet_hub');
 
-  for (var i in tweets)
-    node_tweet_hub.prepend(node_from_tweet(tweets[i]));
+  for (var i in tweets_n2o)
+    node_tweet_hub.prepend(node_from_tweet(tweets_n2o[i]));
 
   node_dummy_tweet.remove();
 
@@ -482,7 +484,7 @@ function show_balloon(text)  //{{{2
 
 function show_conversation(tweet_id)  //{{{2
 {
-  var tweets_in_conoversation = list_tweets_in_conversation(tweet_id);
+  var tweets_in_conoversation_n2o = list_tweets_in_conversation(tweet_id);
 
   var column_name = 'Conversation';
   var node_column = column(column_name);
@@ -494,13 +496,13 @@ function show_conversation(tweet_id)  //{{{2
   select_column(column_name);
 
   node_column.empty();
-  show_tweets(tweets_in_conoversation, node_column);
+  show_tweets(tweets_in_conoversation_n2o, node_column);
 }
 
 
 function list_tweets_in_conversation(tweet_id)
 {
-  var tweets_in_conoversation = [];  // newest_tweet, ..., oldest_tweet
+  var tweets_in_conoversation_n2o = [];  // newest_tweet, ..., oldest_tweet
 
   var id = tweet_id;
   while (id != null) {
@@ -508,27 +510,27 @@ function list_tweets_in_conversation(tweet_id)
     if (tweet == null)  // FIXME: Fetch tweet.
       break;
 
-    tweets_in_conoversation.push(tweet);
+    tweets_in_conoversation_n2o.push(tweet);
 
     id = tweet.in_reply_to_status_id;
   }
 
-  return tweets_in_conoversation;
+  return tweets_in_conoversation_n2o;
 }
 
 
 
 
-function show_tweets(tweets, node_column)  //{{{2
+function show_tweets(tweets_n2o, node_column)  //{{{2
 {
-  // tweets = [{newest-tweet}, ..., {oldest-tweet}]
+  // tweets_n2o = [{newest-tweet}, ..., {oldest-tweet}]
 
-  raise_event('new_tweets', {tweets: tweets});
+  raise_event('new_tweets', {tweets: tweets_n2o});
 
-  if (tweets.length == 0)
+  if (tweets_n2o.length == 0)
     return 0;
 
-  var node_tweet_hub = node_from_tweets(tweets);
+  var node_tweet_hub = node_from_tweets(tweets_n2o);
   node_column.append(node_tweet_hub);
 
   // Scroll to the head of the latest tweet hub.
@@ -536,7 +538,7 @@ function show_tweets(tweets, node_column)  //{{{2
   scroll(node_column.attr('scrollHeight')
          - node_tweet_hub.attr('scrollHeight'));
 
-  return tweets.length;
+  return tweets_n2o.length;
 }
 
 
@@ -600,7 +602,7 @@ var QUEUE_ID_HOME = 'home';
 var QUEUE_ID_MENTIONS = 'mentions';
 var VALID_QUEUE_IDS = [QUEUE_ID_HOME, QUEUE_ID_MENTIONS];
 
-var g_tweet_queues = {/* queue_id: tweets = [newest, ..., oldest] */};
+var g_tweet_queues = {/* queue_id: tweets_n2o = [newest, ..., oldest] */};
 
 
 function callback_update(d, name_since_id, queue_id)  //{{{3
@@ -608,24 +610,24 @@ function callback_update(d, name_since_id, queue_id)  //{{{3
   // d = [{newest-tweet}, ..., {oldest-tweet}]
   $('#i_last_updated_time').text('Last updated: ' + new Date().toString());
 
-  var new_tweets = [];
+  var new_tweets_n2o = [];
   if (d.error == null) {
-    new_tweets = filter(d, function(tweet){return !tweet_db.has_p(tweet);});
+    new_tweets_n2o = filter(d,function(tweet){return !tweet_db.has_p(tweet);});
 
-    if (0 < new_tweets.length) {
+    if (0 < new_tweets_n2o.length) {
       var NEWEST_TWEET_INDEX = 0;
       GLOBAL_VARIABLES[name_since_id] = Math.max(
         GLOBAL_VARIABLES[name_since_id],
-        new_tweets[NEWEST_TWEET_INDEX].id
+        new_tweets_n2o[NEWEST_TWEET_INDEX].id
       );
     }
-    tweet_db.add(new_tweets);
+    tweet_db.add(new_tweets_n2o);
   } else {
     show_balloon(d.error);
     return;
   }
 
-  queue_tweets(new_tweets, queue_id);
+  queue_tweets(new_tweets_n2o, queue_id);
   return;
 }
 
@@ -647,12 +649,12 @@ function callback_update_mentions(d)  //{{{3
 function merge_tweets(tweet_sets)  //{{{3
 {
   // Assumption - There is no duplicate in tweet_sets.
-  var merged_tweets = [];  // newest, ..., oldest
+  var merged_tweets_n2o = [];  // newest, ..., oldest
 
   for (var i in tweet_sets)
-    merged_tweets.push.apply(merged_tweets, tweet_sets[i]);
+    merged_tweets_n2o.push.apply(merged_tweets_n2o, tweet_sets[i]);
 
-  merged_tweets.sort(function(l,r){
+  merged_tweets_n2o.sort(function(l,r){
     if (l.id < r.id)
       return -1;
     else if (l.id == r.id)
@@ -660,20 +662,20 @@ function merge_tweets(tweet_sets)  //{{{3
     else
       return 1;
   });
-  merged_tweets.reverse();
+  merged_tweets_n2o.reverse();
 
-  return merged_tweets;
+  return merged_tweets_n2o;
 }
 
 
-function queue_tweets(tweets, queue_id)  //{{{3
+function queue_tweets(tweets_n2o, queue_id)  //{{{3
 {
   // Prepend tweets into a queue.
   if (g_tweet_queues[queue_id] == null)
     g_tweet_queues[queue_id] = [];
   var queue = g_tweet_queues[queue_id];
   var args = [0, 0];
-  args.push.apply(args, tweets);
+  args.push.apply(args, tweets_n2o);
   queue.splice.apply(queue, args);
 
   // Show tweets if all queues are filled.
