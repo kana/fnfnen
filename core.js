@@ -683,7 +683,10 @@ function queue_tweets_n2o(tweets_n2o, queue_id)  //{{{3
   for (var i in VALID_QUEUE_IDS)
     full_p = full_p && (g_tweet_queues[VALID_QUEUE_IDS[i]] != null);
   if (full_p) {
-    show_tweets_n2o(merge_tweets_n2o(g_tweet_queues), $('#column_home'));
+    var tweets_n2o = merge_tweets_n2o(g_tweet_queues);
+    show_tweets_n2o(tweets_n2o, $('#column_home'));
+    update_censored_columns(tweets_n2o);
+
     g_tweet_queues = {};
   }
 }
@@ -873,8 +876,6 @@ function set_up_censored_columns(rule_text)  //{{{2
     append_column(node_column);
   }
 
-  // FIXME: Update "censored" columns whenever new tweets are fetched.
-
   return;
 }
 
@@ -915,6 +916,15 @@ function set_up_censorship_law(rule_text)  //{{{2
     });
   }
 
+  return;
+}
+
+
+
+
+function update_censored_columns(tweets_n2o) //{{{2
+{
+  // FIXME: NIY
   return;
 }
 
