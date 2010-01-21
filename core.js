@@ -1108,7 +1108,7 @@ function cookie_key(key)  //{{{2
 function read_cookie(key, default_value)  //{{{2
 {
   if (window.localStorage && window.localStorage[cookie_key(key)])
-    return new String(window.localStorage[cookie_key(key)]);
+    return window.localStorage[cookie_key(key)];
 
   var pkey = key + '=';
   var normalizezd_cookie = document.cookie + ';';
