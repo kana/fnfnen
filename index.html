@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+fnfnen, a web-based twitter client
+Version: 0.0.0
+Copyright (C) 2009 kana <http://whileimautomaton.net/>
+License: MIT license  {{{
+    Permission is hereby granted, free of charge, to any person
+    obtaining a copy of this software and associated documentation
+    files (the "Software"), to deal in the Software without
+    restriction, including without limitation the rights to use,
+    copy, modify, merge, publish, distribute, sublicense, and/or
+    sell copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following
+    conditions:
+
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+    OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+    NONINFRINGEMENT.  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+    OTHER DEALINGS IN THE SOFTWARE.
+}}}
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+  <title>fnfnen, a web-based twitter client</title>
+  <link rel="stylesheet" href="style.css"/>
+  <script type="text/javascript" src="jquery.js"></script>
+  <script type="text/javascript" src="core.js"></script>
+</head>
+<body>
+
+
+
+
+<div id="columns">
+  <div class="active column predefined" id="column_home" title="Home">
+    Column for home timeline.
+  </div>
+  <div class="column predefined" id="column_preferences" title="Preferences">
+    <form id="form_preferences" action="/">
+      <dl>
+        <!--
+          <dt>Update interval (sec.)</dt>
+          <dd><input name="update_interval" value="0"/></dd>
+          ...
+        -->
+
+        <dd class="submit">
+          <input type="submit" value="Apply"/>
+          <!-- FIXME: Add a way to reset default values -->
+        </dd>
+      </dl>
+    </form>
+  </div>
+</div>
+
+
+
+
+<div id="console">
+  <form id="post_form" action="http://api.twitter.com/1/statuses/update.xml" method="post">
+    <div>
+      <input id="tweet_box" type="text" name="status" size="140" value="..."/>
+      <span id="tweet_content_counter">140</span>
+    </div>
+  </form>
+</div>
+
+<div id="column_selectors">
+  <a class="active column_selector">Home</a>
+  <a class="column_selector">Preferences</a>
+  ...
+</div>
+
+<div id="information_bar">
+  <span id="i_last_updated_time">Not loaded yet.</span>
+</div>
+
+<div id="balloon_container">
+  <div class="balloon">...</div>
+</div>
+
+
+
+<address id="copyright_notice">
+  Copyright &copy; 2009 kana &lt;<a href="http://whileimautomaton.net/">http://whileimautomaton.net/</a>&gt; / <a href="http://github.com/kana/fnfnen">Source code</a>
+</address>
+
+</body>
+</html>
+<!--
+vim: errorformat=%f\:\ %l\:\ %m
+vim: foldmethod=marker
+-->
