@@ -834,6 +834,7 @@ function fill_column_with_censored_tweets(node_column, required_classes) //{{{2
 function set_up_censored_columns(rule_text)  //{{{2
 {
   var old_censored_columns = g_censored_columns;
+  var columns_order = [];
 
   // Parse settings on "censored" columns.
   g_censored_columns = {};
@@ -862,6 +863,7 @@ function set_up_censored_columns(rule_text)  //{{{2
     }
 
     g_censored_columns[name] = required_classes;
+    columns_order.push(name);
   }
 
   // Remove existing "censored" columns.
@@ -869,7 +871,8 @@ function set_up_censored_columns(rule_text)  //{{{2
     delete_column(column_name, true);
 
   // Add "censored" columns.
-  for (var column_name in g_censored_columns) {
+  for (var _ in columns_order) {
+    var column_name = columns_order[_];
     var node_column = create_column(column_name, 'censorship_result');
     fill_column_with_censored_tweets(node_column,
                                      g_censored_columns[column_name]);
