@@ -98,8 +98,13 @@ function after_post()  //{{{2
 
 function apply_preferences()  //{{{2
 {
+  var priorities = [];  // [[apply_priority, name], ...]
   for (var name in g_preferences)
-    g_preferences[name].apply();
+    priorities.push([g_preferences[name].apply_priority, name]);
+  priorities.sort();
+
+  for (var _ in priorities)
+    g_preferences[priorities[_][1]].apply();
 
   // Notify to user.
   show_balloon('Preferences have been saved.');
@@ -1183,6 +1188,7 @@ function Preference(name, default_value, _kw)  //{{{2
 {
   var kw = _kw || {};
 
+  this.apply_priority = kw.apply_priority || 0;
   this.columns = kw.columns || 80;
   this.current_value = read_cookie(name, default_value);
   this.default_value = default_value;
