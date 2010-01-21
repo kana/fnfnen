@@ -1547,6 +1547,7 @@ $(document).ready(function(){
      + '#   git:git\n'
      + ''),
     {
+      apply_priority: g_preferences.censorship_law.apply_priority + 1,
       form_type: 'textarea',
       on_application: function() {
         set_up_censored_columns(this.current_value);
