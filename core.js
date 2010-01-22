@@ -50,6 +50,7 @@
 // Variables  {{{1
 // Constants  {{{2
 
+var DEFAULT_APPLYING_PRIORITY = 0;
 var DEFAULT_UPDATE_INTERVAL_SEC = 5 * 60;
 var DUMMY_SINCE_ID = 1;
 var GLOBAL_VARIABLES = window;
@@ -1191,7 +1192,7 @@ function Preference(name, default_value, _kw)  //{{{2
 {
   var kw = _kw || {};
 
-  this.applying_priority = kw.applying_priority || 0;
+  this.applying_priority = kw.applying_priority || DEFAULT_APPLYING_PRIORITY;
   this.columns = kw.columns || 80;
   this.current_value = read_cookie(name, default_value);
   this.default_value = default_value;
