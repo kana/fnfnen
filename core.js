@@ -98,9 +98,9 @@ function after_post()  //{{{2
 
 function apply_preferences()  //{{{2
 {
-  var priorities = [];  // [[apply_priority, name], ...]
+  var priorities = [];  // [[applying_priority, name], ...]
   for (var name in g_preferences)
-    priorities.push([g_preferences[name].apply_priority, name]);
+    priorities.push([g_preferences[name].applying_priority, name]);
   priorities.sort();
 
   for (var _ in priorities)
@@ -1191,7 +1191,7 @@ function Preference(name, default_value, _kw)  //{{{2
 {
   var kw = _kw || {};
 
-  this.apply_priority = kw.apply_priority || 0;
+  this.applying_priority = kw.applying_priority || 0;
   this.columns = kw.columns || 80;
   this.current_value = read_cookie(name, default_value);
   this.default_value = default_value;
@@ -1550,7 +1550,7 @@ $(document).ready(function(){
      + '#   git:git\n'
      + ''),
     {
-      apply_priority: g_preferences.censorship_law.apply_priority + 1,
+      applying_priority: g_preferences.censorship_law.applying_priority + 1,
       form_type: 'textarea',
       on_application: function() {
         set_up_censored_columns(this.current_value);
