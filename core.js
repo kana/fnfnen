@@ -67,6 +67,7 @@ var TWITTER_UI_URI = 'http://twitter.com/';
 // Global  {{{2
 
 var g_api_request_queue = [];
+var g_external_configuration = {/* preference_name: value */};
 var g_parameters = {'automatic_update': true};
 var g_plugins = [/* plugin = {event_name: function, ...}, ... */];
 var g_preferences = {/* name: preference, ... */};
@@ -226,6 +227,16 @@ function enqueue_api_request(  //{{{2
 
   if (g_api_request_queue.length <= 1)
     process_queued_api_request();
+  return;
+}
+
+
+
+
+function fnfnen_external_configuration(data)  //{{{2
+{
+  g_external_configuration = data;
+  // apply_preferences(...);
   return;
 }
 
@@ -1462,6 +1473,20 @@ $(document).ready(function(){
 
   // Preferences.
   $('#form_preferences').submit(apply_preferences);
+  g_preferences.external_configuration_uri = new Preference(
+    'external_configuration_uri',
+    '',
+    {
+      applying_priority: DEFAULT_APPLYING_PRIORITY - 1,
+      on_application: function() {
+        if (this.current_value) {
+          // Loaded script should call fnfnen_external_configuration().
+          load_cross_domain_script(this.current_value,
+                                   'external_configuration_uri');
+        }
+      }
+    }
+  );
   g_preferences.update_interval_sec = new Preference(
     'update_interval_sec',
     DEFAULT_UPDATE_INTERVAL_SEC,
