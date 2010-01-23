@@ -724,7 +724,6 @@ function update()  //{{{3
 // API  {{{1
 var call_twitter_api = (function(){  //{{{2
   var s_seq = (new Date).getTime();  // To avoid browser-side caching.
-  var s_lcds_nodes = {};  // {api_name: node_script, ...}
 
   return function(base_uri, api_name, _parameters) {
     parameters = $.extend(false, _parameters, {'seq': s_seq++});
@@ -733,18 +732,29 @@ var call_twitter_api = (function(){  //{{{2
     for (var key in parameters)
       ps.push(key + '=' + parameters[key]);
 
-    if (s_lcds_nodes[api_name])
-      s_lcds_nodes[api_name].remove();
-
     var script_uri = base_uri + api_name + '.json' + '?' + ps.join('&');
-    s_lcds_nodes[api_name] = load_cross_domain_script(script_uri);
+    load_cross_domain_script(script_uri, api_name);
   };
 })();
 
 
 
 
-function load_cross_domain_script(script_uri)  //{{{2
+var load_cross_domain_script = (function(){  //{{{2
+  var s_lcds_nodes = {};  // {key: node_script, ...}
+
+  return function(uri, key) {
+    if (s_lcds_nodes[key])
+      s_lcds_nodes[key].remove();
+
+    s_lcds_nodes[uri] = _load_cross_domain_script(uri);
+  };
+})();
+
+
+
+
+function _load_cross_domain_script(script_uri)  //{{{2
 {
   node_script = create_element('script');
   node_script.attr('src', script_uri);
