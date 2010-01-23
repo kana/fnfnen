@@ -1331,10 +1331,14 @@ function englishize(name)  //{{{2
 {
   // 'foo_bar_baz' ==> 'Foo bar baz'
   // 'foo_bar_sec' ==> 'Foo bar (sec.)'
+  // 'foo_uri' ==> 'Foo URI'
 
   var words = name.split('_');
 
   if (1 <= words.length) {
+    for (var _ in words)
+      words[_] = /^uri$/i.test(words[_]) ? words[_].toUpperCase() : words[_];
+
     words[0] = words[0].substring(0, 1).toUpperCase() + words[0].substring(1);
 
     var i = words.length - 1;
