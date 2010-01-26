@@ -1476,20 +1476,6 @@ $(document).ready(function(){
     apply_preferences();
     return false;
   });
-  g_preferences.external_configuration_uri = new Preference(
-    'external_configuration_uri',
-    '',
-    {
-      applying_priority: DEFAULT_APPLYING_PRIORITY - 1,
-      on_application: function() {
-        if (this.current_value) {
-          // Loaded script should call fnfnen_external_configuration().
-          load_cross_domain_script(this.current_value,
-                                   'external_configuration_uri');
-        }
-      }
-    }
-  );
   g_preferences.update_interval_sec = new Preference(
     'update_interval_sec',
     DEFAULT_UPDATE_INTERVAL_SEC,
@@ -1599,6 +1585,21 @@ $(document).ready(function(){
         set_up_censored_columns(this.current_value);
       },
       rows: 10
+    }
+  );
+  g_preferences.external_configuration_uri = new Preference(
+    'external_configuration_uri',
+    '',
+    {
+      // Should apply at the last to override already applied values.
+      applying_priority: g_preferences.censored_columns + 1,
+      on_application: function() {
+        if (this.current_value) {
+          // Loaded script should call fnfnen_external_configuration().
+          load_cross_domain_script(this.current_value,
+                                   'external_configuration_uri');
+        }
+      }
     }
   );
 
