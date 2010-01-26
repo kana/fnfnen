@@ -110,7 +110,8 @@ function apply_preferences()  //{{{2
 
   // Notify to user.
   show_balloon('Preferences have been saved.');
-  return false;
+
+  return;
 }
 
 
@@ -1471,7 +1472,10 @@ $(document).ready(function(){
   select_column('Home');
 
   // Preferences.
-  $('#form_preferences').submit(apply_preferences);
+  $('#form_preferences').submit(function(event){
+    apply_preferences();
+    return false;
+  });
   g_preferences.external_configuration_uri = new Preference(
     'external_configuration_uri',
     '',
