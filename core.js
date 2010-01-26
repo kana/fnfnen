@@ -1259,6 +1259,7 @@ function Preference(name, default_value, _kw)  //{{{2
       node_input.attr('type', this.form_type);
     }
     node_input.attr('name', this.name);
+    node_input.val(this.current_value);
 
     var node_dd = create_element('dd');
     node_dd.append(node_input);
@@ -1266,10 +1267,8 @@ function Preference(name, default_value, _kw)  //{{{2
     $('#form_preferences > dl > dd.submit').before(node_dt);
     $('#form_preferences > dl > dd.submit').before(node_dd);
 
-    this.set_form();
-    this.save();
-    this.on_application();
-  };
+    this.apply();
+  }
 
   this.node = function() {
     return $(':input[name="' + this.name + '"]');
