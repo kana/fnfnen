@@ -98,7 +98,7 @@ function after_post()  //{{{2
 
 
 
-function apply_preferences()  //{{{2
+function apply_preferences(via_external_configuration_p)  //{{{2
 {
   var priorities = [];  // [[applying_priority, name], ...]
   for (var name in g_preferences)
@@ -106,10 +106,15 @@ function apply_preferences()  //{{{2
   priorities.sort();
 
   for (var _ in priorities)
-    g_preferences[priorities[_][1]].apply();
+    g_preferences[priorities[_][1]].apply(via_external_configuration_p);
 
   // Notify to user.
-  show_balloon('Preferences have been saved.');
+  var actually_applied_p = (
+    g_preferences.external_configuration_uri.current_value == ''
+    || via_external_configuration_p
+  );
+  if (actually_applied_p)
+    show_balloon('Preferences have been saved.');
 
   return;
 }
@@ -237,7 +242,7 @@ function enqueue_api_request(  //{{{2
 function fnfnen_external_configuration(data)  //{{{2
 {
   g_external_configuration = data;
-  // apply_preferences(...);
+  apply_preferences(true);
   return;
 }
 
@@ -1226,11 +1231,18 @@ function Preference(name, default_value, _kw)  //{{{2
   this.rows = kw.rows || 25;
   this.value_type = typeof(default_value);
 
-  this.apply = function() {
+  this.apply = function(via_external_configuration_p) {
     this.get_form();
     this.set_form();
     this.save();
-    this.on_application();
+    if (via_external_configuration_p) {
+      // Leave form content as-is.
+      // But use external configuration if it is available.
+      var value = g_external_configuration[this.name];
+      if (value != undefined)
+        this.current_value = value;  // FIXME: Do validation like get_form().
+    }
+    this.on_application(via_external_configuration_p);
   };
 
   this.get_form = function() {
