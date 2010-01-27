@@ -1,0 +1,5 @@
+.tweet.retweet {color: #666;}
+
+.tweet.quotweet {display: none;}
+.tweet.pure.retweet,
+.column[title="Retweets"] .tweet.quotweet {display: block;}
