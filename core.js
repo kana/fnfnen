@@ -801,7 +801,7 @@ function censorship_classes_from_tweet(tweet)  //{{{2
     }
 
     if (rule.pattern.test(to_string(value)))
-      classes.push(rule.classes);
+      classes.push.apply(classes, rule.classes);
   }
 
   return classes;
@@ -914,7 +914,7 @@ function set_up_censorship_law(rule_text)  //{{{2
     }
 
     g_censorship_law.push({
-      classes: fields[0],
+      classes: fields[0].split(/\s+/),
       property: fields[1],
       pattern: re_pattern,
     });
