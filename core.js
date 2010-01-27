@@ -67,6 +67,7 @@ var TWITTER_UI_URI = 'http://twitter.com/';
 // Global  {{{2
 
 var g_api_request_queue = [];
+var g_external_configuration = {/* preference_name: value */};
 var g_parameters = {'automatic_update': true};
 var g_plugins = [/* plugin = {event_name: function, ...}, ... */];
 var g_preferences = {/* name: preference, ... */};
@@ -97,7 +98,7 @@ function after_post()  //{{{2
 
 
 
-function apply_preferences()  //{{{2
+function apply_preferences(via_external_configuration_p)  //{{{2
 {
   var priorities = [];  // [[applying_priority, name], ...]
   for (var name in g_preferences)
@@ -105,11 +106,17 @@ function apply_preferences()  //{{{2
   priorities.sort();
 
   for (var _ in priorities)
-    g_preferences[priorities[_][1]].apply();
+    g_preferences[priorities[_][1]].apply(via_external_configuration_p);
 
   // Notify to user.
-  show_balloon('Preferences have been saved.');
-  return false;
+  var actually_applied_p = (
+    g_preferences.external_configuration_uri.current_value == ''
+    || via_external_configuration_p
+  );
+  if (actually_applied_p)
+    show_balloon('Preferences have been saved.');
+
+  return;
 }
 
 
@@ -226,6 +233,16 @@ function enqueue_api_request(  //{{{2
 
   if (g_api_request_queue.length <= 1)
     process_queued_api_request();
+  return;
+}
+
+
+
+
+function fnfnen_external_configuration(data)  //{{{2
+{
+  g_external_configuration = data;
+  apply_preferences(true);
   return;
 }
 
@@ -724,7 +741,6 @@ function update()  //{{{3
 // API  {{{1
 var call_twitter_api = (function(){  //{{{2
   var s_seq = (new Date).getTime();  // To avoid browser-side caching.
-  var s_lcds_nodes = {};  // {api_name: node_script, ...}
 
   return function(base_uri, api_name, _parameters) {
     parameters = $.extend(false, _parameters, {'seq': s_seq++});
@@ -733,18 +749,29 @@ var call_twitter_api = (function(){  //{{{2
     for (var key in parameters)
       ps.push(key + '=' + parameters[key]);
 
-    if (s_lcds_nodes[api_name])
-      s_lcds_nodes[api_name].remove();
-
     var script_uri = base_uri + api_name + '.json' + '?' + ps.join('&');
-    s_lcds_nodes[api_name] = load_cross_domain_script(script_uri);
+    load_cross_domain_script(script_uri, api_name);
   };
 })();
 
 
 
 
-function load_cross_domain_script(script_uri)  //{{{2
+var load_cross_domain_script = (function(){  //{{{2
+  var s_lcds_nodes = {};  // {key: node_script, ...}
+
+  return function(uri, key) {
+    if (s_lcds_nodes[key])
+      s_lcds_nodes[key].remove();
+
+    s_lcds_nodes[uri] = _load_cross_domain_script(uri);
+  };
+})();
+
+
+
+
+function _load_cross_domain_script(script_uri)  //{{{2
 {
   node_script = create_element('script');
   node_script.attr('src', script_uri);
@@ -1204,11 +1231,18 @@ function Preference(name, default_value, _kw)  //{{{2
   this.rows = kw.rows || 25;
   this.value_type = typeof(default_value);
 
-  this.apply = function() {
+  this.apply = function(via_external_configuration_p) {
     this.get_form();
     this.set_form();
     this.save();
-    this.on_application();
+    if (via_external_configuration_p) {
+      // Leave form content as-is.
+      // But use external configuration if it is available.
+      var value = g_external_configuration[this.name];
+      if (value != undefined)
+        this.current_value = value;  // FIXME: Do validation like get_form().
+    }
+    this.on_application(via_external_configuration_p);
   };
 
   this.get_form = function() {
@@ -1238,6 +1272,7 @@ function Preference(name, default_value, _kw)  //{{{2
       node_input.attr('type', this.form_type);
     }
     node_input.attr('name', this.name);
+    node_input.val(this.current_value);
 
     var node_dd = create_element('dd');
     node_dd.append(node_input);
@@ -1245,10 +1280,8 @@ function Preference(name, default_value, _kw)  //{{{2
     $('#form_preferences > dl > dd.submit').before(node_dt);
     $('#form_preferences > dl > dd.submit').before(node_dd);
 
-    this.set_form();
-    this.save();
-    this.on_application();
-  };
+    this.apply();
+  }
 
   this.node = function() {
     return $(':input[name="' + this.name + '"]');
@@ -1321,10 +1354,14 @@ function englishize(name)  //{{{2
 {
   // 'foo_bar_baz' ==> 'Foo bar baz'
   // 'foo_bar_sec' ==> 'Foo bar (sec.)'
+  // 'foo_uri' ==> 'Foo URI'
 
   var words = name.split('_');
 
   if (1 <= words.length) {
+    for (var _ in words)
+      words[_] = /^uri$/i.test(words[_]) ? words[_].toUpperCase() : words[_];
+
     words[0] = words[0].substring(0, 1).toUpperCase() + words[0].substring(1);
 
     var i = words.length - 1;
@@ -1447,7 +1484,10 @@ $(document).ready(function(){
   select_column('Home');
 
   // Preferences.
-  $('#form_preferences').submit(apply_preferences);
+  $('#form_preferences').submit(function(event){
+    apply_preferences();
+    return false;
+  });
   g_preferences.update_interval_sec = new Preference(
     'update_interval_sec',
     DEFAULT_UPDATE_INTERVAL_SEC,
@@ -1557,6 +1597,23 @@ $(document).ready(function(){
         set_up_censored_columns(this.current_value);
       },
       rows: 10
+    }
+  );
+  g_preferences.external_configuration_uri = new Preference(
+    'external_configuration_uri',
+    '',
+    {
+      // Should apply at the last to override already applied values.
+      applying_priority: g_preferences.censored_columns + 1,
+      on_application: function(via_external_configuration_p) {
+        if (!via_external_configuration_p) {
+          if (this.current_value) {
+            // Loaded script should call fnfnen_external_configuration().
+            load_cross_domain_script(this.current_value,
+                                     'external_configuration_uri');
+          }
+        }
+      }
     }
   );
 
