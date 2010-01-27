@@ -857,7 +857,7 @@ function set_up_censored_columns(rule_text)  //{{{2
       required_classes = (fields
                           .slice(REQUIRED_FIELDS_COUNT - 1)
                           .join(FIELD_SEPARATOR)
-                          .split());
+                          .split(/\s+/));
     } catch (e) {
       show_balloon('Error in rule: "' + line + '"');
       continue;
