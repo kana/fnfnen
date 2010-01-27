@@ -1605,11 +1605,13 @@ $(document).ready(function(){
     {
       // Should apply at the last to override already applied values.
       applying_priority: g_preferences.censored_columns + 1,
-      on_application: function() {
-        if (this.current_value) {
-          // Loaded script should call fnfnen_external_configuration().
-          load_cross_domain_script(this.current_value,
-                                   'external_configuration_uri');
+      on_application: function(via_external_configuration_p) {
+        if (!via_external_configuration_p) {
+          if (this.current_value) {
+            // Loaded script should call fnfnen_external_configuration().
+            load_cross_domain_script(this.current_value,
+                                     'external_configuration_uri');
+          }
         }
       }
     }
