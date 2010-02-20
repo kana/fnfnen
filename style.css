@@ -68,8 +68,7 @@ body
 
 .column
 {
-  border: 1em solid;
-  padding: 0 1em;
+  margin: 1em 2em;
 }
 
 
@@ -94,17 +93,34 @@ body
 
 .tweet_hub
 {
-  border-top: 1ex solid;
-  margin: 1em 0;
-  padding-top: 1em;
+  border-top: medium solid;
 }
 
 
-.tweet {padding: 0.25ex;}
+.tweet
+{
+  border-top: solid thin;
+  padding: 1ex;
+}
+.tweet * {vertical-align: middle;}
 .tweet .posted_time {font-size: 80%;}
+.tweet .screen_name,
 .tweet .posted_time,
-.tweet .text {margin: 0 1ex;}
-.tweet .user_icon {display: none;}
+.tweet .text {margin: 0 0.5ex;}
+.tweet .text .screen_name {margin: 0;}
+.tweet .user_icon img {width: 1em; height: 1em;}
+
+/*
+----------------------------------------
+|      | @screen_name abc def ghi jkl  |
+| ICON | mno pqr stu vwx yzzzz. abc!!! |
+|      | 2010-02-20T16:23:58 * <       |
+----------------------------------------
+.tweet {clear: both; min-height: 48px;}
+.tweet .screen_name {margin-left: 1ex;}
+.tweet .user_icon {}
+.tweet .user_icon img {float: left; width: 48px; height: 48px;}
+*/
 
 .tweet .button
 {
@@ -157,9 +173,9 @@ input {font-size: medium;}
 .column {border-color: #ddd;}
 
 
-.tweet_hub {border-color: #ddd;}
+.tweet_hub,
+.tweet {border-color: #ccc;}
 
-.tweet {}
 .tweet.mention {background-color: #fed;}
 .tweet.mine {background-color: #efe;}
 
@@ -167,7 +183,7 @@ input {font-size: medium;}
 .tweet .screen_name {color: #000;}
 .tweet .text .screen_name {color: #00f;}
 
-.tweet .button {background-color: #666; border-color: #ccc; color: #fff;}
+.tweet .button {background-color: #999; border-color: #ccc; color: #fff;}
 .tweet .button:active,
 .tweet .button:focus,
 .tweet .button:hover {background-color: #ff3; border-color: #990; color: #000;}
