@@ -34,8 +34,6 @@
 
 body
 {
-  background-color: #eee;
-  color: #000;
   margin: 0 5%;
 }
 
@@ -182,6 +180,9 @@ input {font-size: medium;}
 
 
 /* Color  {{{1*/
+
+body {color: #000; background-color: #eee;}
+
 
 .column {border-color: #ddd;}
 #column_selectors {border-color: #999;}
