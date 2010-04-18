@@ -36,18 +36,19 @@ body
 {
   background-color: #eee;
   color: #000;
+  margin: 0 5%;
 }
 
 #copyright_notice
 {
   font-size: 80%;
-  margin: 1em 2em;
+  margin: 1em 0;
 }
 
 
 #console
 {
-  margin: 1em 2em;
+  margin: 1em 0;
 }
 #console #tweet_box
 {
@@ -69,13 +70,13 @@ body
 
 .column
 {
-  margin: 1em 2em;
+  margin: 1em 0;
 }
 
 
 #column_selectors
 {
-  margin: 0 2em;
+  margin: 0 0;
   border-bottom: thin solid;
 }
 .column_selector
