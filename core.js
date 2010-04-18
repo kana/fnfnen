@@ -1635,6 +1635,9 @@ $(document).ready(function(){
   if (g_parameters['automatic_update'])
     update();
 
+  // Keyboard shortcuts.
+  // ...
+
   raise_event('ready');
 });
 
