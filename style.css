@@ -56,7 +56,8 @@ body
 }
 #information_bar
 {
-  margin: 1em 2em;
+  font-size: 80%;
+  text-align: right;
 }
 
 
@@ -72,8 +73,19 @@ body
 }
 
 
-#column_selectors {margin: 1em 2em;}
-.column_selector {margin-left: 1em;}
+#column_selectors
+{
+  margin: 0 2em;
+  border-bottom: thin solid;
+}
+.column_selector
+{
+  border-style: solid;
+  border-width: thin;
+  margin-left: 1em;
+  padding: 0 0.5em 0;
+}
+.column_selector.active {border-bottom-width: medium;}
 .column_selector:first-child {margin-left: 0;}
 
 
@@ -171,6 +183,9 @@ input {font-size: medium;}
 /* Color  {{{1*/
 
 .column {border-color: #ddd;}
+#column_selectors {border-color: #999;}
+.column_selector {color: #333; background-color: #ccc; border-color: #999;}
+.column_selector.active {background-color: #eee; border-bottom-color: #eee;}
 
 
 .tweet_hub,
@@ -195,6 +210,9 @@ input {font-size: medium;}
 #tweet_content_counter.some_content {background-color: #666;}
 #tweet_content_counter.full_content {background-color: #f90;}
 #tweet_content_counter.much_content {background-color: #f00;}
+
+
+#information_bar {color: #333;}
 
 
 .balloon {background-color: #fff; border-color: #666;}
