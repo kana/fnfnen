@@ -396,7 +396,7 @@ function node_from_tweets_n2o(tweets_n2o)  //{{{2
   node_tweet_hub.addClass('tweet_hub');
 
   for (var i in tweets_n2o)
-    node_tweet_hub.prepend(node_from_tweet(tweets_n2o[i]));
+    node_tweet_hub.append(node_from_tweet(tweets_n2o[i]));
 
   node_dummy_tweet.remove();
 
@@ -483,7 +483,7 @@ function set_up_to_reply(screen_name, tweet_id)  //{{{2
 
   // Scroll to #console.
   // FIXME: Isn't there more proper way to do it?
-  scroll($('#columns').attr('scrollHeight'));
+  scroll(0);
   return;
 }
 
@@ -552,12 +552,11 @@ function show_tweets_n2o(tweets_n2o, node_column)  //{{{2
     return 0;
 
   var node_tweet_hub = node_from_tweets_n2o(tweets_n2o);
-  node_column.append(node_tweet_hub);
+  node_column.prepend(node_tweet_hub);
 
   // Scroll to the head of the latest tweet hub.
   // FIXME: Customize behavior on this autoscroll.
-  scroll(node_column.attr('scrollHeight')
-         - node_tweet_hub.attr('scrollHeight'));
+  scroll(0);
 
   return tweets_n2o.length;
 }

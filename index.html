@@ -40,6 +40,35 @@ License: MIT license  {{{
 
 
 
+<div id="information_bar">
+  <span id="i_last_updated_time">Not loaded yet.</span>
+</div>
+
+<div id="balloon_container">
+  <div class="balloon">...</div>
+</div>
+
+<div id="column_selectors">
+  <a class="active column_selector">Home</a>
+  <a class="column_selector">Preferences</a>
+  ...
+</div>
+
+<div id="console">
+  <form id="post_form" action="http://api.twitter.com/1/statuses/update.xml" method="post">
+    <div>
+      <input id="tweet_box" type="text" name="status" size="140" value="..."/>
+    </div>
+    <div>
+      <input type="submit" value="Update"/>
+      <span id="tweet_content_counter">140</span>
+    </div>
+  </form>
+</div>
+
+
+
+
 <div id="columns">
   <div class="active column predefined" id="column_home" title="Home">
     Column for home timeline.
@@ -62,34 +91,6 @@ License: MIT license  {{{
   </div>
 </div>
 
-
-
-
-<div id="console">
-  <form id="post_form" action="http://api.twitter.com/1/statuses/update.xml" method="post">
-    <div>
-      <input id="tweet_box" type="text" name="status" size="140" value="..."/>
-    </div>
-    <div>
-      <input type="submit" value="Update"/>
-      <span id="tweet_content_counter">140</span>
-    </div>
-  </form>
-</div>
-
-<div id="column_selectors">
-  <a class="active column_selector">Home</a>
-  <a class="column_selector">Preferences</a>
-  ...
-</div>
-
-<div id="information_bar">
-  <span id="i_last_updated_time">Not loaded yet.</span>
-</div>
-
-<div id="balloon_container">
-  <div class="balloon">...</div>
-</div>
 
 
 
