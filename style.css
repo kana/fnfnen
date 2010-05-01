@@ -128,9 +128,9 @@ body
 |      | 2010-02-20T16:23:58 * <       |
 ----------------------------------------
 .tweet {clear: both; min-height: 48px;}
-.tweet .screen_name {margin-left: 1ex;}
-.tweet .user_icon {}
 .tweet .user_icon img {float: left; width: 48px; height: 48px;}
+.tweet .user_icon img {margin-right: 1ex;}
+.tweet .posted_time {white-space: nowrap;}
 */
 
 .tweet .button
