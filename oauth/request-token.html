@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+fnfnen, a web-based twitter client
+Version: 0.0.0
+Copyright (C) 2009-2010 kana <http://whileimautomaton.net/>
+License: MIT license  {{{
+    Permission is hereby granted, free of charge, to any person
+    obtaining a copy of this software and associated documentation
+    files (the "Software"), to deal in the Software without
+    restriction, including without limitation the rights to use,
+    copy, modify, merge, publish, distribute, sublicense, and/or
+    sell copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following
+    conditions:
+
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+    OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+    NONINFRINGEMENT.  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+    OTHER DEALINGS IN THE SOFTWARE.
+}}}
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+  <title>OAuth step 1 - fnfnen, a web-based twitter client</title>
+  <script type="text/javascript" src="../jquery.js"></script>
+  <script type="text/javascript" src="../jquery.cookie.js"></script>
+  <script type="text/javascript" src="common.js"></script>
+  <script type="text/javascript" src="oauth.js"></script>
+  <script type="text/javascript" src="phase1.js"></script>
+  <script type="text/javascript" src="sha1.js"></script>
+  <script type="text/javascript">
+    $(restore_form_values);
+  </script>
+</head>
+<body>
+
+
+
+
+<form id="secret" method="post" action="." onsubmit="return false;">
+  <div>
+    Consumer secret: <input name="consumer_secret" type="text" value="" class="restorable"/>
+    <input name="token_secret" type="hidden" value=""/>
+  </div>
+</form>
+<form id="request" method="post" action="https://api.twitter.com/oauth/request_token" onsubmit="return before_request(this, $('#secret').get(0)) && consumer.sign_form(this, $('#secret').get(0))">
+  <div>
+    Consumer key: <input name="oauth_consumer_key" type="text" value="" class="restorable"/>
+    <input name="oauth_callback" type="hidden" value=""/>
+    <input name="oauth_signature_method" type="hidden" value="HMAC-SHA1"/>
+    <input name="oauth_timestamp" type="hidden"/>
+    <input name="oauth_nonce" type="hidden"/>
+    <input name="oauth_signature" type="hidden"/>
+  </div>
+  <div>
+    <input type="submit" value="Get Request Token"/>
+  </div>
+</form>
+
+
+
+
+</body>
+</html>
+<!--
+vim: errorformat=%f\:\ %l\:\ %m
+vim: foldmethod=marker
+-->
