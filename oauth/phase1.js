@@ -27,6 +27,24 @@
 
 
 
+function before_authentication(form)
+{
+  var token_text = form.oauth_token.value;
+  if (token_text.match(/^oauth_token=([^&]+)&oauth_token_secret=([^&]+)/)) {
+    $.cookie('form_oauth_token_value', token_text);  // For later boot.
+    $.cookie('request_token', RegExp.$1);  // For phase 2.
+    $.cookie('request_secret', RegExp.$2);  // For phase 2.
+    form.oauth_token.value = RegExp.$1;
+    return true;
+  } else {
+    alert('Pasted text is not valid.  Please reload this page then retry this phase.');
+    return false;
+  }
+}
+
+
+
+
 function before_request(request_form, secret_form)
 {
   request_form.oauth_callback.value = location.href.replace(

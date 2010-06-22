@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+fnfnen, a web-based twitter client
+Version: 0.0.0
+Copyright (C) 2009-2010 kana <http://whileimautomaton.net/>
+License: MIT license  {{{
+    Permission is hereby granted, free of charge, to any person
+    obtaining a copy of this software and associated documentation
+    files (the "Software"), to deal in the Software without
+    restriction, including without limitation the rights to use,
+    copy, modify, merge, publish, distribute, sublicense, and/or
+    sell copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following
+    conditions:
+
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+    OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+    NONINFRINGEMENT.  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+    OTHER DEALINGS IN THE SOFTWARE.
+}}}
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+  <title>OAuth phase 1 - fnfnen, a web-based twitter client</title>
+  <script type="text/javascript" src="../jquery.js"></script>
+  <script type="text/javascript" src="../jquery.cookie.js"></script>
+  <script type="text/javascript" src="common.js"></script>
+  <script type="text/javascript" src="phase1.js"></script>
+  <script type="text/javascript">
+    $(restore_form_values);
+  </script>
+</head>
+<body>
+
+<h1>Authenticate by OAuth - Phase 1</h1>
+
+
+
+
+<h2>Step 1</h2>
+
+<p>Please click the blow "Get Request Token" button.</p>
+<iframe src="request-token.html"></iframe>
+
+
+
+
+<h2>Step 2</h2>
+
+<p>Copy the string which is appeared after clicking "Get Request Token" button, then paste it into the following form, and then click "Authorize" button.</p>
+<form id="request" method="get" action="https://api.twitter.com/oauth/authorize" onsubmit="return before_authentication(this)">
+  <div>
+    <input name="oauth_token" type="text" size="64" value="" class="restorable"/>
+  </div>
+  <div>
+    <input type="submit" value="Authorize"/>
+  </div>
+</form>
+
+
+
+
+<address id="copyright_notice">
+  Copyright &copy; 2009-2010 kana &lt;<a href="http://whileimautomaton.net/">http://whileimautomaton.net/</a>&gt; / <a href="http://github.com/kana/fnfnen">Source code</a>
+</address>
+
+</body>
+</html>
+<!--
+vim: errorformat=%f\:\ %l\:\ %m
+vim: foldmethod=marker
+-->
