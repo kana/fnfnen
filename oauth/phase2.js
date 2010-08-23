@@ -59,6 +59,25 @@ function fill_request(form_request, form_secret)
 
 
 
+function before_log_in(form)
+{
+  var value = form.oauth_access_token_result.value;
+
+  if (value.match(/^oauth_token=([^&]+)&oauth_token_secret=([^&]+)/)) {
+    $.cookie('access_token', RegExp.$1);
+    $.cookie('access_secret', RegExp.$2);
+    location.href = '../index.html';
+  } else {
+    alert('Pasted value is not a valid one.  Please retry all steps.');
+    location.href = 'phase1.html';
+  }
+
+  return false;
+}
+
+
+
+
 // __END__  {{{1
 // vim: expandtab shiftwidth=2 softtabstop=2
 // vim: foldmethod=marker
