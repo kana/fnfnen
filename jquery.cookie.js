@@ -55,7 +55,7 @@
  */
 jQuery.cookie = function(name, value, options) {
     if (typeof value != 'undefined') { // name and value given, set cookie
-        options = options || {};
+        options = options || jQuery.cookie.defaultOptions || {};
         if (value === null) {
             value = '';
             options.expires = -1;
@@ -93,4 +93,14 @@ jQuery.cookie = function(name, value, options) {
         }
         return cookieValue;
     }
+};
+
+// Additional feature; Configurable default options for jQuery.cookie().
+jQuery.cookie.defaultOptions = {
+    expires: 30,  // days
+    path: (  // 'http://domain/.../fnfnen/.../foo.ext' => '/.../fnfnen/'
+        location.href
+        .replace(/^[^:]+:\/\/[^\/]*/, '')
+        .replace(/\/fnfnen[^\/]*\/.*/, '/fnfnen/')
+    ),
 };
