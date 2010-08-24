@@ -85,19 +85,6 @@ var g_user = null;
 
 
 // Core  {{{1
-function after_post()  //{{{2
-{
-  $('#tweet_box').val('');
-
-  g_tweet_id_to_reply = null;
-  $('#in_reply_to_status_id').remove();
-
-  return;
-}
-
-
-
-
 function apply_preferences(via_external_configuration_p)  //{{{2
 {
   var priorities = [];  // [[applying_priority, name], ...]
@@ -124,9 +111,14 @@ function apply_preferences(via_external_configuration_p)  //{{{2
 
 function authenticate()  //{{{2
 {
-  call_twitter_api(TWITTER_UI_URI,
-                   'account/verify_credentials',
-                   {'callback': 'callback_authenticate'});
+  request_twitter_api_with_oauth({
+    method: 'get',
+    parameters: {
+      callback: callback_authenticate.name,
+      suppress_response_codes: true,
+    },
+    uri: TWITTER_API_URI + 'account/verify_credentials.json',
+  });
   return;
 }
 
@@ -149,19 +141,11 @@ function callback_authenticate(d)
 function before_post()  //{{{2
 {
   var text = $('#tweet_box').val();
+
   if (text == '') {
     // Update timeline manually.
     update();
-    return false;
-  }
-
-  if (g_tweet_id_to_reply) {
-    var node_reply_id = create_element('input');
-    node_reply_id.attr('id', 'in_reply_to_status_id');
-    node_reply_id.attr('name', 'in_reply_to_status_id');
-    node_reply_id.attr('type', 'hidden');
-    node_reply_id.val(g_tweet_id_to_reply);
-    $('#post_form').append(node_reply_id);
+    return;
   }
 
   if (MAX_TWEET_CONTENT < text.length) {
@@ -174,10 +158,26 @@ function before_post()  //{{{2
     // FIXME: Send a long tweet if user tries posting it twice.
 
     // And disable posting.
-    return false;
+    return;
   }
 
-  return true;
+  // Post a tweet.
+  parameters = {};
+  parameters.status = text;
+  if (g_tweet_id_to_reply)
+    parameters.in_reply_to_status_id = g_tweet_id_to_reply;
+
+  request_twitter_api_with_oauth({
+    method: $('#post_form').attr('method'),
+    parameters: parameters,
+    uri: $('#post_form').attr('action'),
+  });
+
+  // Clear stuffs.
+  $('#tweet_box').val('');
+  g_tweet_id_to_reply = null;
+
+  return;
 }
 
 
@@ -210,30 +210,6 @@ function count_tweet_content(e)  //{{{2
     ;
 
   return true;
-}
-
-
-
-
-function enqueue_api_request(  //{{{2
-  base_uri,
-  api_name,
-  parameters,
-  callback_on_success,
-  callback_on_error
-)
-{
-  g_api_request_queue.push({
-    'base_uri': base_uri,
-    'api_name': api_name,
-    'parameters': parameters,
-    'callback_on_success': callback_on_success,
-    'callback_on_error': callback_on_error
-  });
-
-  if (g_api_request_queue.length <= 1)
-    process_queued_api_request();
-  return;
 }
 
 
@@ -406,75 +382,6 @@ function node_from_tweets_n2o(tweets_n2o)  //{{{2
 
 
 
-function process_queued_api_request()  //{{{2
-{
-  if (g_api_request_queue.length < 1)
-    return;
-
-  request_info = g_api_request_queue.shift();
-
-  //// Construct form to post API request.
-  var TARGET_NAME = 'target_' + (new Date).getTime();
-
-  var node_post_block = create_element('div');
-  node_post_block.css('display', 'none');
-
-  var node_form = create_element('form');
-  node_form.attr('action',
-                 (request_info.base_uri + request_info.api_name + '.xml'));
-  node_form.attr('method', 'post');
-  node_form.attr('target', TARGET_NAME);
-  node_post_block.append(node_form);
-
-  // FIXME: Append <input> for request_info.parameters.
-
-  var node_iframe = create_element('iframe');
-  node_iframe.attr('name', TARGET_NAME);
-  node_iframe.attr('src', 'about:blank');
-  node_post_block.append(node_iframe);
-
-  //// Set up event handlers.
-  var settle = function(){
-    node_post_block.remove();
-    process_queued_api_request();
-    return;
-  };
-
-  // FIXME: Check the result of a request, not only request timeout.
-  var error_timer = setTimeout(
-    function(){
-      request_info.callback_on_error();
-      settle();
-    },
-    10 * 1000
-  );
-
-  var submitted_p = false;
-  node_iframe.load(function(){
-    if (!submitted_p) {
-      setTimeout(
-        function(){
-          node_form.submit();
-        },
-        0
-      );
-      submitted_p = true;
-    } else {
-      clearTimeout(error_timer);
-      request_info.callback_on_success();
-      setTimeout(settle, 0);
-    }
-  });
-
-  //// Load the form.
-  $('body').append(node_post_block);
-
-  return;
-}
-
-
-
-
 function set_up_to_reply(screen_name, tweet_id)  //{{{2
 {
   g_tweet_id_to_reply = tweet_id;
@@ -584,14 +491,23 @@ function toggle_favorite(tweet_id)  //{{{2
     stop_fading();
   }
 
-  enqueue_api_request(TWITTER_UI_URI,
-                      ((currently_favorited_p
-                        ? 'favorites/destroy'
-                        : 'favorites/create')
-                       + '/' + tweet_id),
-                      {},
-                      update_views,
-                      stop_fading);
+  request_twitter_api_with_oauth({
+    callback_on_error: stop_fading,
+    callback_on_success: update_views,
+    method: 'post',
+    parameters: {
+      suppress_response_codes: true,
+    },
+    uri: (
+      TWITTER_API_URI
+      + (currently_favorited_p
+          ? 'favorites/destroy'
+          : 'favorites/create')
+      + '/'
+      + tweet_id
+      + '.json'
+    ),
+  });
   start_fading();
   return;
 }
@@ -717,68 +633,27 @@ function update()  //{{{3
   if (!g_user)
     return authenticate();
 
-  call_twitter_api(TWITTER_API_URI,
-                   'statuses/home_timeline',
-                   {'callback': 'callback_update_home',
-                    'count': MAX_COUNT_HOME,
-                    'since_id': g_since_id_home});
-  call_twitter_api(TWITTER_UI_URI,
-                   'statuses/mentions',
-                   {'callback': 'callback_update_mentions',
-                    'count': MAX_COUNT_MENTIONS,
-                    'since_id': g_since_id_mentions});
+  request_twitter_api_with_oauth({
+    method: 'get',
+    parameters: {
+      callback: callback_update_home.name,
+      count: MAX_COUNT_HOME,
+      since_id: g_since_id_home,
+      suppress_response_codes: true,
+    },
+    uri: TWITTER_API_URI + 'statuses/home_timeline.json',
+  });
+  request_twitter_api_with_oauth({
+    method: 'get',
+    parameters: {
+      callback: callback_update_mentions.name,
+      count: MAX_COUNT_MENTIONS,
+      since_id: g_since_id_mentions,
+      suppress_response_codes: true,
+    },
+    uri: TWITTER_API_URI + 'statuses/mentions.json',
+  });
   return;
-}
-
-
-
-
-
-
-
-
-// API  {{{1
-var call_twitter_api = (function(){  //{{{2
-  var s_seq = (new Date).getTime();  // To avoid browser-side caching.
-
-  return function(base_uri, api_name, _parameters) {
-    parameters = $.extend(false, _parameters, {'seq': s_seq++});
-
-    var ps = [];
-    for (var key in parameters)
-      ps.push(key + '=' + parameters[key]);
-
-    var script_uri = base_uri + api_name + '.json' + '?' + ps.join('&');
-    load_cross_domain_script(script_uri, api_name);
-  };
-})();
-
-
-
-
-var load_cross_domain_script = (function(){  //{{{2
-  var s_lcds_nodes = {};  // {key: node_script, ...}
-
-  return function(uri, key) {
-    if (s_lcds_nodes[key])
-      s_lcds_nodes[key].remove();
-
-    s_lcds_nodes[uri] = _load_cross_domain_script(uri);
-  };
-})();
-
-
-
-
-function _load_cross_domain_script(script_uri)  //{{{2
-{
-  node_script = create_element('script');
-  node_script.attr('src', script_uri);
-  node_script.attr('type', 'text/javascript');
-
-  $('body').append(node_script);
-
-  return node_script;
 }
 
 
@@ -1340,6 +1215,94 @@ var tweet_db = new TweetDatabase();  //{{{2
 
 
 
+// Twitter API  {{{1
+// Shared variables  {{{2
+
+var g_oauthed_api_request_queue = [];
+var g_oauthed_api_request_sequence = (new Date).getTime();
+
+
+
+
+function request_twitter_api_with_oauth(request)  //{{{2
+{
+  g_oauthed_api_request_queue.push({
+    callback_on_error: request.callback_on_error || nop,
+    callback_on_success: request.callback_on_success || nop,
+    method: request.method,  // required
+    parameters: $.extend({}, request.parameters),
+    uri: request.uri,  // required
+  });
+
+  if (g_oauthed_api_request_queue.length <= 1)
+    process_queued_api_request_with_oauth();
+  return;
+}
+
+
+
+
+function process_queued_api_request_with_oauth()  //{{{2
+{
+  if (g_oauthed_api_request_queue.length < 1)
+    return;
+
+  request = g_oauthed_api_request_queue.shift();
+
+  $('#request_form').attr('action', request.uri);
+  $('#request_form').attr('method', request.method);
+  $('#request_form #additional_arguments').empty();
+  for (var name in request.parameters) {
+    var e = create_element('input');
+    e.attr('id', name);
+    e.attr('name', name);
+    e.attr('type', 'hidden');
+    e.val(request.parameters[name]);
+    $('#request_form #additional_arguments').append(e);
+  }
+
+  consumer.sign_form($('#request_form').get(0), $('#secret_form').get(0));
+
+  if (request.parameters.callback != null && request.method == 'get') {
+    var uri = (request.uri
+               + '?'
+               + query_string_from_form($('#request_form').get(0)));
+    load_cross_domain_script(uri);
+  } else {
+    // Set up event handlers.
+    var settle = function(){
+      process_queued_api_request_with_oauth();
+      return;
+    };
+
+    // FIXME: Check the result of a request, not only request timeout.
+    var error_timer = setTimeout(
+      function(){
+        request.callback_on_error();
+        settle();
+      },
+      10 * 1000
+    );
+
+    $('#request_iframe').one('load', function(){
+      clearTimeout(error_timer);
+      request.callback_on_success();
+      setTimeout(settle, 0);
+    });
+
+    $('#request_form').submit();
+  }
+
+  return;
+}
+
+
+
+
+
+
+
+
 // Misc.  {{{1
 function create_element(element_name)  //{{{2
 {
@@ -1419,6 +1382,41 @@ function pad(n)
 
 
 
+var load_cross_domain_script = (function(){  //{{{2
+  var s_cached_nodes = {};
+
+  return function(script_uri){
+    var key = script_uri.split('?')[0];
+    if (s_cached_nodes[key])
+      s_cached_nodes[key].remove();
+
+    var e = create_element("script");
+    e.attr('src', script_uri);
+    e.attr('type', "text/javascript");
+
+    // We should call jQuery API such as "$('body').append(e)" for readability
+    // and consistency, but we can not use it here.  Because:
+    //
+    // - jQuery internally uses $.ajax() if a script element is given to
+    //   .append().  This $.ajax() call sends a request to a URI which is
+    //   different from the original URI in the script element to avoid
+    //   caching by the browser.
+    //
+    // - Any request with OAuth must include a signature which is calculated
+    //   from various information including a URI to send the request.
+    //
+    // As a result, "$('body').append(e)" sends a request to a different URI
+    // which is invalid for OAuth -- the request will be always failed because
+    // its signature is incorrect.  So that we have to use "raw" API instead.
+    document.body.appendChild(e.get(0));
+
+    s_cached_nodes[key] = e;
+  };
+})();
+
+
+
+
 function map(list, f)  //{{{2
 {
   var mapped_list = [];
@@ -1437,6 +1435,20 @@ function map(list, f)  //{{{2
 function nop()  //{{{2
 {
   return;
+}
+
+
+
+
+function query_string_from_form(form)  //{{{2
+{
+  var parameters = [];
+  for (var i = 0; i < form.elements.length; i++) {
+    var input = form.elements[i];
+    if (input.name && input.value)
+      parameters.push(input.name + '=' + encodeURIComponent(input.value));
+  }
+  return parameters.join('&');
 }
 
 
@@ -1471,6 +1483,23 @@ function to_string(value)  //{{{2
 // Main  {{{1
 
 $(document).ready(function(){
+  // OAuth.
+  var oauth_consumer_key = $.cookie('form_oauth_consumer_key_value');
+  var oauth_consumer_secret = $.cookie('form_consumer_secret_value');
+  var oauth_token = $.cookie('access_token');
+  var oauth_token_secret = $.cookie('access_secret');
+  if (oauth_consumer_key == null
+      || oauth_consumer_secret == null
+      || oauth_token == null
+      || oauth_token_secret == null)
+  {
+    location.href = 'oauth/phase1.html';
+  }
+  $('#request_form *[name="oauth_token"]').val(oauth_token);
+  $('#request_form *[name="oauth_consumer_key"]').val(oauth_consumer_key);
+  $('#secret_form *[name="consumer_secret"]').val(oauth_consumer_secret);
+  $('#secret_form *[name="token_secret"]').val(oauth_token_secret);
+
   // Misc.
   initialize_parameters();
   $('#column_home').empty();
@@ -1608,8 +1637,7 @@ $(document).ready(function(){
         if (!via_external_configuration_p) {
           if (this.current_value) {
             // Loaded script should call fnfnen_external_configuration().
-            load_cross_domain_script(this.current_value,
-                                     'external_configuration_uri');
+            load_cross_domain_script(this.current_value);
           }
         }
       }
@@ -1619,15 +1647,14 @@ $(document).ready(function(){
   // To post.
     // Add a secret iframe to hide interaction with Twitter.
   var node_iframe = create_element('iframe');
-  node_iframe.attr('id', 'post_iframe');
+  node_iframe.attr('id', 'request_iframe');
   node_iframe.attr('name', 'xpost');
   node_iframe.attr('src', 'about:blank');
   node_iframe.css('display', 'none');
   $('body').append(node_iframe);
-  $('#post_form').attr('target', 'xpost');
+  $('#request_form').attr('target', 'xpost');
     // Event handlers.
-  $('#post_form').submit(before_post);
-  $('#post_iframe').load(after_post);
+  $('#post_form').submit(function(){before_post(); return false;});
   $('#tweet_box').keyup(count_tweet_content);
 
   // To update.

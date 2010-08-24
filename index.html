@@ -33,6 +33,10 @@ License: MIT license  {{{
   <link rel="stylesheet" href="style.css"/>
   <link rel="stylesheet" href="iphone.css" media="only screen and (max-device-width: 480px)"/>
   <script type="text/javascript" src="jquery.js"></script>
+  <script type="text/javascript" src="jquery.cookie.js"></script>
+  <script type="text/javascript" src="oauth/oauth.js"></script>
+  <script type="text/javascript" src="oauth/common.js"></script>
+  <script type="text/javascript" src="oauth/sha1.js"></script>
   <script type="text/javascript" src="core.js"></script>
   <meta name="viewport" content="width=320"/>
 </head>
@@ -64,6 +68,23 @@ License: MIT license  {{{
       <input type="submit" value="Update"/>
       <span id="tweet_content_counter">140</span>
     </div>
+  </form>
+  <form id="request_form" class="invisible" action="__dummy__">
+    <table summary="Parameters to be sent for OAuth.  All forms in this table are visible for debugging, but they should be type='hidden'.">
+      <tr><th>oauth_consumer_key</th><td><input name="oauth_consumer_key" type="text" value=""/></td></tr>
+      <tr><th>oauth_nonce</th><td><input name="oauth_nonce" type="text" value=""/></td></tr>
+      <tr><th>oauth_signature</th><td><input name="oauth_signature" type="text" value=""/></td></tr>
+      <tr><th>oauth_signature_method</th><td><input name="oauth_signature_method" type="text" value="HMAC-SHA1"/></td></tr>
+      <tr><th>oauth_timestamp</th><td><input name="oauth_timestamp" type="text" value=""/></td></tr>
+      <tr><th>oauth_token</th><td><input name="oauth_token" type="text" value=""/></td></tr>
+      <tr><th>additional arguments</th><td id="additional_arguments"></td></tr>
+    </table>
+  </form>
+  <form id="secret_form" class="invisible" action="__dummy__" method="get">
+    <table summary="Secret parameters to calculate values for OAuth.  All forms in this table are visible for debugging, but they should be type='hidden'.">
+      <tr><th>consumer_secret</th><td><input name="consumer_secret" type="text" value=""/></td></tr>
+      <tr><th>token_secret</th><td><input name="token_secret" type="text" value=""/></td></tr>
+    </table>
   </form>
 </div>
 
