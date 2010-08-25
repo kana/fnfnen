@@ -617,9 +617,7 @@ function queue_tweets_n2o(tweets_n2o, queue_id)  //{{{3
   for (var i in VALID_QUEUE_IDS)
     full_p = full_p && (g_tweet_queues[VALID_QUEUE_IDS[i]] != null);
   if (full_p) {
-    var tweets_n2o = merge_tweets_n2o(g_tweet_queues);
-    show_tweets_n2o(tweets_n2o, $('#column_home'));
-    update_censored_columns(tweets_n2o);
+    update_censored_columns(merge_tweets_n2o(g_tweet_queues));
 
     g_tweet_queues = {};
   }
@@ -764,6 +762,10 @@ function set_up_censored_columns(rule_text)  //{{{2
     columns_order.push(name);
   }
 
+  // Add predefined columns as if they are written in rule_text.
+  g_censored_columns[HOME_COLUMN_NAME] = [];  // All tweets will be appeared.
+  columns_order = $.merge([HOME_COLUMN_NAME], columns_order);
+
   // Remove existing "censored" columns.
   for (var column_name in old_censored_columns)
     delete_column(column_name, true);
@@ -774,8 +776,12 @@ function set_up_censored_columns(rule_text)  //{{{2
     var node_column = create_column(column_name, 'censorship_result');
     fill_column_with_censored_tweets(node_column,
                                      g_censored_columns[column_name]);
-    append_column(node_column);
+    append_column(node_column,
+                  (column_name == HOME_COLUMN_NAME
+                   ? 'first'
+                   : 'last'));
   }
+  select_column(HOME_COLUMN_NAME);
 
   return;
 }
@@ -1505,7 +1511,6 @@ $(document).ready(function(){
 
   // Misc.
   initialize_parameters();
-  $('#column_home').empty();
   $('#tweet_box').val('');
   $('#column_selectors').empty();
   $('#balloon_container').empty();
@@ -1514,7 +1519,6 @@ $(document).ready(function(){
   $('.predefined.column').each(function(){
     append_column($(this), 'predefined');
   });
-  select_column(HOME_COLUMN_NAME);
 
   // Preferences.
   $('#form_preferences').submit(function(event){
