@@ -848,8 +848,9 @@ function update_censored_columns(tweets_n2o) //{{{2
 // Columns  {{{1
 function append_column(node_column, position)  //{{{2
 {
-  // FIXME: NIY - position
-  if (!node_column.hasClass('predefined'))
+  position = position || 'last';
+
+  if (position != 'predefined')
     $('#columns').append(node_column);
 
   var column_name = node_column.attr('title');
@@ -878,7 +879,10 @@ function append_column(node_column, position)  //{{{2
 
   node_selector.append(node_label);
   node_selector.append(node_button);
-  $('#column_selectors').append(node_selector);
+  if (position == 'first')
+    $('#column_selectors').prepend(node_selector);
+  else
+    $('#column_selectors').append(node_selector);
   return;
 }
 
@@ -1507,7 +1511,9 @@ $(document).ready(function(){
   $('#balloon_container').empty();
 
   // Columns.
-  $('.predefined.column').each(function(){append_column($(this));});
+  $('.predefined.column').each(function(){
+    append_column($(this), 'predefined');
+  });
   select_column(HOME_COLUMN_NAME);
 
   // Preferences.
