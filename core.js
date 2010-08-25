@@ -369,6 +369,8 @@ function node_from_tweets_n2o(tweets_n2o)  //{{{2
 
   node_tweet_hub.append(node_dummy_tweet);
   node_tweet_hub.addClass('tweet_hub');
+  if (tweets_n2o.length == 0)
+    node_tweet_hub.addClass('empty');
 
   for (var i in tweets_n2o)
     node_tweet_hub.append(node_from_tweet(tweets_n2o[i]));
@@ -453,9 +455,6 @@ function show_tweets_n2o(tweets_n2o, node_column)  //{{{2
   // tweets_n2o = [{newest-tweet}, ..., {oldest-tweet}]
 
   raise_event('new_tweets', {tweets: tweets_n2o});
-
-  if (tweets_n2o.length == 0)
-    return 0;
 
   var node_tweet_hub = node_from_tweets_n2o(tweets_n2o);
   node_column.prepend(node_tweet_hub);
@@ -832,8 +831,7 @@ function update_censored_columns(tweets_n2o) //{{{2
 
     var censored_tweets_n2o = filter(tweets_n2o, matches_p);
 
-    if (0 < censored_tweets_n2o.length)
-      node_column.prepend(node_from_tweets_n2o(censored_tweets_n2o));
+    node_column.prepend(node_from_tweets_n2o(censored_tweets_n2o));
   }
 
   return;
