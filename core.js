@@ -54,6 +54,7 @@ var DEFAULT_APPLYING_PRIORITY = 0;
 var DEFAULT_UPDATE_INTERVAL_SEC = 5 * 60;
 var DUMMY_SINCE_ID = 1;
 var GLOBAL_VARIABLES = window;
+var HOME_COLUMN_NAME = 'Home';
 var MAX_COUNT_HOME = 200;
 var MAX_COUNT_MENTIONS = 200;
 var MAX_TWEET_CONTENT = 140;
@@ -949,7 +950,7 @@ function delete_column(column_name_or_node, forced_p)  //{{{2
     return;
 
   if (node_column.hasClass('active'))
-    select_column('Home');  // FIXME: Is this column better than others?
+    select_column(HOME_COLUMN_NAME);  // FIXME: Is there better column?
 
   node_column.remove();
   column_selector(column_name).remove();
@@ -1507,7 +1508,7 @@ $(document).ready(function(){
 
   // Columns.
   $('.predefined.column').each(function(){append_column($(this));});
-  select_column('Home');
+  select_column(HOME_COLUMN_NAME);
 
   // Preferences.
   $('#form_preferences').submit(function(event){
