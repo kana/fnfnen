@@ -115,7 +115,6 @@ function authenticate()  //{{{2
     method: 'get',
     parameters: {
       callback: callback_authenticate.name,
-      suppress_response_codes: true,
     },
     uri: TWITTER_API_URI + 'account/verify_credentials.json',
   });
@@ -496,7 +495,6 @@ function toggle_favorite(tweet_id)  //{{{2
     callback_on_success: update_views,
     method: 'post',
     parameters: {
-      suppress_response_codes: true,
     },
     uri: (
       TWITTER_API_URI
@@ -639,7 +637,6 @@ function update()  //{{{3
       callback: callback_update_home.name,
       count: MAX_COUNT_HOME,
       since_id: g_since_id_home,
-      suppress_response_codes: true,
     },
     uri: TWITTER_API_URI + 'statuses/home_timeline.json',
   });
@@ -649,7 +646,6 @@ function update()  //{{{3
       callback: callback_update_mentions.name,
       count: MAX_COUNT_MENTIONS,
       since_id: g_since_id_mentions,
-      suppress_response_codes: true,
     },
     uri: TWITTER_API_URI + 'statuses/mentions.json',
   });
@@ -1218,6 +1214,10 @@ var tweet_db = new TweetDatabase();  //{{{2
 // Twitter API  {{{1
 // Shared variables  {{{2
 
+var OAUTHED_API_DEFAULT_PARAMETERS = {
+  suppress_response_codes: true,
+};
+
 var g_oauthed_api_request_queue = [];
 var g_oauthed_api_request_sequence = (new Date).getTime();
 
@@ -1230,7 +1230,7 @@ function request_twitter_api_with_oauth(request)  //{{{2
     callback_on_error: request.callback_on_error || nop,
     callback_on_success: request.callback_on_success || nop,
     method: request.method,  // required
-    parameters: $.extend({}, request.parameters),
+    parameters: $.extend(OAUTHED_API_DEFAULT_PARAMETERS, request.parameters),
     uri: request.uri,  // required
   });
 
