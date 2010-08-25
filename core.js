@@ -994,62 +994,6 @@ function select_column(column_name)  //{{{2
 
 
 
-// Cookie  {{{1
-// Initialization  {{{2
-if (!window.localStorage) {
-  window.localStorage = (window.globalStorage
-                         && window.globalStorage[location.hostname]);
-}
-
-
-
-
-function cookie_key(key)  //{{{2
-{
-  return 'fnfnen_' + key;
-}
-
-
-
-
-function read_cookie(key, default_value)  //{{{2
-{
-  if (window.localStorage && window.localStorage[cookie_key(key)])
-    return window.localStorage[cookie_key(key)];
-
-  var pkey = key + '=';
-  var normalizezd_cookie = document.cookie + ';';
-  var start = normalizezd_cookie.indexOf(pkey);
-  if (0 <= start) {
-    var end = normalizezd_cookie.indexOf(';', start);
-    return unescape(normalizezd_cookie.substring(start + pkey.length, end));
-  } else {
-    return default_value;
-  }
-}
-
-
-
-
-function write_cookie(key, value)  //{{{2
-{
-  if (window.localStorage) {
-    window.localStorage[cookie_key(key)] = value;
-  } else {
-    var expired_date = new Date();
-    expired_date.setTime(expired_date.getTime() + (100 * 24 * 60 * 60 * 1000));
-    document.cookie = (key + '=' + escape(value) + ';'
-                       + 'expires=' + expired_date.toGMTString());
-  }
-}
-
-
-
-
-
-
-
-
 // Plugins  {{{1
 // FIXME: Be reloadable.
 function load_plugins(plugin_uris)  //{{{2
@@ -1100,7 +1044,7 @@ function Preference(name, default_value, _kw)  //{{{2
 
   this.applying_priority = kw.applying_priority || DEFAULT_APPLYING_PRIORITY;
   this.columns = kw.columns || 80;
-  this.current_value = read_cookie(name, default_value);
+  this.current_value = $.cookie(name) || default_value;
   this.default_value = default_value;
   this.form_type = kw.form_type || 'text';
   this.maximum_value = kw.maximum_value || Number.MAX_VALUE;
@@ -1167,7 +1111,7 @@ function Preference(name, default_value, _kw)  //{{{2
   };
 
   this.save = function() {
-    write_cookie(this.name, this.current_value);
+    $.cookie(this.name, this.current_value);
   };
 
   this.set_form = function() {
