@@ -101,6 +101,6 @@ jQuery.cookie.defaultOptions = {
     path: (  // 'http://domain/.../fnfnen/.../foo.ext' => '/.../fnfnen/'
         location.href
         .replace(/^[^:]+:\/\/[^\/]*/, '')
-        .replace(/\/fnfnen[^\/]*\/.*/, '/fnfnen/')
+        .replace(/(\/fnfnen[^\/]*\/).*/, '$1')
     ),
 };
