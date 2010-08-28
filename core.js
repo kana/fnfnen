@@ -1596,7 +1596,7 @@ $(document).ready(function(){
     );
   };
 
-  var initialize_to_post = function(){
+  var initialize_to_call_twitter_api = function(){
     // Add a secret iframe to hide interaction with Twitter.
     var node_iframe = create_element('iframe');
     node_iframe.attr('id', 'request_iframe');
@@ -1605,8 +1605,9 @@ $(document).ready(function(){
     node_iframe.css('display', 'none');
     $('body').append(node_iframe);
     $('#request_form').attr('target', 'xpost');
+  };
 
-    // Event handlers.
+  var initialize_to_post = function(){
     $('#post_form').submit(function(){before_post(); return false;});
     $('#tweet_box').keyup(count_tweet_content);
   };
@@ -1617,6 +1618,7 @@ $(document).ready(function(){
     initialize_misc();
     initialize_columns();
     initialize_preferences();
+    initialize_to_call_twitter_api();
     initialize_to_post();
 
     raise_event('ready');
