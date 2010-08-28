@@ -1616,15 +1616,17 @@ $(document).ready(function(){
       update();
   };
 
-  initialize_oauth();
-  initialize_parameters();
-  initialize_misc();
-  initialize_columns();
-  initialize_preferences();
-  initialize_to_post();
-  initialize_to_update();
+  {
+    initialize_oauth();
+    initialize_parameters();
+    initialize_misc();
+    initialize_columns();
+    initialize_preferences();
+    initialize_to_post();
+    initialize_to_update();
 
-  raise_event('ready');
+    raise_event('ready');
+  }
 });
 
 
