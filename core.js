@@ -1611,11 +1611,6 @@ $(document).ready(function(){
     $('#tweet_box').keyup(count_tweet_content);
   };
 
-  var initialize_to_update = function(){
-    if (g_parameters['automatic_update'])
-      update();
-  };
-
   {
     initialize_oauth();
     initialize_parameters();
@@ -1623,9 +1618,11 @@ $(document).ready(function(){
     initialize_columns();
     initialize_preferences();
     initialize_to_post();
-    initialize_to_update();
 
     raise_event('ready');
+
+    if (g_parameters['automatic_update'])
+      update();
   }
 });
 
