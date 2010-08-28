@@ -292,27 +292,6 @@ function html_from_tweet(tweet)  //{{{2
 
 
 
-function initialize_parameters()  //{{{2
-{
-  var ss = window.location.href.split('?', 2);
-  var parameters = (ss[1] ? ss[1] : '').split('&');
-  parameters = ((1 <= parameters.length) && (parameters[0] != '')
-                ? parameters
-                : []);
-
-  for (var i in parameters) {
-    var key_value = parameters[i].split('=', 2);
-    var key = decodeURIComponent(key_value[0]);
-    var value = eval(decodeURIComponent(key_value[1]));  // FIXME: eval?
-
-    g_parameters[key] = value;
-  }
-  return;
-}
-
-
-
-
 function make_links_in_text(text)  //{{{2
 {
   // FIXME: Regular expression for URI.
@@ -1443,7 +1422,6 @@ $(document).ready(function(){
   };
 
   var initialize_misc = function(){
-    initialize_parameters();
     $('#tweet_box').val('');
     $('#column_selectors').empty();
     $('#balloon_container').empty();
@@ -1465,6 +1443,23 @@ $(document).ready(function(){
     $('#request_form *[name="oauth_consumer_key"]').val(oauth_consumer_key);
     $('#secret_form *[name="consumer_secret"]').val(oauth_consumer_secret);
     $('#secret_form *[name="token_secret"]').val(oauth_token_secret);
+  };
+
+  var initialize_parameters = function() {
+    var ss = window.location.href.split('?', 2);
+    var parameters = (ss[1] ? ss[1] : '').split('&');
+    parameters = ((1 <= parameters.length) && (parameters[0] != '')
+                  ? parameters
+                  : []);
+
+    for (var i in parameters) {
+      var key_value = parameters[i].split('=', 2);
+      var key = decodeURIComponent(key_value[0]);
+      var value = eval(decodeURIComponent(key_value[1]));  // FIXME: eval?
+
+      g_parameters[key] = value;
+    }
+    return;
   };
 
   var initialize_preferences = function(){
@@ -1622,6 +1617,7 @@ $(document).ready(function(){
   };
 
   initialize_oauth();
+  initialize_parameters();
   initialize_misc();
   initialize_columns();
   initialize_preferences();
