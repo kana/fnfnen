@@ -1416,6 +1416,7 @@ function to_string(value)  //{{{2
 
 $(document).ready(function(){
   var initialize_columns = function(){
+    $('#column_selectors').empty();
     $('.predefined.column').each(function(){
       append_column($(this), 'predefined');
     });
@@ -1423,7 +1424,6 @@ $(document).ready(function(){
 
   var initialize_misc = function(){
     $('#tweet_box').val('');
-    $('#column_selectors').empty();
     $('#balloon_container').empty();
   };
 
