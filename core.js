@@ -843,14 +843,14 @@ function append_column(node_column, position)  //{{{2
   var node_selector = create_element('span');
   node_selector.attr('class', 'column_selector');
   node_selector.data('title', column_name);
+  node_selector.click(function(){
+    select_column(column_name);
+    return false;
+  });
 
   var node_label = create_element('span');
   node_label.addClass('label');
   node_label.text(column_name);
-  node_label.click(function(){
-    select_column(column_name);
-    return false;
-  });
 
   if (node_column.hasClass('temporary')) {
     var node_button = create_element('span');
