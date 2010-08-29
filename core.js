@@ -838,11 +838,11 @@ function append_column(node_column, position)  //{{{2
   if (position != 'predefined')
     $('#columns').append(node_column);
 
-  var column_name = node_column.attr('title');
+  var column_name = node_column.data('title');
 
   var node_selector = create_element('span');
   node_selector.attr('class', 'column_selector');
-  node_selector.attr('title', column_name);
+  node_selector.data('title', column_name);
 
   var node_label = create_element('span');
   node_label.addClass('label');
@@ -878,7 +878,7 @@ function column(column_name)  //{{{2
 {
   if (column_name) {
     return $('.column').filter(function(){
-      return $(this).attr('title') == column_name;
+      return $(this).data('title') == column_name;
     });
   } else {
     return $('.column');
@@ -892,7 +892,7 @@ function column_selector(column_name)  //{{{2
 {
   if (column_name) {
     return $('.column_selector').filter(function(){
-      return $(this).attr('title') == column_name;
+      return $(this).data('title') == column_name;
     });
   } else {
     return $('.column_selector');
@@ -905,7 +905,7 @@ function column_selector(column_name)  //{{{2
 function create_column(column_name, additional_classes)  //{{{2
 {
   var node_column = create_element('div');
-  node_column.attr('title', column_name);
+  node_column.data('title', column_name);
   node_column.addClass('column');
   if (additional_classes)
     node_column.addClass(additional_classes);
@@ -927,7 +927,7 @@ function delete_column(column_name_or_node, forced_p)  //{{{2
     node_column = column(column_name);
   } else {
     node_column = column_name_or_node;
-    column_name = node_column.attr('title');
+    column_name = node_column.data('title');
   }
 
   if (node_column.length != 1)
@@ -1471,6 +1471,13 @@ $(document).ready(function(){  //{{{2
     initialize_columns: {  //{{{
       requirements: [],
       procedure: function () {
+        $('.predefined.column').each(function(){
+          var node_column = $(this);
+          var title = node_column.attr('title');
+          node_column.data('title', title);
+          node_column.removeAttr('title');
+        });
+
         $('#column_selectors').empty();
         $('.predefined.column').each(function(){
           append_column($(this), 'predefined');
