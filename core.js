@@ -1413,219 +1413,280 @@ function to_string(value)  //{{{2
 
 
 // Main  {{{1
+function initialize(steps)  //{{{2
+{
+  var completed_p = false;
+  var executed_p = function (x) {return x.executed_p;};
+  var _i = 0;
+  var _result_table = (create_element('table')
+                       .attr('summary', 'Initialization results'));
 
-$(document).ready(function(){
-  var initialize_columns = function(){
-    $('#column_selectors').empty();
-    $('.predefined.column').each(function(){
-      append_column($(this), 'predefined');
+  var _header_row = create_element('tr');
+  _header_row.append(create_element('th').text('#'));
+  for (var ks in steps)
+    _header_row.append(create_element('th')
+                       .text(ks.replace(/^initialize_/, '')));
+  _result_table.append(_header_row);
+
+  for (var ks in steps) {
+    steps[ks]._requirements = steps[ks].requirements.map(function (x) {
+      return steps[x];
     });
-  };
+  }
 
-  var initialize_misc = function(){
-    $('#tweet_box').val('');
-    $('#balloon_container').empty();
-  };
+  while (!completed_p) {
+    _i++;
+    completed_p = true;
+    var _result_row = create_element('tr');
+    _result_row.append(create_element('th').text(_i));
 
-  var initialize_oauth = function(){
-    var oauth_consumer_key = $.cookie('form_oauth_consumer_key_value');
-    var oauth_consumer_secret = $.cookie('form_consumer_secret_value');
-    var oauth_token = $.cookie('access_token');
-    var oauth_token_secret = $.cookie('access_secret');
-    if (oauth_consumer_key == null
-        || oauth_consumer_secret == null
-        || oauth_token == null
-        || oauth_token_secret == null)
-    {
-      location.href = 'oauth/phase1.html';
+    for (var ks in steps) {
+      var s = steps[ks];
+
+      completed_p = completed_p && s.executed_p;
+      var requirements_ready_p = s._requirements.every(executed_p);
+      var this_completed_p = executed_p(s);
+      if (requirements_ready_p && !this_completed_p) {
+        s.procedure();
+        s.executed_p = true;
+      }
+
+      _result_row.append(create_element('td').text(
+        (requirements_ready_p ? 'R' : '_') + (this_completed_p ? 'S' : '_')
+      ));
     }
-    $('#request_form *[name="oauth_token"]').val(oauth_token);
-    $('#request_form *[name="oauth_consumer_key"]').val(oauth_consumer_key);
-    $('#secret_form *[name="consumer_secret"]').val(oauth_consumer_secret);
-    $('#secret_form *[name="token_secret"]').val(oauth_token_secret);
-  };
 
-  var initialize_parameters = function() {
-    var ss = window.location.href.split('?', 2);
-    var parameters = (ss[1] ? ss[1] : '').split('&');
-    parameters = ((1 <= parameters.length) && (parameters[0] != '')
-                  ? parameters
-                  : []);
+    _result_table.append(_result_row);
+  }
 
-    for (var i in parameters) {
-      var key_value = parameters[i].split('=', 2);
-      var key = decodeURIComponent(key_value[0]);
-      var value = eval(decodeURIComponent(key_value[1]));  // FIXME: eval?
+  $('body').append(_result_table.hide());
+  return;
+}
 
-      g_parameters[key] = value;
-    }
-    return;
-  };
 
-  var initialize_preferences = function(){
-    $('#form_preferences').submit(function(event){
-      apply_preferences();
-      return false;
-    });
-    g_preferences.update_interval_sec = new Preference(
-      'update_interval_sec',
-      DEFAULT_UPDATE_INTERVAL_SEC,
-      {
-        minimum_value: MINIMUM_UPDATE_INTERVAL_SEC,
-        on_application: function() {
-          if (g_parameters['automatic_update']) {
-            clearInterval(g_update_timer);
-            g_update_timer = setInterval(update, this.current_value * 1000);
-          }
+
+
+$(document).ready(function(){  //{{{2
+  var initialization_steps = {
+    initialize_columns: {  //{{{
+      requirements: [],
+      procedure: function () {
+        $('#column_selectors').empty();
+        $('.predefined.column').each(function(){
+          append_column($(this), 'predefined');
+        });
+      },
+    },  //}}}
+    initialize_misc: {  //{{{
+      requirements: [],
+      procedure: function () {
+        $('#tweet_box').val('');
+        $('#balloon_container').empty();
+      },
+    },  //}}}
+    initialize_oauth: {  //{{{
+      requirements: [],
+      procedure: function () {
+        var oauth_consumer_key = $.cookie('form_oauth_consumer_key_value');
+        var oauth_consumer_secret = $.cookie('form_consumer_secret_value');
+        var oauth_token = $.cookie('access_token');
+        var oauth_token_secret = $.cookie('access_secret');
+        if (oauth_consumer_key == null
+            || oauth_consumer_secret == null
+            || oauth_token == null
+            || oauth_token_secret == null)
+        {
+          location.href = 'oauth/phase1.html';
         }
-      }
-    );
-    g_preferences.custom_stylesheet = new Preference(
-      'custom_stylesheet',
-      '/* .user_icon {display: inline;} ... */',
-      {
-        form_type: 'textarea',
-        on_application: function() {
-          $('#custom_stylesheet').remove();
+        $('#request_form *[name="oauth_token"]').val(oauth_token);
+        $('#request_form *[name="oauth_consumer_key"]').val(oauth_consumer_key);
+        $('#secret_form *[name="consumer_secret"]').val(oauth_consumer_secret);
+        $('#secret_form *[name="token_secret"]').val(oauth_token_secret);
+      },
+    },  //}}}
+    initialize_parameters: {  //{{{
+      requirements: [],
+      procedure: function () {
+        var ss = window.location.href.split('?', 2);
+        var parameters = (ss[1] ? ss[1] : '').split('&');
+        parameters = ((1 <= parameters.length) && (parameters[0] != '')
+                      ? parameters
+                      : []);
 
-          var node_style = create_element('style');
-          node_style.attr('type', 'text/css');
-          node_style.text(this.current_value);
-          $('body').append(node_style);
-        },
-        rows: 10
-      }
-    );
-    g_preferences.plugins = new Preference(
-      'plugins',
-      '',
-      {
-        form_type: 'textarea',
-        on_application: function() {
-          var plugin_uris = this.current_value.split('\n');
-          load_plugins(plugin_uris);
-        },
-        rows: 10
-      }
-    );
-    g_preferences.censorship_law = new Preference(
-      'censorship_law',
-      (''
-       + '# Lines start with "#" are comments, so that they are ignored.\n'
-       + '# Blank lines are also ignored.\n'
-       + '#\n'
-       + '# Format: "{classes}:{property}:{pattern}"\n'
-       + '#\n'
-       + '#  {classes}\n'
-       + '#    Names to be added value of "class" attribute of a tweet.\n'
-       + '#\n'
-       + '#  {property}\n'
-       + '#    The name of property to be censored.\n'
-       + '#    Examples: "text", "source", "user.screen_name".\n'
-       + '#\n'
-       + '#  {pattern}\n'
-       + '#    Regular expression to test whether a tweet is censored or not.\n'
-       + '#    A tweet is censored if {pattern} is matched to the value of\n'
-       + '#    {property}.  If {pattern} starts with "?", pattern matching is\n'
-       + '#    case-insensitive.\n'
-       + '#\n'
-       + '# Examples:\n'
-       + '#\n'
-       + '#   censored retweet:text:\\bRT @\n'
-       + '#   censored user:user.screen_name:?_bot$\n'
-       + '#   interested keyword:text:?\\bgit\\b\n'
-       + '#\n'
-       + '# Note that you also have to customize stylesheet to use censored\n'
-       + '# results.  For example, add the following:\n'
-       + '#\n'
-       + '#   .censored.tweet {text-decoration: line-through;}\n'
-       + '#   .interested.tweet {font-weight: bolder;}\n'
-       + ''),
-      {
-        form_type: 'textarea',
-        on_application: function() {
-          set_up_censorship_law(this.current_value);
-        },
-        rows: 10
-      }
-    );
-    g_preferences.censored_columns = new Preference(
-      'censored_columns',
-      (''
-       + '# Lines start with "#" are comments, so that they are ignored.\n'
-       + '# Blank lines are also ignored.\n'
-       + '#\n'
-       + '# Format: "{column_name}:{classes}"\n'
-       + '#\n'
-       + '#  {column_name}\n'
-       + '#    The name of column to show censored tweets.\n'
-       + '#\n'
-       + '#  {classes}\n'
-       + '#    Space-separated names of classes.  If a tweet has all classes\n'
-       + '#    as specified by {classes}, the tweet is shown in the column.\n'
-       + '#\n'
-       + '# Examples:\n'
-       + '#\n'
-       + '#   retweets:retweet\n'
-       + '#   git:git\n'
-       + ''),
-      {
-        applying_priority: g_preferences.censorship_law.applying_priority + 1,
-        form_type: 'textarea',
-        on_application: function() {
-          set_up_censored_columns(this.current_value);
-        },
-        rows: 10
-      }
-    );
-    g_preferences.external_configuration_uri = new Preference(
-      'external_configuration_uri',
-      '',
-      {
-        // Should apply at the last to override already applied values.
-        applying_priority: g_preferences.censored_columns + 1,
-        on_application: function(via_external_configuration_p) {
-          if (!via_external_configuration_p) {
-            if (this.current_value) {
-              // Loaded script should call fnfnen_external_configuration().
-              load_cross_domain_script(this.current_value);
+        for (var i in parameters) {
+          var key_value = parameters[i].split('=', 2);
+          var key = decodeURIComponent(key_value[0]);
+          var value = eval(decodeURIComponent(key_value[1]));  // FIXME: eval?
+
+          g_parameters[key] = value;
+        }
+        return;
+      },
+    },  //}}}
+    initialize_preferences: {  //{{{
+      requirements: ['initialize_columns', 'initialize_misc'],
+      procedure: function () {
+        $('#form_preferences').submit(function(event){
+          apply_preferences();
+          return false;
+        });
+        g_preferences.update_interval_sec = new Preference(
+          'update_interval_sec',
+          DEFAULT_UPDATE_INTERVAL_SEC,
+          {
+            minimum_value: MINIMUM_UPDATE_INTERVAL_SEC,
+            on_application: function() {
+              if (g_parameters['automatic_update']) {
+                clearInterval(g_update_timer);
+                g_update_timer = setInterval(update, this.current_value * 1000);
+              }
             }
           }
-        }
-      }
-    );
+        );
+        g_preferences.custom_stylesheet = new Preference(
+          'custom_stylesheet',
+          '/* .user_icon {display: inline;} ... */',
+          {
+            form_type: 'textarea',
+            on_application: function() {
+              $('#custom_stylesheet').remove();
+
+              var node_style = create_element('style');
+              node_style.attr('type', 'text/css');
+              node_style.text(this.current_value);
+              $('body').append(node_style);
+            },
+            rows: 10
+          }
+        );
+        g_preferences.plugins = new Preference(
+          'plugins',
+          '',
+          {
+            form_type: 'textarea',
+            on_application: function() {
+              var plugin_uris = this.current_value.split('\n');
+              load_plugins(plugin_uris);
+            },
+            rows: 10
+          }
+        );
+        g_preferences.censorship_law = new Preference(
+          'censorship_law',
+          (''
+           + '# Lines start with "#" are comments, so that they are ignored.\n'
+           + '# Blank lines are also ignored.\n'
+           + '#\n'
+           + '# Format: "{classes}:{property}:{pattern}"\n'
+           + '#\n'
+           + '#  {classes}\n'
+           + '#    Names to be added value of "class" attribute of a tweet.\n'
+           + '#\n'
+           + '#  {property}\n'
+           + '#    The name of property to be censored.\n'
+           + '#    Examples: "text", "source", "user.screen_name".\n'
+           + '#\n'
+           + '#  {pattern}\n'
+           + '#    Regular expression to test whether a tweet is censored or not.\n'
+           + '#    A tweet is censored if {pattern} is matched to the value of\n'
+           + '#    {property}.  If {pattern} starts with "?", pattern matching is\n'
+           + '#    case-insensitive.\n'
+           + '#\n'
+           + '# Examples:\n'
+           + '#\n'
+           + '#   censored retweet:text:\\bRT @\n'
+           + '#   censored user:user.screen_name:?_bot$\n'
+           + '#   interested keyword:text:?\\bgit\\b\n'
+           + '#\n'
+           + '# Note that you also have to customize stylesheet to use censored\n'
+           + '# results.  For example, add the following:\n'
+           + '#\n'
+           + '#   .censored.tweet {text-decoration: line-through;}\n'
+           + '#   .interested.tweet {font-weight: bolder;}\n'
+           + ''),
+          {
+            form_type: 'textarea',
+            on_application: function() {
+              set_up_censorship_law(this.current_value);
+            },
+            rows: 10
+          }
+        );
+        g_preferences.censored_columns = new Preference(
+          'censored_columns',
+          (''
+           + '# Lines start with "#" are comments, so that they are ignored.\n'
+           + '# Blank lines are also ignored.\n'
+           + '#\n'
+           + '# Format: "{column_name}:{classes}"\n'
+           + '#\n'
+           + '#  {column_name}\n'
+           + '#    The name of column to show censored tweets.\n'
+           + '#\n'
+           + '#  {classes}\n'
+           + '#    Space-separated names of classes.  If a tweet has all classes\n'
+           + '#    as specified by {classes}, the tweet is shown in the column.\n'
+           + '#\n'
+           + '# Examples:\n'
+           + '#\n'
+           + '#   retweets:retweet\n'
+           + '#   git:git\n'
+           + ''),
+          {
+            applying_priority: g_preferences.censorship_law.applying_priority + 1,
+            form_type: 'textarea',
+            on_application: function() {
+              set_up_censored_columns(this.current_value);
+            },
+            rows: 10
+          }
+        );
+        g_preferences.external_configuration_uri = new Preference(
+          'external_configuration_uri',
+          '',
+          {
+            // Should apply at the last to override already applied values.
+            applying_priority: g_preferences.censored_columns + 1,
+            on_application: function(via_external_configuration_p) {
+              if (!via_external_configuration_p) {
+                if (this.current_value) {
+                  // Loaded script should call fnfnen_external_configuration().
+                  load_cross_domain_script(this.current_value);
+                }
+              }
+            }
+          }
+        );
+      },
+    },  //}}}
+    initialize_to_call_twitter_api: {  //{{{
+      requirements: [],
+      procedure: function () {
+        // Add a secret iframe to hide interaction with Twitter.
+        var node_iframe = create_element('iframe');
+        node_iframe.attr('id', 'request_iframe');
+        node_iframe.attr('name', 'xpost');
+        node_iframe.attr('src', 'about:blank');
+        node_iframe.css('display', 'none');
+        $('body').append(node_iframe);
+        $('#request_form').attr('target', 'xpost');
+      },
+    },  //}}}
+    initialize_to_post: {  //{{{
+      requirements: [],
+      procedure: function () {
+        $('#post_form').submit(function(){before_post(); return false;});
+        $('#tweet_box').keyup(count_tweet_content);
+      },
+    },  //}}}
   };
 
-  var initialize_to_call_twitter_api = function(){
-    // Add a secret iframe to hide interaction with Twitter.
-    var node_iframe = create_element('iframe');
-    node_iframe.attr('id', 'request_iframe');
-    node_iframe.attr('name', 'xpost');
-    node_iframe.attr('src', 'about:blank');
-    node_iframe.css('display', 'none');
-    $('body').append(node_iframe);
-    $('#request_form').attr('target', 'xpost');
-  };
+  initialize(initialization_steps);
 
-  var initialize_to_post = function(){
-    $('#post_form').submit(function(){before_post(); return false;});
-    $('#tweet_box').keyup(count_tweet_content);
-  };
+  raise_event('ready');
 
-  {
-    initialize_oauth();
-    initialize_parameters();
-    initialize_misc();
-    initialize_columns();
-    initialize_preferences();
-    initialize_to_call_twitter_api();
-    initialize_to_post();
-
-    raise_event('ready');
-
-    if (g_parameters['automatic_update'])
-      update();
-  }
+  if (g_parameters['automatic_update'])
+    update();
 });
 
 
