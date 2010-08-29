@@ -849,7 +849,7 @@ function append_column(node_column, position)  //{{{2
   node_label.text(column_name);
   node_label.click(function(){
     select_column(column_name);
-    return;
+    return false;
   });
 
   if (node_column.hasClass('temporary')) {
