@@ -159,6 +159,7 @@ dd.submit {margin: 0;}
 #console #tweet_box {font-family: sans-serif;}
 
 
+.column_selector {cursor: pointer;}
 .active.column_selector .label {font-weight: bolder;}
 .column_selector .button {vertical-align: super;}
 
