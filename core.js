@@ -945,7 +945,7 @@ function select_column(column_name)  //{{{2
   column(column_name).addClass('active').show();
 
   column_selector().removeClass('active');
-  column_selector(column_name).addClass('active');
+  column_selector(column_name).addClass('active').removeClass('unread');
 
   var view = $('.active.column').data(KEY_VIEW);
   if (view != null)
@@ -998,6 +998,8 @@ function log(type, where, message)  //{{{2
 function log_error(where, message)  //{{{2
 {
   log('error', where, message);
+
+  column_selector('Error Log').not('.active').addClass('unread');
 }
 
 

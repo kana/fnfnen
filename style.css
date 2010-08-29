@@ -203,6 +203,7 @@ body {color: #000; background-color: #eee;}
 #column_selectors {border-color: #999;}
 .column_selector {color: #333; background-color: #ccc; border-color: #999;}
 .column_selector.active {background-color: #eee; border-bottom-color: #eee;}
+.column_selector.unread {background-color: #eec;}
 
 
 .tweet_hub,
