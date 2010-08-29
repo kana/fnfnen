@@ -102,7 +102,7 @@ function apply_preferences(via_external_configuration_p)  //{{{2
     || via_external_configuration_p
   );
   if (actually_applied_p)
-    show_balloon('Preferences have been saved.');
+    log_notice(arguments.callee.name, 'Preferences have been saved.');
 
   return;
 }
@@ -125,7 +125,7 @@ function authenticate()  //{{{2
 function callback_authenticate(d)
 {
   if (d.error) {
-    show_balloon(d.error);
+    log_error(arguments.callee.name, d.error);
     return;
   }
 
@@ -378,19 +378,6 @@ function set_up_to_reply(screen_name, tweet_id)  //{{{2
 
 
 
-function show_balloon(text)  //{{{2
-{
-  var node_balloon = create_element('div');
-  node_balloon.addClass('balloon');
-  node_balloon.text(text);
-  $('#balloon_container').append(node_balloon);
-  node_balloon.fadeOut(10 * 1000, function(){$(this).remove();});
-  return;
-}
-
-
-
-
 function show_conversation(tweet_id)  //{{{2
 {
   var tweets_in_conoversation_n2o = list_tweets_in_conversation_n2o(tweet_id);
@@ -536,7 +523,7 @@ function callback_update(d, name_since_id, queue_id)  //{{{3
     }
     tweet_db.add(new_tweets_n2o);
   } else {
-    show_balloon(d.error);
+    log_error(arguments.callee.name, d.error);
     return;
   }
 
@@ -733,7 +720,7 @@ function set_up_censored_columns(rule_text)  //{{{2
                           .join(FIELD_SEPARATOR)
                           .split(/\s+/));
     } catch (e) {
-      show_balloon('Error in rule: "' + line + '"');
+      log_error(arguments.callee.name, 'Error in rule: "' + line + '"');
       continue;
     }
 
@@ -791,7 +778,7 @@ function set_up_censorship_law(rule_text)  //{{{2
        var flags = ignore_case_p ? 'i' : '';
        re_pattern = new RegExp(pattern, flags);
     } catch (e) {
-      show_balloon('Error in pattern: "' + line + '"');
+      log_error(arguments.callee.name, 'Error in pattern: "' + line + '"');
       continue;
     }
 
@@ -963,6 +950,48 @@ function select_column(column_name)  //{{{2
   var view = $('.active.column').data(KEY_VIEW);
   if (view != null)
     scroll(view);
+  return;
+}
+
+
+
+
+
+
+
+
+// Log  {{{1
+function log(type, where, message)  //{{{2
+{
+  show_balloon(message);
+}
+
+
+
+
+function log_error(where, message)  //{{{2
+{
+  log('error', where, message);
+}
+
+
+
+
+function log_notice(where, message)  //{{{2
+{
+  log('notice', where, message);
+}
+
+
+
+
+function show_balloon(text)  //{{{2
+{
+  var node_balloon = create_element('div');
+  node_balloon.addClass('balloon');
+  node_balloon.text(text);
+  $('#balloon_container').append(node_balloon);
+  node_balloon.fadeOut(10 * 1000, function(){$(this).remove();});
   return;
 }
 
