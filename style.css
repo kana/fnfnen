@@ -152,6 +152,13 @@ dd {margin-left: 5%;  margin-bottom: 1em;}
 dd.submit {margin: 0;}
 
 
+.log
+{
+  border-top: solid thin;
+  padding: 1ex;
+}
+
+
 
 
 /* Decoration  {{{1*/
@@ -178,6 +185,11 @@ dd.submit {margin: 0;}
 
 
 .invisible {display: none;}
+
+
+.log .type:after {content: ': ';}
+.log .when:after {content: ': ';}
+.log .where:after {content: ': ';}
 
 
 
@@ -221,6 +233,15 @@ body {color: #000; background-color: #eee;}
 
 
 .balloon {background-color: #fff; border-color: #666;}
+
+
+.log {border-color: #ccc;}
+.log.error {color: #900;}
+.log.notice {}
+
+.log .type {color: #000;}
+.log .when {color: #666;}
+.log .where {color: #666;}
 
 
 

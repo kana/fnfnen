@@ -963,6 +963,32 @@ function select_column(column_name)  //{{{2
 // Log  {{{1
 function log(type, where, message)  //{{{2
 {
+  var node_log = create_element('div');
+  node_log.addClass('log');
+  node_log.addClass(type);
+
+  var node_when = create_element('span');
+  node_when.addClass('when');
+  node_when.text(human_readable_format_from_date(new Date()));
+
+  var node_type = create_element('span');
+  node_type.addClass('type');
+  node_type.text(type.charAt(0).toUpperCase() + type.substring(1));
+
+  var node_where = create_element('span');
+  node_where.addClass('where');
+  node_where.text(where);
+
+  var node_message = create_element('span');
+  node_message.addClass('message');
+  node_message.text(message);
+
+  node_log.append(node_when);
+  node_log.append(node_type);
+  node_log.append(node_where);
+  node_log.append(node_message);
+  $('#column_error_log').prepend(node_log);
+
   show_balloon(message);
 }
 
@@ -1518,6 +1544,7 @@ $(document).ready(function(){  //{{{2
       procedure: function () {
         $('#tweet_box').val('');
         $('#balloon_container').empty();
+        $('#column_error_log').empty();
       },
     },  //}}}
     initialize_oauth: {  //{{{
