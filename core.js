@@ -1748,6 +1748,8 @@ $(document).ready(function(){  //{{{2
 
   initialize(initialization_steps);
 
+  log_notice('$(document).ready', 'System has been initialized.');
+
   raise_event('ready');
 
   if (g_parameters['automatic_update'])
