@@ -1219,7 +1219,9 @@ function request_twitter_api_with_oauth(request)  //{{{2
     callback_on_error: request.callback_on_error || nop,
     callback_on_success: request.callback_on_success || nop,
     method: request.method,  // required
-    parameters: $.extend(OAUTHED_API_DEFAULT_PARAMETERS, request.parameters),
+    parameters: $.extend({},  // To avoid destructive side effect.
+                         OAUTHED_API_DEFAULT_PARAMETERS,
+                         request.parameters),
     uri: request.uri,  // required
   });
 
