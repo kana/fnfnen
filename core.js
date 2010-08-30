@@ -86,6 +86,22 @@ var g_user = null;
 
 
 // Core  {{{1
+function after_post(d)  //{{{2
+{
+  // On success: d = {text: '...', ...};
+  // On failure: d = {error: '...', ...};
+
+  if (!(d.error))
+    update_with_given_tweet(d);
+  else
+    log_error('Post', d.error);
+
+  return;
+}
+
+
+
+
 function apply_preferences(via_external_configuration_p)  //{{{2
 {
   var priorities = [];  // [[applying_priority, name], ...]
@@ -168,6 +184,12 @@ function before_post()  //{{{2
     parameters.in_reply_to_status_id = g_tweet_id_to_reply;
 
   request_twitter_api_with_oauth({
+    callback_on_error: function () {
+      after_post({error: 'Request time out.'});
+    },
+    callback_on_success: function () {
+      after_post(eval('(' + $('#request_iframe').contents().text() + ')'));
+    },
     method: $('#post_form').attr('method'),
     parameters: parameters,
     uri: $('#post_form').attr('action'),
@@ -613,6 +635,17 @@ function update()  //{{{3
     },
     uri: TWITTER_API_URI + 'statuses/mentions.json',
   });
+  return;
+}
+
+
+function update_with_given_tweet(tweet)  //{{{3
+{
+  if (!(tweet_db.has_p(tweet)))
+  {
+    tweet_db.add([tweet]);
+    update_censored_columns([tweet]);
+  }
   return;
 }
 
