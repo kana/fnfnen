@@ -1251,7 +1251,7 @@ function request_twitter_api_with_oauth(request)  //{{{2
   g_oauthed_api_request_queue.push({
     callback_on_error: request.callback_on_error || nop,
     callback_on_success: request.callback_on_success || nop,
-    method: request.method,  // required
+    method: request.method.toUpperCase(),  // required
     parameters: $.extend({},  // To avoid destructive side effect.
                          OAUTHED_API_DEFAULT_PARAMETERS,
                          request.parameters),
@@ -1287,7 +1287,7 @@ function process_queued_api_request_with_oauth()  //{{{2
 
   consumer.sign_form($('#request_form').get(0), $('#secret_form').get(0));
 
-  if (request.parameters.callback != null && request.method == 'get') {
+  if (request.parameters.callback != null && request.method == 'GET') {
     var uri = (request.uri
                + '?'
                + query_string_from_form($('#request_form').get(0)));
