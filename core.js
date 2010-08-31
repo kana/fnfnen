@@ -1244,6 +1244,7 @@ var OAUTHED_API_DEFAULT_PARAMETERS = {
 
 var g_oauthed_api_request_queue = [];
 var g_oauthed_api_request_sequence = (new Date).getTime();
+var g_currently_processing_requests = [];
 
 
 
@@ -1259,6 +1260,7 @@ function request_twitter_api_with_oauth(request)  //{{{2
                          request.parameters),
     uri: request.uri,  // required
   });
+  update_requesting_status();
 
   if (g_oauthed_api_request_queue.length <= 1)
     process_queued_api_request_with_oauth();
@@ -1271,9 +1273,14 @@ function request_twitter_api_with_oauth(request)  //{{{2
 function process_queued_api_request_with_oauth()  //{{{2
 {
   if (g_oauthed_api_request_queue.length < 1)
+  {
+    update_requesting_status();
     return;
+  }
 
   var request = g_oauthed_api_request_queue.shift();
+  g_currently_processing_requests.push(request);
+  update_requesting_status();
 
   // Set up parameters to send.
   //
@@ -1302,6 +1309,12 @@ function process_queued_api_request_with_oauth()  //{{{2
   }
 
   var finish = function () {
+    var i = g_currently_processing_requests.indexOf(request);
+    if (0 <= i)
+      g_currently_processing_requests.splice(i, 1);
+    else
+      log_error(arguments.callee.name, 'Internal error: ' + request.uri);
+
     process_queued_api_request_with_oauth();
     return;
   };
@@ -1338,11 +1351,44 @@ function process_queued_api_request_with_oauth()  //{{{2
 
 
 
+function update_requesting_status()  //{{{2
+{
+  var active_p = (1 <= g_currently_processing_requests.length
+                  || 1 <= g_oauthed_api_request_queue.length);
+
+  $('#request_status').text(
+    'Now requesting: ['
+    + (g_currently_processing_requests.map(function (request) {
+         return api_name_from_uri(request.uri);
+       })
+       .join(', '))
+    + ']'
+    + ' / '
+    + 'Pending ' + g_oauthed_api_request_queue.length + ' requests'
+  ).each(function(){
+    if (active_p)
+      $(this).slideDown();
+    else
+      $(this).slideUp();
+  });
+}
+
+
+
+
 
 
 
 
 // Misc.  {{{1
+function api_name_from_uri(api_uri)  //{{{2
+{
+  return api_uri.replace(TWITTER_API_URI, '').replace(/\..*/, '');
+}
+
+
+
+
 function create_element(element_name)  //{{{2
 {
   return $(document.createElement(element_name));
@@ -1583,6 +1629,7 @@ $(document).ready(function(){  //{{{2
         $('#tweet_box').val('');
         $('#balloon_container').empty();
         $('#column_error_log').empty();
+        $('#request_status').hide();
       },
     },  //}}}
     initialize_oauth: {  //{{{

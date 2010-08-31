@@ -58,6 +58,15 @@ body
   font-size: 80%;
   text-align: right;
 }
+#information_bar #request_status
+{
+  bottom: 0;
+  display: block;
+  padding: 1ex;
+  position: fixed;
+  right: 0;
+  width: 100%;
+}
 
 
 #tweet_content_counter
@@ -231,6 +240,12 @@ body {color: #000; background-color: #eee;}
 
 
 #information_bar {color: #333;}
+#information_bar #request_status
+{
+  background-color: #ccc;
+  color: #000;
+  opacity: 0.8;
+}
 
 
 .balloon {background-color: #fff; border-color: #666;}
