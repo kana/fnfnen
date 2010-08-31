@@ -1271,7 +1271,7 @@ function process_queued_api_request_with_oauth()  //{{{2
   if (g_oauthed_api_request_queue.length < 1)
     return;
 
-  request = g_oauthed_api_request_queue.shift();
+  var request = g_oauthed_api_request_queue.shift();
 
   $('#request_form').attr('action', request.uri);
   $('#request_form').attr('method', request.method);
