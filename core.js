@@ -530,7 +530,7 @@ var g_tweet_queues = {/* queue_id: tweets_n2o = [newest, ..., oldest] */};
 function callback_update(d, name_since_id, queue_id)  //{{{3
 {
   // d = [{newest-tweet}, ..., {oldest-tweet}]
-  $('#i_last_updated_time').text('Last updated: ' + new Date().toString());
+  $('#last_updated_time').text('Last updated: ' + new Date().toString());
 
   var new_tweets_n2o = [];
   if (d.error == null) {
