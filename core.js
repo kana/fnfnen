@@ -67,7 +67,6 @@ var TWITTER_UI_URI = 'http://twitter.com/';
 
 // Global  {{{2
 
-var g_api_request_queue = [];
 var g_external_configuration = {/* preference_name: value */};
 var g_parameters = {'automatic_update': true};
 var g_plugins = [/* plugin = {event_name: function, ...}, ... */];
