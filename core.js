@@ -1272,6 +1272,9 @@ function process_queued_api_request_with_oauth()  //{{{2
 
   var request = g_oauthed_api_request_queue.shift();
 
+  // Set up parameters to send.
+  //
+  // FIXME: Simplify this signing procedure.
   $('#request_form').attr('action', request.uri);
   $('#request_form').attr('method', request.method);
   $('#request_form #additional_arguments').empty();
@@ -1283,9 +1286,13 @@ function process_queued_api_request_with_oauth()  //{{{2
     e.val(request.parameters[name]);
     $('#request_form #additional_arguments').append(e);
   }
-
   consumer.sign_form($('#request_form').get(0), $('#secret_form').get(0));
 
+  // Send a request.
+  //
+  // NB: There is an alternative way -- jQuery.ajax().  But jQuery.ajax() uses
+  // XmlHttpRequest for many cases and XmlHttpRequest is usually restricted
+  // with same origin poricy.
   if (request.parameters.callback != null && request.method == 'GET') {
     var uri = request.uri + '?' + $('#request_form').serialize();
     load_cross_domain_script(uri);
