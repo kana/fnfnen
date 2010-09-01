@@ -1287,9 +1287,7 @@ function process_queued_api_request_with_oauth()  //{{{2
   consumer.sign_form($('#request_form').get(0), $('#secret_form').get(0));
 
   if (request.parameters.callback != null && request.method == 'GET') {
-    var uri = (request.uri
-               + '?'
-               + query_string_from_form($('#request_form').get(0)));
+    var uri = request.uri + '?' + $('#request_form').serialize();
     load_cross_domain_script(uri);
   } else {
     // Set up event handlers.
@@ -1458,20 +1456,6 @@ function map(list, f)  //{{{2
 function nop()  //{{{2
 {
   return;
-}
-
-
-
-
-function query_string_from_form(form)  //{{{2
-{
-  var parameters = [];
-  for (var i = 0; i < form.elements.length; i++) {
-    var input = form.elements[i];
-    if (input.name && input.value)
-      parameters.push(input.name + '=' + encodeURIComponent(input.value));
-  }
-  return parameters.join('&');
 }
 
 
