@@ -1325,27 +1325,37 @@ function process_queued_api_request_with_oauth()  //{{{2
     // finish_processing_a_request() will be called by
     // callback_for_jsonp_request() if the request is completed.
   } else {
-    var error_timer = setTimeout(
-      function(){
-        request.callback({error: 'Request time out.'});
-        finish_processing_a_request();
+    // error_timer doubles the parts of a timer id and a lock.
+    // Though the way to lock is not perfect yet.
+    var error_timer = null;
+
+    error_timer = setTimeout(
+      function () {
+        if (error_timer) {
+          error_timer = null;  // Prevents "loaded" handler.
+          request.callback({error: 'Request time out.'});
+          finish_processing_a_request();
+        }
       },
       10 * 1000
     );
+    var loaded_handler = function () {
+      if (error_timer) {
+        clearTimeout(error_timer);  // Prevents error_timer handler.
+        error_timer = null;
 
-    $('#request_iframe').one('load', function(){
-      clearTimeout(error_timer);
+        var response = (
+          location.protocol == 'file:'
+          ? eval('(' + $('#request_iframe').contents().text() + ')')
+          : null  // Investigating is not allowed because of same origin policy.
+        );
+        request.callback(response);
 
-      var response = (
-        location.protocol == 'file:'
-        ? eval('(' + $('#request_iframe').contents().text() + ')')
-        : null  // Investigating is not allowed because of same origin policy.
-      );
-      request.callback(response);
+        setTimeout(finish_processing_a_request, 0);
+      }
+    };
 
-      setTimeout(finish_processing_a_request, 0);
-    });
-
+    $('#request_iframe').one('load', loaded_handler);
     $('#request_form').submit();
   }
 
