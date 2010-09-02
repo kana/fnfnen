@@ -835,7 +835,10 @@ function update_censored_columns(tweets_n2o) //{{{2
 
     var censored_tweets_n2o = filter(tweets_n2o, matches_p);
 
-    node_column.prepend(node_from_tweets_n2o(censored_tweets_n2o));
+    var node_tweets = node_from_tweets_n2o(censored_tweets_n2o);
+    node_tweets.hide();
+    node_column.prepend(node_tweets);
+    node_tweets.slideDown();
   }
 
   return;
