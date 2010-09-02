@@ -130,10 +130,8 @@ function apply_preferences(via_external_configuration_p)  //{{{2
 function authenticate()  //{{{2
 {
   request_twitter_api_with_oauth({
+    callback: callback_authenticate,
     method: 'get',
-    parameters: {
-      callback: callback_authenticate.name,
-    },
     uri: TWITTER_API_URI + 'account/verify_credentials.json',
   });
   return;
@@ -618,18 +616,18 @@ function update()  //{{{3
     return authenticate();
 
   request_twitter_api_with_oauth({
+    callback: callback_update_home,
     method: 'get',
     parameters: {
-      callback: callback_update_home.name,
       count: MAX_COUNT_HOME,
       since_id: g_since_id_home,
     },
     uri: TWITTER_API_URI + 'statuses/home_timeline.json',
   });
   request_twitter_api_with_oauth({
+    callback: callback_update_mentions,
     method: 'get',
     parameters: {
-      callback: callback_update_mentions.name,
       count: MAX_COUNT_MENTIONS,
       since_id: g_since_id_mentions,
     },
@@ -1246,14 +1244,34 @@ var g_oauthed_api_request_sequence = (new Date).getTime();
 
 
 
+var callback_for_jsonp_request = 'Placeholder for a callback closure';  //{{{2
+
+
+
+
+function finish_processing_a_request()  //{{{2
+{
+  g_oauthed_api_request_queue.shift();  // Discard the finished request.
+  process_queued_api_request_with_oauth();
+  return;
+};
+
+
+
+
 function request_twitter_api_with_oauth(request)  //{{{2
 {
+  var normalized_method = request.method.toUpperCase();
+
   g_oauthed_api_request_queue.push({
     callback: request.callback || nop,
-    method: request.method.toUpperCase(),  // required
+    method: normalized_method,  // required
     parameters: $.extend({},  // To avoid destructive side effect.
                          OAUTHED_API_DEFAULT_PARAMETERS,
-                         request.parameters),
+                         request.parameters,
+                         (normalized_method == 'GET'
+                          ? {callback: 'callback_for_jsonp_request'}
+                          : {})),
     uri: request.uri,  // required
   });
 
@@ -1291,20 +1309,21 @@ function process_queued_api_request_with_oauth()  //{{{2
   // Send a request.
   //
   // NB: Assumption: Requesting format is always JSON.
+  // NB: Assumption: Twitter API supports JSONP.
   //
   // NB: There is an alternative way -- jQuery.ajax().  But jQuery.ajax() uses
   // XmlHttpRequest for many cases and XmlHttpRequest is usually restricted
   // with same origin poricy.
-  var finish_processing_a_request = function () {
-    g_oauthed_api_request_queue.shift();  // Discard the finished request.
-    process_queued_api_request_with_oauth();
-    return;
-  };
-
-  if (request.parameters.callback != null && request.method == 'GET') {
+  if (request.method == 'GET') {
+    callback_for_jsonp_request = function (data) {
+      request.callback(data);
+      setTimeout(finish_processing_a_request, 0);
+      return;
+    };
     var uri = request.uri + '?' + $('#request_form').serialize();
     load_cross_domain_script(uri);
-    finish_processing_a_request();
+    // finish_processing_a_request() will be called by
+    // callback_for_jsonp_request() if the request is completed.
   } else {
     var error_timer = setTimeout(
       function(){
