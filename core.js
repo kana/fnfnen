@@ -1270,7 +1270,7 @@ function process_queued_api_request_with_oauth()  //{{{2
   if (g_oauthed_api_request_queue.length < 1)
     return;
 
-  var request = g_oauthed_api_request_queue.shift();
+  var request = g_oauthed_api_request_queue[0];
 
   // Set up parameters to send.
   //
@@ -1295,19 +1295,21 @@ function process_queued_api_request_with_oauth()  //{{{2
   // NB: There is an alternative way -- jQuery.ajax().  But jQuery.ajax() uses
   // XmlHttpRequest for many cases and XmlHttpRequest is usually restricted
   // with same origin poricy.
+  var finish_processing_a_request = function () {
+    g_oauthed_api_request_queue.shift();  // Discard the finished request.
+    process_queued_api_request_with_oauth();
+    return;
+  };
+
   if (request.parameters.callback != null && request.method == 'GET') {
     var uri = request.uri + '?' + $('#request_form').serialize();
     load_cross_domain_script(uri);
+    finish_processing_a_request();
   } else {
-    var settle = function(){
-      process_queued_api_request_with_oauth();
-      return;
-    };
-
     var error_timer = setTimeout(
       function(){
         request.callback({error: 'Request time out.'});
-        settle();
+        finish_processing_a_request();
       },
       10 * 1000
     );
@@ -1322,7 +1324,7 @@ function process_queued_api_request_with_oauth()  //{{{2
       );
       request.callback(response);
 
-      setTimeout(settle, 0);
+      setTimeout(finish_processing_a_request, 0);
     });
 
     $('#request_form').submit();
