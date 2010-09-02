@@ -1314,31 +1314,36 @@ function process_queued_api_request_with_oauth()  //{{{2
   // NB: There is an alternative way -- jQuery.ajax().  But jQuery.ajax() uses
   // XmlHttpRequest for many cases and XmlHttpRequest is usually restricted
   // with same origin poricy.
+
+  // error_timer doubles the parts of a timer id and a lock.
+  // Though the way to lock is not perfect yet.
+  var error_timer = null;
+  error_timer = setTimeout(
+    function () {
+      if (error_timer) {
+        error_timer = null;  // Prevents "loaded" handler.
+        request.callback({error: 'Request time out.'});
+        finish_processing_a_request();
+      }
+    },
+    10 * 1000
+  );
+
   if (request.method == 'GET') {
     callback_for_jsonp_request = function (data) {
-      request.callback(data);
-      setTimeout(finish_processing_a_request, 0);
-      return;
+      if (error_timer) {
+        clearTimeout(error_timer);  // Prevents error_timer handler.
+        error_timer = null;
+
+        request.callback(data);
+        setTimeout(finish_processing_a_request, 0);
+      }
     };
     var uri = request.uri + '?' + $('#request_form').serialize();
     load_cross_domain_script(uri);
     // finish_processing_a_request() will be called by
     // callback_for_jsonp_request() if the request is completed.
   } else {
-    // error_timer doubles the parts of a timer id and a lock.
-    // Though the way to lock is not perfect yet.
-    var error_timer = null;
-
-    error_timer = setTimeout(
-      function () {
-        if (error_timer) {
-          error_timer = null;  // Prevents "loaded" handler.
-          request.callback({error: 'Request time out.'});
-          finish_processing_a_request();
-        }
-      },
-      10 * 1000
-    );
     var loaded_handler = function () {
       if (error_timer) {
         clearTimeout(error_timer);  // Prevents error_timer handler.
