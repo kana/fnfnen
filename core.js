@@ -90,7 +90,9 @@ function after_post(d)  //{{{2
   // On success: d = {text: '...', ...};
   // On failure: d = {error: '...', ...};
 
-  if (!(d.error))
+  if (d == null)  // It seems to have succeeded, but the result is unknown.
+    log_notice('Post', 'Posted.');
+  else if (d.error == null)
     update_with_given_tweet(d);
   else
     log_error('Post', d.error);
@@ -183,12 +185,7 @@ function before_post()  //{{{2
     parameters.in_reply_to_status_id = g_tweet_id_to_reply;
 
   request_twitter_api_with_oauth({
-    callback_on_error: function () {
-      after_post({error: 'Request time out.'});
-    },
-    callback_on_success: function () {
-      after_post(eval('(' + $('#request_iframe').contents().text() + ')'));
-    },
+    callback: after_post,
     method: $('#post_form').attr('method'),
     parameters: parameters,
     uri: $('#post_form').attr('action'),
@@ -478,8 +475,12 @@ function toggle_favorite(tweet_id)  //{{{2
   }
 
   request_twitter_api_with_oauth({
-    callback_on_error: stop_fading,
-    callback_on_success: update_views,
+    callback: function (data) {
+      if (data && data.error)
+        stop_fading();
+      else
+        update_views();
+    },
     method: 'post',
     parameters: {
     },
@@ -1248,8 +1249,7 @@ var g_oauthed_api_request_sequence = (new Date).getTime();
 function request_twitter_api_with_oauth(request)  //{{{2
 {
   g_oauthed_api_request_queue.push({
-    callback_on_error: request.callback_on_error || nop,
-    callback_on_success: request.callback_on_success || nop,
+    callback: request.callback || nop,
     method: request.method.toUpperCase(),  // required
     parameters: $.extend({},  // To avoid destructive side effect.
                          OAUTHED_API_DEFAULT_PARAMETERS,
@@ -1290,6 +1290,8 @@ function process_queued_api_request_with_oauth()  //{{{2
 
   // Send a request.
   //
+  // NB: Assumption: Requesting format is always JSON.
+  //
   // NB: There is an alternative way -- jQuery.ajax().  But jQuery.ajax() uses
   // XmlHttpRequest for many cases and XmlHttpRequest is usually restricted
   // with same origin poricy.
@@ -1302,10 +1304,9 @@ function process_queued_api_request_with_oauth()  //{{{2
       return;
     };
 
-    // FIXME: Check the result of a request, not only request timeout.
     var error_timer = setTimeout(
       function(){
-        request.callback_on_error();
+        request.callback({error: 'Request time out.'});
         settle();
       },
       10 * 1000
@@ -1313,7 +1314,14 @@ function process_queued_api_request_with_oauth()  //{{{2
 
     $('#request_iframe').one('load', function(){
       clearTimeout(error_timer);
-      request.callback_on_success();
+
+      var response = (
+        location.protocol == 'file:'
+        ? eval('(' + $('#request_iframe').contents().text() + ')')
+        : null  // Investigating is not allowed because of same origin policy.
+      );
+      request.callback(response);
+
       setTimeout(settle, 0);
     });
 
