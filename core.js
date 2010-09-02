@@ -1252,6 +1252,7 @@ var callback_for_jsonp_request = 'Placeholder for a callback closure';  //{{{2
 function finish_processing_a_request()  //{{{2
 {
   g_oauthed_api_request_queue.shift();  // Discard the finished request.
+  update_requesting_status();
   process_queued_api_request_with_oauth();
   return;
 };
@@ -1274,6 +1275,7 @@ function request_twitter_api_with_oauth(request)  //{{{2
                           : {})),
     uri: request.uri,  // required
   });
+  update_requesting_status();
 
   if (g_oauthed_api_request_queue.length <= 1)
     process_queued_api_request_with_oauth();
@@ -1370,11 +1372,37 @@ function process_queued_api_request_with_oauth()  //{{{2
 
 
 
+function update_requesting_status()  //{{{2
+{
+  if (1 <= g_oauthed_api_request_queue.length) {
+    $('#requesting_status').text(
+      'Now requesting: '
+      + (g_oauthed_api_request_queue.map(function (request) {
+           return api_name_from_uri(request.uri);
+         })
+         .join(', '))
+    ).slideDown();
+  } else {
+    $('#requesting_status').text('(idle)').slideUp();
+  }
+}
+
+
+
+
 
 
 
 
 // Misc.  {{{1
+function api_name_from_uri(api_uri)  //{{{2
+{
+  return api_uri.replace(TWITTER_API_URI, '').replace(/\..*/, '');
+}
+
+
+
+
 function create_element(element_name)  //{{{2
 {
   return $(document.createElement(element_name));
@@ -1615,6 +1643,7 @@ $(document).ready(function(){  //{{{2
         $('#tweet_box').val('');
         $('#balloon_container').empty();
         $('#column_error_log').empty();
+        $('#requesting_status').hide();
       },
     },  //}}}
     initialize_oauth: {  //{{{
