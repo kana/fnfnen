@@ -1068,11 +1068,17 @@ function log_notice(where, message)  //{{{2
 
 function show_balloon(text)  //{{{2
 {
-  var node_balloon = create_element('div');
-  node_balloon.addClass('balloon');
-  node_balloon.text(text);
+  var node_balloon = (create_element('div')
+                      .addClass('balloon')
+                      .text(text)
+                      .hide());
+
   $('#balloon_container').append(node_balloon);
-  node_balloon.fadeOut(10 * 1000, function () {$(this).remove();});
+
+  (node_balloon
+   .fadeIn()
+   .animate({opapcity: 0}, 10 * 1000)  // FIXME: Use $.delay() in jQuery 1.4
+   .slideUp(function () {$(this).remove();}));
   return;
 }
 
