@@ -160,6 +160,9 @@ function before_post()  //{{{2
   if (text == '') {
     // Update timeline manually.
     update();
+    reset_automatic_update_timer(
+      g_preferences.update_interval_sec.current_value
+    );
     return;
   }
 
@@ -607,6 +610,16 @@ function queue_tweets_n2o(tweets_n2o, queue_id)  //{{{3
 
     g_tweet_queues = {};
   }
+}
+
+
+function reset_automatic_update_timer(interval_sec)  //{{{3
+{
+  if (g_parameters['automatic_update']) {
+    clearInterval(g_update_timer);
+    g_update_timer = setInterval(update, interval_sec * 1000);
+  }
+  return;
 }
 
 
@@ -1701,10 +1714,7 @@ $(document).ready(function(){  //{{{2
           {
             minimum_value: MINIMUM_UPDATE_INTERVAL_SEC,
             on_application: function() {
-              if (g_parameters['automatic_update']) {
-                clearInterval(g_update_timer);
-                g_update_timer = setInterval(update, this.current_value * 1000);
-              }
+              reset_automatic_update_timer(this.current_value);
             }
           }
         );
