@@ -92,7 +92,7 @@ function after_post(d)  //{{{2
   // On failure: d = {error: '...', ...};
 
   if (d == null)  // It seems to have succeeded, but the result is unknown.
-    log_notice('Post', 'Posted.');
+    show_balloon('Posted.');
   else if (d.error == null)
     update_with_given_tweet(d);
   else
