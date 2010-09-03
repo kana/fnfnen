@@ -1255,7 +1255,6 @@ var OAUTHED_API_DEFAULT_PARAMETERS = {
 };
 
 var g_oauthed_api_request_queue = [];
-var g_oauthed_api_request_sequence = (new Date).getTime();
 
 
 
