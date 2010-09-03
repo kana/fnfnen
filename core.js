@@ -39,6 +39,7 @@
 // - Variables suffixed with "_sec" and "_SEC" contain an integer as second.
 // - Suffix "_n2o"/"_o2n" means an array of values which are sorted from newest
 //   to oldest or from oldest to newest.
+// - Write "function (a, b) {...}", not "function(a,b){...}".
 
 
 
@@ -316,7 +317,7 @@ function make_links_in_text(text)  //{{{2
   // FIXME: Regular expression for URI.
   return text.replace(
     /https?:\/\/[\w!#$%&'*+,.\/:;=?@~-]+|@(\w+)/g,
-    function(matched_string, screen_name){
+    function (matched_string, screen_name) {
       if (screen_name) {
         return ('<a class="screen_name"'
                 + ' href="'
@@ -535,7 +536,10 @@ function callback_update(d, name_since_id, queue_id)  //{{{3
 
   var new_tweets_n2o = [];
   if (d.error == null) {
-    new_tweets_n2o = filter(d,function(tweet){return !tweet_db.has_p(tweet);});
+    new_tweets_n2o = filter(
+      d,
+      function (tweet) {return !tweet_db.has_p(tweet);}
+    );
 
     if (0 < new_tweets_n2o.length) {
       var NEWEST_TWEET_INDEX = 0;
@@ -577,7 +581,7 @@ function merge_tweets_n2o(tweet_sets)  //{{{3
   for (var i in tweet_sets)
     merged_tweets_n2o.push.apply(merged_tweets_n2o, tweet_sets[i]);
 
-  merged_tweets_n2o.sort(function(l,r){
+  merged_tweets_n2o.sort(function (l, r) {
     if (l.id < r.id)
       return -1;
     else if (l.id == r.id)
@@ -723,9 +727,9 @@ function fill_column_with_censored_tweets(node_column, required_classes) //{{{2
   ids.sort();  // BUGS: This doesn't work for ids with different length.
   ids.reverse();
   var ids_n2o = ids;
-  var tweets_n2o = map(ids_n2o, function(_){return tweet_db.get(_);});
+  var tweets_n2o = map(ids_n2o, function (_) {return tweet_db.get(_);});
 
-  var matches_p = function(t){return censored_tweet_p(t, required_classes);}
+  var matches_p = function (t) {return censored_tweet_p(t, required_classes);}
   var censored_tweets_n2o = filter(tweets_n2o, matches_p);
 
   if (0 < censored_tweets_n2o.length)
@@ -844,7 +848,9 @@ function update_censored_columns(tweets_n2o) //{{{2
   for (var column_name in g_censored_columns) {
     var node_column = column(column_name);
     var required_classes = g_censored_columns[column_name];
-    var matches_p = function(t){return censored_tweet_p(t, required_classes);}
+    var matches_p = function (t) {
+      return censored_tweet_p(t, required_classes);
+    };
 
     var censored_tweets_n2o = filter(tweets_n2o, matches_p);
 
@@ -877,7 +883,7 @@ function append_column(node_column, position)  //{{{2
   var node_selector = create_element('span');
   node_selector.attr('class', 'column_selector');
   node_selector.data('title', column_name);
-  node_selector.click(function(){
+  node_selector.click(function () {
     select_column(column_name);
     return false;
   });
@@ -890,7 +896,7 @@ function append_column(node_column, position)  //{{{2
     var node_button = create_element('span');
     node_button.addClass('button');
     node_button.text('\u2612');  // [X] - BALLOT BOX WITH X
-    node_button.click(function(){
+    node_button.click(function () {
       delete_column(column_name);
       return;
     });
@@ -911,7 +917,7 @@ function append_column(node_column, position)  //{{{2
 function column(column_name)  //{{{2
 {
   if (column_name) {
-    return $('.column').filter(function(){
+    return $('.column').filter(function () {
       return $(this).data('title') == column_name;
     });
   } else {
@@ -925,7 +931,7 @@ function column(column_name)  //{{{2
 function column_selector(column_name)  //{{{2
 {
   if (column_name) {
-    return $('.column_selector').filter(function(){
+    return $('.column_selector').filter(function () {
       return $(this).data('title') == column_name;
     });
   } else {
@@ -1066,7 +1072,7 @@ function show_balloon(text)  //{{{2
   node_balloon.addClass('balloon');
   node_balloon.text(text);
   $('#balloon_container').append(node_balloon);
-  node_balloon.fadeOut(10 * 1000, function(){$(this).remove();});
+  node_balloon.fadeOut(10 * 1000, function () {$(this).remove();});
   return;
 }
 
@@ -1137,7 +1143,7 @@ function Preference(name, default_value, _kw)  //{{{2
   this.rows = kw.rows || 25;
   this.value_type = typeof(default_value);
 
-  this.apply = function(via_external_configuration_p) {
+  this.apply = function (via_external_configuration_p) {
     this.get_form();
     this.set_form();
     this.save();
@@ -1151,7 +1157,7 @@ function Preference(name, default_value, _kw)  //{{{2
     this.on_application(via_external_configuration_p);
   };
 
-  this.get_form = function() {
+  this.get_form = function () {
     var v = this.node().val();
     if (this.value_type == 'number') {
       if (isNaN(v))
@@ -1164,7 +1170,7 @@ function Preference(name, default_value, _kw)  //{{{2
     this.current_value = v;
   };
 
-  this.initialize_form = function() {
+  this.initialize_form = function () {
     var node_dt = create_element('dt');
     node_dt.text(englishize(this.name));
 
@@ -1189,15 +1195,15 @@ function Preference(name, default_value, _kw)  //{{{2
     this.apply();
   }
 
-  this.node = function() {
+  this.node = function () {
     return $(':input[name="' + this.name + '"]');
   };
 
-  this.save = function() {
+  this.save = function () {
     $.cookie(this.name, this.current_value);
   };
 
-  this.set_form = function() {
+  this.set_form = function () {
     this.node().val(this.current_value);
   };
 
@@ -1214,7 +1220,7 @@ function Preference(name, default_value, _kw)  //{{{2
 // Tweet Database  {{{1
 function TweetDatabase()  //{{{2
 {
-  this.add = function(new_tweets){
+  this.add = function (new_tweets) {
     for (i in new_tweets) {
       var tweet = new_tweets[i];
       if (!this.has_p(tweet))
@@ -1225,11 +1231,11 @@ function TweetDatabase()  //{{{2
 
   this.db = {};  // tweet_id: tweet
 
-  this.get = function(id){
+  this.get = function (id) {
     return this.db[id];
   };
 
-  this.has_p = function(_){
+  this.has_p = function (_) {
     var id = typeof(_) == 'string' ? _ : _.id;
     return this.db[id] != null;
   };
@@ -1496,10 +1502,10 @@ function pad(n)
 
 
 
-var load_cross_domain_script = (function(){  //{{{2
+var load_cross_domain_script = (function () {  //{{{2
   var s_cached_nodes = {};
 
-  return function(script_uri){
+  return function (script_uri) {
     var key = script_uri.split('?')[0];
     if (s_cached_nodes[key])
       s_cached_nodes[key].remove();
@@ -1634,12 +1640,12 @@ function initialize(steps)  //{{{2
 
 
 
-$(document).ready(function(){  //{{{2
+$(document).ready(function () {  //{{{2
   var initialization_steps = {
     initialize_columns: {  //{{{
       requirements: [],
       procedure: function () {
-        $('.predefined.column').each(function(){
+        $('.predefined.column').each(function () {
           var node_column = $(this);
           var title = node_column.attr('title');
           node_column.data('title', title);
@@ -1647,7 +1653,7 @@ $(document).ready(function(){  //{{{2
         });
 
         $('#column_selectors').empty();
-        $('.predefined.column').each(function(){
+        $('.predefined.column').each(function () {
           append_column($(this), 'predefined');
         });
       },
@@ -1703,7 +1709,7 @@ $(document).ready(function(){  //{{{2
     initialize_preferences: {  //{{{
       requirements: ['initialize_columns', 'initialize_misc'],
       procedure: function () {
-        $('#form_preferences').submit(function(event){
+        $('#form_preferences').submit(function (event) {
           apply_preferences();
           return false;
         });
@@ -1712,7 +1718,7 @@ $(document).ready(function(){  //{{{2
           DEFAULT_UPDATE_INTERVAL_SEC,
           {
             minimum_value: MINIMUM_UPDATE_INTERVAL_SEC,
-            on_application: function() {
+            on_application: function () {
               reset_automatic_update_timer(this.current_value);
             }
           }
@@ -1722,7 +1728,7 @@ $(document).ready(function(){  //{{{2
           '/* .user_icon {display: inline;} ... */',
           {
             form_type: 'textarea',
-            on_application: function() {
+            on_application: function () {
               $('#custom_stylesheet').remove();
 
               var node_style = create_element('style');
@@ -1738,7 +1744,7 @@ $(document).ready(function(){  //{{{2
           '',
           {
             form_type: 'textarea',
-            on_application: function() {
+            on_application: function () {
               var plugin_uris = this.current_value.split('\n');
               load_plugins(plugin_uris);
             },
@@ -1780,7 +1786,7 @@ $(document).ready(function(){  //{{{2
            + ''),
           {
             form_type: 'textarea',
-            on_application: function() {
+            on_application: function () {
               set_up_censorship_law(this.current_value);
             },
             rows: 10
@@ -1809,7 +1815,7 @@ $(document).ready(function(){  //{{{2
           {
             applying_priority: g_preferences.censorship_law.applying_priority + 1,
             form_type: 'textarea',
-            on_application: function() {
+            on_application: function () {
               set_up_censored_columns(this.current_value);
             },
             rows: 10
@@ -1821,7 +1827,7 @@ $(document).ready(function(){  //{{{2
           {
             // Should apply at the last to override already applied values.
             applying_priority: g_preferences.censored_columns + 1,
-            on_application: function(via_external_configuration_p) {
+            on_application: function (via_external_configuration_p) {
               if (!via_external_configuration_p) {
                 if (this.current_value) {
                   // Loaded script should call fnfnen_external_configuration().
@@ -1849,7 +1855,7 @@ $(document).ready(function(){  //{{{2
     initialize_to_post: {  //{{{
       requirements: [],
       procedure: function () {
-        $('#post_form').submit(function(){before_post(); return false;});
+        $('#post_form').submit(function () {before_post(); return false;});
         $('#tweet_box').keyup(count_tweet_content);
       },
     },  //}}}
