@@ -1014,43 +1014,43 @@ function select_column(column_name)  //{{{2
 
 
 // Log  {{{1
-function log(type, where, message)  //{{{2
+function log(type, from, subject)  //{{{2
 {
   var node_log = create_element('div');
   node_log.addClass('log');
   node_log.addClass(type);
 
-  var node_when = create_element('span');
-  node_when.addClass('when');
-  node_when.text(human_readable_format_from_date(new Date()));
+  var node_date = create_element('span');
+  node_date.addClass('date');
+  node_date.text(human_readable_format_from_date(new Date()));
 
   var node_type = create_element('span');
   node_type.addClass('type');
   node_type.text(type.charAt(0).toUpperCase() + type.substring(1));
 
-  var node_where = create_element('span');
-  node_where.addClass('where');
-  node_where.text(where);
+  var node_from = create_element('span');
+  node_from.addClass('from');
+  node_from.text(from);
 
-  var node_message = create_element('span');
-  node_message.addClass('message');
-  node_message.text(message);
+  var node_subject = create_element('span');
+  node_subject.addClass('subject');
+  node_subject.text(subject);
 
-  node_log.append(node_when);
+  node_log.append(node_date);
   node_log.append(node_type);
-  node_log.append(node_where);
-  node_log.append(node_message);
+  node_log.append(node_from);
+  node_log.append(node_subject);
   $('#column_error_log').prepend(node_log);
 
-  show_balloon(message);
+  show_balloon(subject);
 }
 
 
 
 
-function log_error(where, message)  //{{{2
+function log_error(from, subject)  //{{{2
 {
-  log('error', where, message);
+  log('error', from, subject);
 
   column_selector('Error Log').not('.active').addClass('unread');
 }
@@ -1058,9 +1058,9 @@ function log_error(where, message)  //{{{2
 
 
 
-function log_notice(where, message)  //{{{2
+function log_notice(from, subject)  //{{{2
 {
-  log('notice', where, message);
+  log('notice', from, subject);
 }
 
 
