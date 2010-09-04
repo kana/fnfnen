@@ -1729,12 +1729,15 @@ $(document).ready(function () {  //{{{2
           {
             form_type: 'textarea',
             on_application: function () {
-              $('#custom_stylesheet').remove();
+              // Not all schemas/DTDs define id attribute for style element.
+              var id = 'fnfnen custom stylesheet';
+              $('style[title="' + id + '"]').remove();
 
               var node_style = create_element('style');
+              node_style.attr('title', id);
               node_style.attr('type', 'text/css');
               node_style.text(this.current_value);
-              $('body').append(node_style);
+              $('head').append(node_style);
             },
             rows: 10
           }
