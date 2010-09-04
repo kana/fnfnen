@@ -1189,8 +1189,6 @@ function Preference(name, default_value, _kw)  //{{{2
 
     $('#form_preferences > dl > dd.submit').before(node_dt);
     $('#form_preferences > dl > dd.submit').before(node_dd);
-
-    this.apply();
   }
 
   this.node = function () {
@@ -1204,8 +1202,6 @@ function Preference(name, default_value, _kw)  //{{{2
   this.set_form = function () {
     this.node().val(this.current_value);
   };
-
-  this.initialize_form();
 }
 
 
@@ -1244,6 +1240,7 @@ function PreferenceForm()  //{{{2
     var p = new Preference(name, default_value, options);
     this.preference_items[name] = p;
     this[name] = p;  // For ease of access.
+    p.initialize_form();
   };
 
   // Initialization
@@ -1896,6 +1893,8 @@ $(document).ready(function () {  //{{{2
             }
           }
         );
+
+        g_preferences.apply();
       },
     },  //}}}
     initialize_to_call_twitter_api: {  //{{{
