@@ -92,7 +92,7 @@ function after_post(d)  //{{{2
   // On failure: d = {error: '...', ...};
 
   if (d == null)  // It seems to have succeeded, but the result is unknown.
-    show_balloon('Posted.');
+    show_balloon('Post', 'Tweet has been posted');
   else if (d.error == null)
     update_with_given_tweet(d);
   else
@@ -120,7 +120,7 @@ function apply_preferences(via_external_configuration_p)  //{{{2
     || via_external_configuration_p
   );
   if (actually_applied_p)
-    log_notice(arguments.callee.name, 'Preferences have been saved.');
+    log_notice('Preferences', 'Preferences have been saved');
 
   return;
 }
@@ -141,7 +141,7 @@ function authenticate()  //{{{2
 function callback_authenticate(d)
 {
   if (d.error) {
-    log_error(arguments.callee.name, d.error);
+    log_error('Authentication', d.error);
     return;
   }
 
@@ -531,7 +531,7 @@ function callback_update(d, name_since_id, queue_id)  //{{{3
     }
     tweet_db.add(new_tweets_n2o);
   } else {
-    log_error(arguments.callee.name, d.error);
+    log_error('Timeline update', d.error);
     return;
   }
 
@@ -749,7 +749,7 @@ function set_up_censored_columns(rule_text)  //{{{2
                           .join(FIELD_SEPARATOR)
                           .split(/\s+/));
     } catch (e) {
-      log_error(arguments.callee.name, 'Error in rule: "' + line + '"');
+      log_error('Censored columns', 'Error in rule: "' + line + '"');
       continue;
     }
 
@@ -807,7 +807,7 @@ function set_up_censorship_law(rule_text)  //{{{2
        var flags = ignore_case_p ? 'i' : '';
        re_pattern = new RegExp(pattern, flags);
     } catch (e) {
-      log_error(arguments.callee.name, 'Error in pattern: "' + line + '"');
+      log_error('Censorship law', 'Error in pattern: "' + line + '"');
       continue;
     }
 
@@ -1012,43 +1012,50 @@ function select_column(column_name)  //{{{2
 
 
 // Log  {{{1
-function log(type, where, message)  //{{{2
+function log(type, from, subject, opt_body)  //{{{2
 {
+  var body = opt_body || '-';
+
   var node_log = create_element('div');
   node_log.addClass('log');
   node_log.addClass(type);
 
-  var node_when = create_element('span');
-  node_when.addClass('when');
-  node_when.text(human_readable_format_from_date(new Date()));
+  var node_date = create_element('span');
+  node_date.addClass('date');
+  node_date.text(human_readable_format_from_date(new Date()));
 
   var node_type = create_element('span');
   node_type.addClass('type');
   node_type.text(type.charAt(0).toUpperCase() + type.substring(1));
 
-  var node_where = create_element('span');
-  node_where.addClass('where');
-  node_where.text(where);
+  var node_from = create_element('span');
+  node_from.addClass('from');
+  node_from.text(from);
 
-  var node_message = create_element('span');
-  node_message.addClass('message');
-  node_message.text(message);
+  var node_subject = create_element('span');
+  node_subject.addClass('subject');
+  node_subject.text(subject);
 
-  node_log.append(node_when);
+  var node_body = create_element('span');
+  node_body.addClass('body');
+  node_body.text(body);
+
+  node_log.append(node_date);
   node_log.append(node_type);
-  node_log.append(node_where);
-  node_log.append(node_message);
+  node_log.append(node_from);
+  node_log.append(node_subject);
+  node_log.append(node_body);
   $('#column_error_log').prepend(node_log);
 
-  show_balloon(message);
+  show_balloon(from, subject);
 }
 
 
 
 
-function log_error(where, message)  //{{{2
+function log_error(from, subject, opt_body)  //{{{2
 {
-  log('error', where, message);
+  log('error', from, subject, opt_body);
 
   column_selector('Error Log').not('.active').addClass('unread');
 }
@@ -1056,20 +1063,28 @@ function log_error(where, message)  //{{{2
 
 
 
-function log_notice(where, message)  //{{{2
+function log_notice(from, subject, opt_body)  //{{{2
 {
-  log('notice', where, message);
+  log('notice', from, subject, opt_body);
 }
 
 
 
 
-function show_balloon(text)  //{{{2
+function show_balloon(opt_from, subject)  //{{{2
 {
-  var node_balloon = (create_element('div')
-                      .addClass('balloon')
-                      .text(text)
-                      .hide());
+  var from = subject ? opt_from : null;
+  var subject = subject ? subject : opt_from;
+
+  var node_from = create_element('span').addClass('from').text(from);
+  var node_subject = create_element('span').addClass('subject').text(subject);
+
+  var node_balloon = create_element('div');
+  node_balloon.addClass('balloon');
+  node_balloon.hide();
+  if (from)
+    node_balloon.append(node_from);
+  node_balloon.append(node_subject);
 
   $('#balloon_container').append(node_balloon);
 
@@ -1349,7 +1364,7 @@ function process_queued_api_request_with_oauth()  //{{{2
     function () {
       if (error_timer) {
         error_timer = null;  // Prevents "loaded" handler.
-        request.callback({error: 'Request time out.'});
+        request.callback({error: 'Request time out'});
         finish_processing_a_request();
       }
     },
@@ -1871,7 +1886,7 @@ $(document).ready(function () {  //{{{2
 
   initialize(initialization_steps);
 
-  log_notice('$(document).ready', 'System has been initialized.');
+  log_notice('System', 'Initializationi has been completed');
 
   raise_event('ready');
 
