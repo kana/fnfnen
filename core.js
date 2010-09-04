@@ -132,6 +132,7 @@ function authenticate()  //{{{2
 {
   request_twitter_api_with_oauth({
     callback: callback_authenticate,
+    from: 'Authentication',
     method: 'get',
     uri: TWITTER_API_URI + 'account/verify_credentials.json',
   });
@@ -188,6 +189,7 @@ function before_post()  //{{{2
 
   request_twitter_api_with_oauth({
     callback: after_post,
+    from: 'Post',
     method: $('#post_form').attr('method'),
     parameters: parameters,
     uri: $('#post_form').attr('action'),
@@ -483,6 +485,7 @@ function toggle_favorite(tweet_id)  //{{{2
       else
         update_views();
     },
+    from: 'Favorite',
     method: 'post',
     parameters: {
     },
@@ -634,6 +637,7 @@ function update()  //{{{3
 
   request_twitter_api_with_oauth({
     callback: callback_update_home,
+    from: 'Update (home)',
     method: 'get',
     parameters: {
       count: MAX_COUNT_HOME,
@@ -643,6 +647,7 @@ function update()  //{{{3
   });
   request_twitter_api_with_oauth({
     callback: callback_update_mentions,
+    from: 'Update (mentions)',
     method: 'get',
     parameters: {
       count: MAX_COUNT_MENTIONS,
@@ -1303,6 +1308,7 @@ function request_twitter_api_with_oauth(request)  //{{{2
 
   g_oauthed_api_request_queue.push({
     callback: request.callback || nop,
+    from: request.from || '?',
     method: normalized_method,  // required
     parameters: $.extend({},  // To avoid destructive side effect.
                          OAUTHED_API_DEFAULT_PARAMETERS,
