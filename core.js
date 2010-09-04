@@ -92,7 +92,7 @@ function after_post(d)  //{{{2
   // On failure: d = {error: '...', ...};
 
   if (d == null)  // It seems to have succeeded, but the result is unknown.
-    log_notice('Post', 'Posted.');
+    log_notice('Post', 'Tweet has been posted');
   else if (d.error == null)
     update_with_given_tweet(d);
   else
@@ -120,7 +120,7 @@ function apply_preferences(via_external_configuration_p)  //{{{2
     || via_external_configuration_p
   );
   if (actually_applied_p)
-    log_notice(arguments.callee.name, 'Preferences have been saved.');
+    log_notice('Preferences', 'Preferences have been saved');
 
   return;
 }
@@ -141,7 +141,7 @@ function authenticate()  //{{{2
 function callback_authenticate(d)
 {
   if (d.error) {
-    log_error(arguments.callee.name, d.error);
+    log_error('Authentication', d.error);
     return;
   }
 
@@ -550,7 +550,7 @@ function callback_update(d, name_since_id, queue_id)  //{{{3
     }
     tweet_db.add(new_tweets_n2o);
   } else {
-    log_error(arguments.callee.name, d.error);
+    log_error('Timeline update', d.error);
     return;
   }
 
@@ -768,7 +768,7 @@ function set_up_censored_columns(rule_text)  //{{{2
                           .join(FIELD_SEPARATOR)
                           .split(/\s+/));
     } catch (e) {
-      log_error(arguments.callee.name, 'Error in rule: "' + line + '"');
+      log_error('Censored columns', 'Error in rule: "' + line + '"');
       continue;
     }
 
@@ -826,7 +826,7 @@ function set_up_censorship_law(rule_text)  //{{{2
        var flags = ignore_case_p ? 'i' : '';
        re_pattern = new RegExp(pattern, flags);
     } catch (e) {
-      log_error(arguments.callee.name, 'Error in pattern: "' + line + '"');
+      log_error('Censorship law', 'Error in pattern: "' + line + '"');
       continue;
     }
 
@@ -1352,7 +1352,7 @@ function process_queued_api_request_with_oauth()  //{{{2
     function () {
       if (error_timer) {
         error_timer = null;  // Prevents "loaded" handler.
-        request.callback({error: 'Request time out.'});
+        request.callback({error: 'Request time out'});
         finish_processing_a_request();
       }
     },
@@ -1870,7 +1870,7 @@ $(document).ready(function () {  //{{{2
 
   initialize(initialization_steps);
 
-  log_notice('$(document).ready', 'System has been initialized.');
+  log_notice('System', 'Initializationi has been completed');
 
   raise_event('ready');
 
