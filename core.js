@@ -912,8 +912,12 @@ function delete_column(column_name_or_node, forced_p)  //{{{2
     column_name = node_column.data('title');
   }
 
-  if (node_column.length != 1)
-    return;  // FIXME: Unexpected situation - raise error.
+  if (node_column.length != 1) {
+    return log_error(
+      'System (delete_column)',
+      'Unexpected column_name_or_node: ' + column_name_or_node
+    );
+  }
 
   // Some kinds of columns are indestructible.
   if (node_column.hasClass('predefined')
