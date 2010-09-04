@@ -215,7 +215,7 @@ function count_tweet_content(e)  //{{{2
 function fnfnen_external_configuration(data)  //{{{2
 {
   g_external_configuration = data;
-  apply_preferences(true);
+  g_preferences.apply(true);
   return;
 }
 
@@ -1213,7 +1213,11 @@ function PreferenceForm()  //{{{2
   this.preference_items = {};  // {name: Preference, ...}
 
   // Methods
-  this.apply = function (via_external_configuration_p) {
+  this.apply = function (opt_mode) {
+    var via_external_configuration_p = (opt_mode == 'initialization'
+                                        ? false
+                                        : opt_mode);
+
     var priorities = [];  // [[applying_priority, name], ...]
     for (var name in this.preference_items)
       priorities.push([this.preference_items[name].applying_priority, name]);
@@ -1230,10 +1234,8 @@ function PreferenceForm()  //{{{2
       this.preference_items.external_configuration_uri.current_value == ''
       || via_external_configuration_p
     );
-    if (actually_applied_p)
+    if (actually_applied_p && opt_mode != 'initialization')
       log_notice('Preferences', 'Preferences have been saved');
-
-    return;
   };
 
   this.register = function (name, default_value, options) {
@@ -1894,7 +1896,7 @@ $(document).ready(function () {  //{{{2
           }
         );
 
-        g_preferences.apply();
+        g_preferences.apply('initialization');
       },
     },  //}}}
     initialize_to_call_twitter_api: {  //{{{
