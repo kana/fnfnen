@@ -1725,7 +1725,7 @@ $(document).ready(function () {  //{{{2
         );
         g_preferences.request_time_out_interval_sec = new Preference(
           'request_time_out_interval_sec',
-          10
+          15
         );
         g_preferences.custom_stylesheet = new Preference(
           'custom_stylesheet',
