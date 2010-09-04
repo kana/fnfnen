@@ -412,7 +412,7 @@ function show_conversation(tweet_id)  //{{{2
   select_column(column_name);
 
   node_column.empty();
-  show_tweets_n2o(tweets_in_conoversation_n2o, node_column);
+  add_tweets_n2o_into_column(node_column, tweets_in_conoversation_n2o);
 }
 
 
@@ -432,25 +432,6 @@ function list_tweets_in_conversation_n2o(tweet_id)
   }
 
   return tweets_in_conoversation_n2o;
-}
-
-
-
-
-function show_tweets_n2o(tweets_n2o, node_column)  //{{{2
-{
-  // tweets_n2o = [{newest-tweet}, ..., {oldest-tweet}]
-
-  raise_event('new_tweets', {tweets: tweets_n2o});
-
-  var node_tweet_hub = node_from_tweets_n2o(tweets_n2o);
-  node_column.prepend(node_tweet_hub);
-
-  // Scroll to the head of the latest tweet hub.
-  // FIXME: Customize behavior on this autoscroll.
-  scroll(0);
-
-  return tweets_n2o.length;
 }
 
 
@@ -733,7 +714,7 @@ function fill_column_with_censored_tweets(node_column, required_classes) //{{{2
   var censored_tweets_n2o = filter(tweets_n2o, matches_p);
 
   if (0 < censored_tweets_n2o.length)
-    node_column.append(node_from_tweets_n2o(censored_tweets_n2o));
+    add_tweets_n2o_into_column(node_column, censored_tweets_n2o);
 
   return;
 }
@@ -845,6 +826,8 @@ function set_up_censorship_law(rule_text)  //{{{2
 
 function update_censored_columns(tweets_n2o) //{{{2
 {
+  raise_event('new_tweets', {tweets: tweets_n2o});
+
   for (var column_name in g_censored_columns) {
     var node_column = column(column_name);
     var required_classes = g_censored_columns[column_name];
@@ -854,10 +837,7 @@ function update_censored_columns(tweets_n2o) //{{{2
 
     var censored_tweets_n2o = filter(tweets_n2o, matches_p);
 
-    var node_tweets = node_from_tweets_n2o(censored_tweets_n2o);
-    node_tweets.hide();
-    node_column.prepend(node_tweets);
-    node_tweets.slideDown();
+    add_tweets_n2o_into_column(node_column, censored_tweets_n2o);
   }
 
   return;
@@ -871,6 +851,24 @@ function update_censored_columns(tweets_n2o) //{{{2
 
 
 // Columns  {{{1
+function add_tweets_n2o_into_column(node_column, tweets_n2o)  //{{{2
+{
+  var node_tweets = node_from_tweets_n2o(tweets_n2o);
+  node_tweets.hide();
+  node_column.prepend(node_tweets);
+  node_tweets.slideDown();
+
+  // Scroll to the head of the latest tweet hub.
+  // FIXME: Customize behavior on this autoscroll.
+  if (node_column.hasClass('active'))
+    scroll(0);
+
+  return;
+}
+
+
+
+
 function append_column(node_column, position)  //{{{2
 {
   position = position || 'last';
