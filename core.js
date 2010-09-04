@@ -795,11 +795,13 @@ function update_censored_columns(tweets_n2o) //{{{2
 
 
 // Columns  {{{1
-function add_tweets_n2o_into_column(node_column, tweets_n2o)  //{{{2
+function add_tweets_n2o_into_column(node_column, tweets_n2o, opt_place)  //{{{2
 {
+  var place = opt_place || 'prepend';  // MUST be 'append' or 'prepend'.
+
   var node_tweets = node_from_tweets_n2o(tweets_n2o);
   node_tweets.hide();
-  node_column.prepend(node_tweets);
+  node_column[place](node_tweets);
   node_tweets.slideDown();
 
   // Scroll to the head of the latest tweet hub.
