@@ -40,6 +40,7 @@
 // - Suffix "_n2o"/"_o2n" means an array of values which are sorted from newest
 //   to oldest or from oldest to newest.
 // - Write "function (a, b) {...}", not "function(a,b){...}".
+// - Prefix "opt_" to optional arguments.
 
 
 
@@ -871,9 +872,10 @@ function add_tweets_n2o_into_column(node_column, tweets_n2o)  //{{{2
 
 
 
-function append_column(node_column, position)  //{{{2
+function append_column(node_column, opt_position)  //{{{2
 {
-  position = position || 'last';
+  // opt_position MUST be 'first', 'last' or 'predefined'.
+  var position = opt_position || 'last';
 
   if (position != 'predefined')
     $('#columns').append(node_column);
@@ -914,11 +916,11 @@ function append_column(node_column, position)  //{{{2
 
 
 
-function column(column_name)  //{{{2
+function column(opt_column_name)  //{{{2
 {
-  if (column_name) {
+  if (opt_column_name) {
     return $('.column').filter(function () {
-      return $(this).data('title') == column_name;
+      return $(this).data('title') == opt_column_name;
     });
   } else {
     return $('.column');
@@ -928,11 +930,11 @@ function column(column_name)  //{{{2
 
 
 
-function column_selector(column_name)  //{{{2
+function column_selector(opt_column_name)  //{{{2
 {
-  if (column_name) {
+  if (opt_column_name) {
     return $('.column_selector').filter(function () {
-      return $(this).data('title') == column_name;
+      return $(this).data('title') == opt_column_name;
     });
   } else {
     return $('.column_selector');
@@ -1148,9 +1150,9 @@ function register_plugin(plugin)  //{{{2
 
 
 // Preference  {{{1
-function Preference(name, default_value, _kw)  //{{{2
+function Preference(name, default_value, opt_kw)  //{{{2
 {
-  var kw = _kw || {};
+  var kw = opt_kw || {};
 
   this.applying_priority = kw.applying_priority || DEFAULT_APPLYING_PRIORITY;
   this.columns = kw.columns || 80;
