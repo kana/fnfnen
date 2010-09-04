@@ -1014,8 +1014,10 @@ function select_column(column_name)  //{{{2
 
 
 // Log  {{{1
-function log(type, from, subject)  //{{{2
+function log(type, from, subject, opt_body)  //{{{2
 {
+  var body = opt_body || '-';
+
   var node_log = create_element('div');
   node_log.addClass('log');
   node_log.addClass(type);
@@ -1036,10 +1038,15 @@ function log(type, from, subject)  //{{{2
   node_subject.addClass('subject');
   node_subject.text(subject);
 
+  var node_body = create_element('span');
+  node_body.addClass('body');
+  node_body.text(body);
+
   node_log.append(node_date);
   node_log.append(node_type);
   node_log.append(node_from);
   node_log.append(node_subject);
+  node_log.append(node_body);
   $('#column_error_log').prepend(node_log);
 
   show_balloon(subject);
@@ -1048,9 +1055,9 @@ function log(type, from, subject)  //{{{2
 
 
 
-function log_error(from, subject)  //{{{2
+function log_error(from, subject, opt_body)  //{{{2
 {
-  log('error', from, subject);
+  log('error', from, subject, opt_body);
 
   column_selector('Error Log').not('.active').addClass('unread');
 }
@@ -1058,9 +1065,9 @@ function log_error(from, subject)  //{{{2
 
 
 
-function log_notice(from, subject)  //{{{2
+function log_notice(from, subject, opt_body)  //{{{2
 {
-  log('notice', from, subject);
+  log('notice', from, subject, opt_body);
 }
 
 
