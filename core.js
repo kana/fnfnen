@@ -1897,7 +1897,7 @@ $(document).ready(function () {  //{{{2
 
   initialize(initialization_steps);
 
-  log_notice('System', 'Initializationi has been completed');
+  log_notice('System', 'Initialization has been completed');
 
   raise_event('ready');
 
