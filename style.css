@@ -203,8 +203,7 @@ dd.submit {margin: 0;}
 .log .date:after {content: ': ';}
 .log .type:after {content: ': ';}
 .log .from:after {content: ': ';}
-.log .subject:after {content: ': ';}
-.log .body:after {}
+.log .subject:after {}
 
 
 
@@ -265,7 +264,6 @@ body {color: #000; background-color: #eee;}
 .log .type {color: #000;}
 .log .from {color: #666;}
 .log .subject {}
-.log .body {color: #000;}
 
 
 
