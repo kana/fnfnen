@@ -96,7 +96,7 @@ function after_post(d)  //{{{2
   else if (d.error == null)
     update_with_given_tweet(d);
   else
-    log_error('Post', d.error);
+    nop();
 
   return;
 }
@@ -132,6 +132,7 @@ function authenticate()  //{{{2
 {
   request_twitter_api_with_oauth({
     callback: callback_authenticate,
+    from: 'Authentication',
     method: 'get',
     uri: TWITTER_API_URI + 'account/verify_credentials.json',
   });
@@ -140,10 +141,8 @@ function authenticate()  //{{{2
 
 function callback_authenticate(d)
 {
-  if (d.error) {
-    log_error('Authentication', d.error);
+  if (d.error)
     return;
-  }
 
   g_user = d;
 
@@ -188,6 +187,7 @@ function before_post()  //{{{2
 
   request_twitter_api_with_oauth({
     callback: after_post,
+    from: 'Post',
     method: $('#post_form').attr('method'),
     parameters: parameters,
     uri: $('#post_form').attr('action'),
@@ -464,6 +464,7 @@ function toggle_favorite(tweet_id)  //{{{2
       else
         update_views();
     },
+    from: 'Favorite',
     method: 'post',
     parameters: {
     },
@@ -531,7 +532,6 @@ function callback_update(d, name_since_id, queue_id)  //{{{3
     }
     tweet_db.add(new_tweets_n2o);
   } else {
-    log_error('Timeline update', d.error);
     return;
   }
 
@@ -615,6 +615,7 @@ function update()  //{{{3
 
   request_twitter_api_with_oauth({
     callback: callback_update_home,
+    from: 'Update (home)',
     method: 'get',
     parameters: {
       count: MAX_COUNT_HOME,
@@ -624,6 +625,7 @@ function update()  //{{{3
   });
   request_twitter_api_with_oauth({
     callback: callback_update_mentions,
+    from: 'Update (mentions)',
     method: 'get',
     parameters: {
       count: MAX_COUNT_MENTIONS,
@@ -1306,6 +1308,7 @@ function request_twitter_api_with_oauth(request)  //{{{2
 
   g_oauthed_api_request_queue.push({
     callback: request.callback || nop,
+    from: request.from || '?',
     method: normalized_method,  // required
     parameters: $.extend({},  // To avoid destructive side effect.
                          OAUTHED_API_DEFAULT_PARAMETERS,
@@ -1364,7 +1367,11 @@ function process_queued_api_request_with_oauth()  //{{{2
     function () {
       if (error_timer) {
         error_timer = null;  // Prevents "loaded" handler.
-        request.callback({error: 'Request time out'});
+
+        var data = {error: 'Request time out'};
+        log_error(request.from, data.error);
+        request.callback(data);
+
         finish_processing_a_request();
       }
     },
@@ -1377,6 +1384,8 @@ function process_queued_api_request_with_oauth()  //{{{2
         clearTimeout(error_timer);  // Prevents error_timer handler.
         error_timer = null;
 
+        if (data.error)
+          log_error(request.from, data.error);
         request.callback(data);
         setTimeout(finish_processing_a_request, 0);
       }
@@ -1396,6 +1405,8 @@ function process_queued_api_request_with_oauth()  //{{{2
           ? eval('(' + $('#request_iframe').contents().text() + ')')
           : null  // Investigating is not allowed because of same origin policy.
         );
+        if (response && response.error)
+          log_error(request.from, data.error);
         request.callback(response);
 
         setTimeout(finish_processing_a_request, 0);
