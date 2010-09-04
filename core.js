@@ -60,6 +60,7 @@ var DEFAULT_UPDATE_INTERVAL_SEC = 5 * 60;
 var DUMMY_SINCE_ID = 1;
 var GLOBAL_VARIABLES = window;
 var HOME_COLUMN_NAME = 'Home';
+var LAST_APPLYING_PRIORITY = 1000;
 var MAX_COUNT_HOME = 200;
 var MAX_COUNT_MENTIONS = 200;
 var MAX_TWEET_CONTENT = 140;
@@ -90,30 +91,6 @@ var g_user = null;
 
 
 // Core  {{{1
-function apply_preferences(via_external_configuration_p)  //{{{2
-{
-  var priorities = [];  // [[applying_priority, name], ...]
-  for (var name in g_preferences)
-    priorities.push([g_preferences[name].applying_priority, name]);
-  priorities.sort();
-
-  for (var _ in priorities)
-    g_preferences[priorities[_][1]].apply(via_external_configuration_p);
-
-  // Notify to user.
-  var actually_applied_p = (
-    g_preferences.external_configuration_uri.current_value == ''
-    || via_external_configuration_p
-  );
-  if (actually_applied_p)
-    log_notice('Preferences', 'Preferences have been saved');
-
-  return;
-}
-
-
-
-
 function authenticate()  //{{{2
 {
   request_twitter_api_with_oauth({
@@ -225,7 +202,7 @@ function count_tweet_content(e)  //{{{2
 function fnfnen_external_configuration(data)  //{{{2
 {
   g_external_configuration = data;
-  apply_preferences(true);
+  g_preferences.apply(true);
   return;
 }
 
@@ -1189,8 +1166,6 @@ function Preference(name, default_value, opt_kw)  //{{{2
 
     $('#form_preferences > dl > dd.submit').before(node_dt);
     $('#form_preferences > dl > dd.submit').before(node_dd);
-
-    this.apply();
   }
 
   this.node = function () {
@@ -1204,8 +1179,55 @@ function Preference(name, default_value, opt_kw)  //{{{2
   this.set_form = function () {
     this.node().val(this.current_value);
   };
+}
 
-  this.initialize_form();
+
+
+
+function PreferenceForm()  //{{{2
+{
+  // Properties
+  this.preference_items = {};  // {name: Preference, ...}
+
+  // Methods
+  this.apply = function (opt_mode) {
+    var via_external_configuration_p = (opt_mode == 'initialization'
+                                        ? false
+                                        : opt_mode);
+
+    var priorities = [];  // [[applying_priority, name], ...]
+    for (var name in this.preference_items)
+      priorities.push([this.preference_items[name].applying_priority, name]);
+    priorities.sort();
+
+    for (var _ in priorities) {
+      this.preference_items[priorities[_][1]].apply(
+        via_external_configuration_p
+      );
+    }
+
+    // Notify to user.
+    var actually_applied_p = (
+      this.preference_items.external_configuration_uri.current_value == ''
+      || via_external_configuration_p
+    );
+    if (actually_applied_p && opt_mode != 'initialization')
+      log_notice('Preferences', 'Saved');
+  };
+
+  this.register = function (name, default_value, options) {
+    var p = new Preference(name, default_value, options);
+    this.preference_items[name] = p;
+    this[name] = p;  // For ease of access.
+    p.initialize_form();
+  };
+
+  // Initialization
+  var _this = this;
+  $('#form_preferences').submit(function (event) {
+    _this.apply();
+    return false;
+  });
 }
 
 
@@ -1685,11 +1707,9 @@ $(document).ready(function () {  //{{{2
     initialize_preferences: {  //{{{
       requirements: ['initialize_columns', 'initialize_misc'],
       procedure: function () {
-        $('#form_preferences').submit(function (event) {
-          apply_preferences();
-          return false;
-        });
-        g_preferences.update_interval_sec = new Preference(
+        g_preferences = new PreferenceForm();
+
+        g_preferences.register(
           'update_interval_sec',
           DEFAULT_UPDATE_INTERVAL_SEC,
           {
@@ -1699,11 +1719,11 @@ $(document).ready(function () {  //{{{2
             }
           }
         );
-        g_preferences.request_time_out_interval_sec = new Preference(
+        g_preferences.register(
           'request_time_out_interval_sec',
           15
         );
-        g_preferences.custom_stylesheet = new Preference(
+        g_preferences.register(
           'custom_stylesheet',
           '/* .user_icon {display: inline;} ... */',
           {
@@ -1719,7 +1739,7 @@ $(document).ready(function () {  //{{{2
             rows: 10
           }
         );
-        g_preferences.plugins = new Preference(
+        g_preferences.register(
           'plugins',
           '',
           {
@@ -1731,39 +1751,40 @@ $(document).ready(function () {  //{{{2
             rows: 10
           }
         );
-        g_preferences.censorship_law = new Preference(
+        g_preferences.register(
           'censorship_law',
-          (''
-           + '# Lines start with "#" are comments, so that they are ignored.\n'
-           + '# Blank lines are also ignored.\n'
-           + '#\n'
-           + '# Format: "{classes}:{property}:{pattern}"\n'
-           + '#\n'
-           + '#  {classes}\n'
-           + '#    Names to be added value of "class" attribute of a tweet.\n'
-           + '#\n'
-           + '#  {property}\n'
-           + '#    The name of property to be censored.\n'
-           + '#    Examples: "text", "source", "user.screen_name".\n'
-           + '#\n'
-           + '#  {pattern}\n'
-           + '#    Regular expression to test whether a tweet is censored or not.\n'
-           + '#    A tweet is censored if {pattern} is matched to the value of\n'
-           + '#    {property}.  If {pattern} starts with "?", pattern matching is\n'
-           + '#    case-insensitive.\n'
-           + '#\n'
-           + '# Examples:\n'
-           + '#\n'
-           + '#   censored retweet:text:\\bRT @\n'
-           + '#   censored user:user.screen_name:?_bot$\n'
-           + '#   interested keyword:text:?\\bgit\\b\n'
-           + '#\n'
-           + '# Note that you also have to customize stylesheet to use censored\n'
-           + '# results.  For example, add the following:\n'
-           + '#\n'
-           + '#   .censored.tweet {text-decoration: line-through;}\n'
-           + '#   .interested.tweet {font-weight: bolder;}\n'
-           + ''),
+          [
+            '# Lines start with "#" are comments, so that they are ignored.',
+            '# Blank lines are also ignored.',
+            '#',
+            '# Format: "{classes}:{property}:{pattern}"',
+            '#',
+            '#  {classes}',
+            '#    Names to be added value of "class" attribute of a tweet.',
+            '#',
+            '#  {property}',
+            '#    The name of property to be censored.',
+            '#    Examples: "text", "source", "user.screen_name".',
+            '#',
+            '#  {pattern}',
+            '#    Regular expression to test whether a tweet is censored or not.',
+            '#    A tweet is censored if {pattern} is matched to the value of',
+            '#    {property}.  If {pattern} starts with "?", pattern matching is',
+            '#    case-insensitive.',
+            '#',
+            '# Examples:',
+            '#',
+            '#   censored retweet:text:\\bRT @',
+            '#   censored user:user.screen_name:?_bot$',
+            '#   interested keyword:text:?\\bgit\\b',
+            '#',
+            '# Note that you also have to customize stylesheet to use censored',
+            '# results.  For example, add the following:',
+            '#',
+            '#   .censored.tweet {text-decoration: line-through;}',
+            '#   .interested.tweet {font-weight: bolder;}',
+            ''
+          ].join('\n'),
           {
             form_type: 'textarea',
             on_application: function () {
@@ -1772,28 +1793,31 @@ $(document).ready(function () {  //{{{2
             rows: 10
           }
         );
-        g_preferences.censored_columns = new Preference(
+        g_preferences.register(
           'censored_columns',
-          (''
-           + '# Lines start with "#" are comments, so that they are ignored.\n'
-           + '# Blank lines are also ignored.\n'
-           + '#\n'
-           + '# Format: "{column_name}:{classes}"\n'
-           + '#\n'
-           + '#  {column_name}\n'
-           + '#    The name of column to show censored tweets.\n'
-           + '#\n'
-           + '#  {classes}\n'
-           + '#    Space-separated names of classes.  If a tweet has all classes\n'
-           + '#    as specified by {classes}, the tweet is shown in the column.\n'
-           + '#\n'
-           + '# Examples:\n'
-           + '#\n'
-           + '#   retweets:retweet\n'
-           + '#   git:git\n'
-           + ''),
+          [
+            '# Lines start with "#" are comments, so that they are ignored.',
+            '# Blank lines are also ignored.',
+            '#',
+            '# Format: "{column_name}:{classes}"',
+            '#',
+            '#  {column_name}',
+            '#    The name of column to show censored tweets.',
+            '#',
+            '#  {classes}',
+            '#    Space-separated names of classes.  If a tweet has all classes',
+            '#    as specified by {classes}, the tweet is shown in the column.',
+            '#',
+            '# Examples:',
+            '#',
+            '#   retweets:retweet',
+            '#   git:git',
+            ''
+          ].join('\n'),
           {
-            applying_priority: g_preferences.censorship_law.applying_priority + 1,
+            applying_priority: (
+              g_preferences.censorship_law.applying_priority + 1
+            ),
             form_type: 'textarea',
             on_application: function () {
               set_up_censored_columns(this.current_value);
@@ -1801,12 +1825,12 @@ $(document).ready(function () {  //{{{2
             rows: 10
           }
         );
-        g_preferences.external_configuration_uri = new Preference(
+        g_preferences.register(
           'external_configuration_uri',
           '',
           {
             // Should apply at the last to override already applied values.
-            applying_priority: g_preferences.censored_columns + 1,
+            applying_priority: LAST_APPLYING_PRIORITY,
             on_application: function (via_external_configuration_p) {
               if (!via_external_configuration_p) {
                 if (this.current_value) {
@@ -1817,6 +1841,8 @@ $(document).ready(function () {  //{{{2
             }
           }
         );
+
+        g_preferences.apply('initialization');
       },
     },  //}}}
     initialize_to_call_twitter_api: {  //{{{
