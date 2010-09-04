@@ -41,6 +41,9 @@
 //   to oldest or from oldest to newest.
 // - Write "function (a, b) {...}", not "function(a,b){...}".
 // - Prefix "opt_" to optional arguments.
+// - Use the name "response" for variable which contains the result of
+//   a request to Twitter API.  For example, write "function (response) {...}"
+//   for request.callback for request_twitter_api_with_oauth().
 
 
 
@@ -87,15 +90,12 @@ var g_user = null;
 
 
 // Core  {{{1
-function after_post(d)  //{{{2
+function after_post(response)  //{{{2
 {
-  // On success: d = {text: '...', ...};
-  // On failure: d = {error: '...', ...};
-
-  if (d == null)  // It seems to have succeeded, but the result is unknown.
+  if (response == null)  // Response is unknown because of same origin policy.
     show_balloon('Post', 'Tweet has been posted');
-  else if (d.error == null)
-    update_with_given_tweet(d);
+  else if (response.error == null)
+    update_with_given_tweet(response);
   else
     nop();
 
@@ -140,12 +140,12 @@ function authenticate()  //{{{2
   return;
 }
 
-function callback_authenticate(d)
+function callback_authenticate(response)
 {
-  if (d.error)
+  if (response.error)
     return;
 
-  g_user = d;
+  g_user = response;
 
   update();
   return;
@@ -459,8 +459,8 @@ function toggle_favorite(tweet_id)  //{{{2
   }
 
   request_twitter_api_with_oauth({
-    callback: function (data) {
-      if (data && data.error)
+    callback: function (response) {
+      if (response && response.error)
         stop_fading();
       else
         update_views();
@@ -512,15 +512,15 @@ var VALID_QUEUE_IDS = [QUEUE_ID_HOME, QUEUE_ID_MENTIONS];
 var g_tweet_queues = {/* queue_id: tweets_n2o = [newest, ..., oldest] */};
 
 
-function callback_update(d, name_since_id, queue_id)  //{{{3
+function callback_update(response, name_since_id, queue_id)  //{{{3
 {
-  // d = [{newest-tweet}, ..., {oldest-tweet}]
+  // response = [{newest-tweet}, ..., {oldest-tweet}]
   $('#last_updated_time').text('Last updated: ' + new Date().toString());
 
   var new_tweets_n2o = [];
-  if (d.error == null) {
+  if (response.error == null) {
     new_tweets_n2o = filter(
-      d,
+      response,
       function (tweet) {return !tweet_db.has_p(tweet);}
     );
 
@@ -541,16 +541,16 @@ function callback_update(d, name_since_id, queue_id)  //{{{3
 }
 
 
-function callback_update_home(d)  //{{{3
+function callback_update_home(response)  //{{{3
 {
-  callback_update(d, 'g_since_id_home', QUEUE_ID_HOME);
+  callback_update(response, 'g_since_id_home', QUEUE_ID_HOME);
   return;
 }
 
 
-function callback_update_mentions(d)  //{{{3
+function callback_update_mentions(response)  //{{{3
 {
-  callback_update(d, 'g_since_id_mentions', QUEUE_ID_MENTIONS);
+  callback_update(response, 'g_since_id_mentions', QUEUE_ID_MENTIONS);
   return;
 }
 
@@ -1370,9 +1370,9 @@ function process_queued_api_request_with_oauth()  //{{{2
       if (error_timer) {
         error_timer = null;  // Prevents "loaded" handler.
 
-        var data = {error: 'Request time out'};
-        log_error(request.from, data.error);
-        request.callback(data);
+        var response = {error: 'Request time out'};
+        log_error(request.from, response.error);
+        request.callback(response);
 
         finish_processing_a_request();
       }
@@ -1381,14 +1381,14 @@ function process_queued_api_request_with_oauth()  //{{{2
   );
 
   if (request.method == 'GET') {
-    callback_for_jsonp_request = function (data) {
+    callback_for_jsonp_request = function (response) {
       if (error_timer) {
         clearTimeout(error_timer);  // Prevents error_timer handler.
         error_timer = null;
 
-        if (data.error)
-          log_error(request.from, data.error);
-        request.callback(data);
+        if (response.error)
+          log_error(request.from, response.error);
+        request.callback(response);
         setTimeout(finish_processing_a_request, 0);
       }
     };
@@ -1408,7 +1408,7 @@ function process_queued_api_request_with_oauth()  //{{{2
           : null  // Investigating is not allowed because of same origin policy.
         );
         if (response && response.error)
-          log_error(request.from, data.error);
+          log_error(request.from, response.error);
         request.callback(response);
 
         setTimeout(finish_processing_a_request, 0);
