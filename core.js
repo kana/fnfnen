@@ -408,10 +408,10 @@ function show_conversation(tweet_id)  //{{{2
     node_column = create_column(column_name, 'temporary');
     append_column(node_column);
   }
+  node_column.empty();
 
   select_column(column_name);
 
-  node_column.empty();
   show_tweets_n2o(tweets_in_conoversation_n2o, node_column);
 }
 
