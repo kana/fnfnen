@@ -1788,37 +1788,38 @@ $(document).ready(function () {  //{{{2
         );
         g_preferences.censorship_law = new Preference(
           'censorship_law',
-          (''
-           + '# Lines start with "#" are comments, so that they are ignored.\n'
-           + '# Blank lines are also ignored.\n'
-           + '#\n'
-           + '# Format: "{classes}:{property}:{pattern}"\n'
-           + '#\n'
-           + '#  {classes}\n'
-           + '#    Names to be added value of "class" attribute of a tweet.\n'
-           + '#\n'
-           + '#  {property}\n'
-           + '#    The name of property to be censored.\n'
-           + '#    Examples: "text", "source", "user.screen_name".\n'
-           + '#\n'
-           + '#  {pattern}\n'
-           + '#    Regular expression to test whether a tweet is censored or not.\n'
-           + '#    A tweet is censored if {pattern} is matched to the value of\n'
-           + '#    {property}.  If {pattern} starts with "?", pattern matching is\n'
-           + '#    case-insensitive.\n'
-           + '#\n'
-           + '# Examples:\n'
-           + '#\n'
-           + '#   censored retweet:text:\\bRT @\n'
-           + '#   censored user:user.screen_name:?_bot$\n'
-           + '#   interested keyword:text:?\\bgit\\b\n'
-           + '#\n'
-           + '# Note that you also have to customize stylesheet to use censored\n'
-           + '# results.  For example, add the following:\n'
-           + '#\n'
-           + '#   .censored.tweet {text-decoration: line-through;}\n'
-           + '#   .interested.tweet {font-weight: bolder;}\n'
-           + ''),
+          [
+            '# Lines start with "#" are comments, so that they are ignored.',
+            '# Blank lines are also ignored.',
+            '#',
+            '# Format: "{classes}:{property}:{pattern}"',
+            '#',
+            '#  {classes}',
+            '#    Names to be added value of "class" attribute of a tweet.',
+            '#',
+            '#  {property}',
+            '#    The name of property to be censored.',
+            '#    Examples: "text", "source", "user.screen_name".',
+            '#',
+            '#  {pattern}',
+            '#    Regular expression to test whether a tweet is censored or not.',
+            '#    A tweet is censored if {pattern} is matched to the value of',
+            '#    {property}.  If {pattern} starts with "?", pattern matching is',
+            '#    case-insensitive.',
+            '#',
+            '# Examples:',
+            '#',
+            '#   censored retweet:text:\\bRT @',
+            '#   censored user:user.screen_name:?_bot$',
+            '#   interested keyword:text:?\\bgit\\b',
+            '#',
+            '# Note that you also have to customize stylesheet to use censored',
+            '# results.  For example, add the following:',
+            '#',
+            '#   .censored.tweet {text-decoration: line-through;}',
+            '#   .interested.tweet {font-weight: bolder;}',
+            ''
+          ].join('\n'),
           {
             form_type: 'textarea',
             on_application: function () {
@@ -1829,24 +1830,25 @@ $(document).ready(function () {  //{{{2
         );
         g_preferences.censored_columns = new Preference(
           'censored_columns',
-          (''
-           + '# Lines start with "#" are comments, so that they are ignored.\n'
-           + '# Blank lines are also ignored.\n'
-           + '#\n'
-           + '# Format: "{column_name}:{classes}"\n'
-           + '#\n'
-           + '#  {column_name}\n'
-           + '#    The name of column to show censored tweets.\n'
-           + '#\n'
-           + '#  {classes}\n'
-           + '#    Space-separated names of classes.  If a tweet has all classes\n'
-           + '#    as specified by {classes}, the tweet is shown in the column.\n'
-           + '#\n'
-           + '# Examples:\n'
-           + '#\n'
-           + '#   retweets:retweet\n'
-           + '#   git:git\n'
-           + ''),
+          [
+            '# Lines start with "#" are comments, so that they are ignored.',
+            '# Blank lines are also ignored.',
+            '#',
+            '# Format: "{column_name}:{classes}"',
+            '#',
+            '#  {column_name}',
+            '#    The name of column to show censored tweets.',
+            '#',
+            '#  {classes}',
+            '#    Space-separated names of classes.  If a tweet has all classes',
+            '#    as specified by {classes}, the tweet is shown in the column.',
+            '#',
+            '# Examples:',
+            '#',
+            '#   retweets:retweet',
+            '#   git:git',
+            ''
+          ].join('\n'),
           {
             applying_priority: g_preferences.censorship_law.applying_priority + 1,
             form_type: 'textarea',
