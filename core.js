@@ -1768,7 +1768,7 @@ $(document).ready(function () {  //{{{2
               var node_style = create_element('style');
               node_style.attr('type', 'text/css');
               node_style.text(this.current_value);
-              $('body').append(node_style);
+              $('head').append(node_style);
             },
             rows: 10
           }
