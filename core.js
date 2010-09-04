@@ -505,8 +505,7 @@ function callback_update(response, name_since_id, queue_id)  //{{{3
 
   var new_tweets_n2o = [];
   if (response.error == null) {
-    new_tweets_n2o = filter(
-      response,
+    new_tweets_n2o = response.filter(
       function (tweet) {return !tweet_db.has_p(tweet);}
     );
 
@@ -687,10 +686,10 @@ function fill_column_with_censored_tweets(node_column, required_classes) //{{{2
   ids.sort();  // BUGS: This doesn't work for ids with different length.
   ids.reverse();
   var ids_n2o = ids;
-  var tweets_n2o = map(ids_n2o, function (_) {return tweet_db.get(_);});
+  var tweets_n2o = ids_n2o.map(function (_) {return tweet_db.get(_);});
 
   var matches_p = function (t) {return censored_tweet_p(t, required_classes);}
-  var censored_tweets_n2o = filter(tweets_n2o, matches_p);
+  var censored_tweets_n2o = tweets_n2o.filter(matches_p);
 
   if (0 < censored_tweets_n2o.length)
     add_tweets_n2o_into_column(node_column, censored_tweets_n2o);
@@ -814,7 +813,7 @@ function update_censored_columns(tweets_n2o) //{{{2
       return censored_tweet_p(t, required_classes);
     };
 
-    var censored_tweets_n2o = filter(tweets_n2o, matches_p);
+    var censored_tweets_n2o = tweets_n2o.filter(matches_p);
 
     add_tweets_n2o_into_column(node_column, censored_tweets_n2o);
   }
@@ -1476,22 +1475,6 @@ function favorite_symbol(favorite_p)  //{{{2
 
 
 
-function filter(list, predicate)  //{{{2
-{
-  var filtered_list = [];
-
-  for (var i in list) {
-    var value = list[i];
-    if (predicate(value))
-      filtered_list.push(value);
-  }
-
-  return filtered_list;
-}
-
-
-
-
 function human_readable_format_from_date(date)  //{{{2
 {
   return (date.getFullYear()
@@ -1541,21 +1524,6 @@ var load_cross_domain_script = (function () {  //{{{2
     s_cached_nodes[key] = e;
   };
 })();
-
-
-
-
-function map(list, f)  //{{{2
-{
-  var mapped_list = [];
-
-  for (var i in list) {
-    var value = list[i];
-    mapped_list.push(f(value));
-  }
-
-  return mapped_list;
-}
 
 
 
