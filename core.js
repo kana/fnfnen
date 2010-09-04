@@ -25,16 +25,13 @@
 // }}}
 // Notes  {{{1
 //
-// FIXME: Add raise_event() for several places.
-// FIXME: Multiple columns.
-// FIXME: Multiple tabpages.
-// FIXME: Warn about some preferences require to reload fnfnen to take effect.
-//
+// Design:
 // - A tabpage contains 1 or more columns.
 // - A column is to show tweets or other information.
 // - Currently, a tabpage contains only 1 column.  There is no distinction
 //   between column and tabpage.  Use term "column" at this moment.
 //
+// Coding style:
 // - Variables suffixed with "_ms" and "_MS" contain an integer as millisecond.
 // - Variables suffixed with "_sec" and "_SEC" contain an integer as second.
 // - Suffix "_n2o"/"_o2n" means an array of values which are sorted from newest
@@ -124,15 +121,11 @@ function before_post()  //{{{2
   }
 
   if (MAX_TWEET_CONTENT < text.length) {
-    // Warn about too long tweet.
+    // Warn and disable to post a too long tweet.
     for (var i = 0; i < 3; i++) {
       $('#tweet_content_counter').fadeOut('fast');
       $('#tweet_content_counter').fadeIn('fast');
     }
-
-    // FIXME: Send a long tweet if user tries posting it twice.
-
-    // And disable posting.
     return;
   }
 
@@ -211,9 +204,6 @@ function fnfnen_external_configuration(data)  //{{{2
 
 function html_from_tweet(tweet)  //{{{2
 {
-  // FIXME: Add a button to retweet a tweet.
-  // FIXME: Expand abbreviated URIs in a tweet.
-  // FIXME: Make links for hashtags in a tweet.
   return (''
           // user icon
           + '<a class="user_icon"'
@@ -354,7 +344,6 @@ function set_up_to_reply(screen_name, tweet_id)  //{{{2
   $('#tweet_box').focus();
 
   // Scroll to #console.
-  // FIXME: Isn't there more proper way to do it?
   scroll(0);
   return;
 }
@@ -814,7 +803,6 @@ function add_tweets_n2o_into_column(node_column, tweets_n2o)  //{{{2
   node_tweets.slideDown();
 
   // Scroll to the head of the latest tweet hub.
-  // FIXME: Customize behavior on this autoscroll.
   if (node_column.hasClass('active'))
     scroll(0);
 
@@ -1052,7 +1040,6 @@ function show_balloon(opt_from, message)  //{{{2
 
 
 // Plugins  {{{1
-// FIXME: Be reloadable.
 function load_plugins(plugin_uris)  //{{{2
 {
   for (var i in plugin_uris) {
@@ -1095,6 +1082,7 @@ function register_plugin(plugin)  //{{{2
 
 
 // Preference  {{{1
+// FIXME: Warn about some preferences require to reload fnfnen to take effect.
 function Preference(name, default_value, opt_kw)  //{{{2
 {
   var kw = opt_kw || {};
@@ -1328,8 +1316,6 @@ function process_queued_api_request_with_oauth()  //{{{2
   var request = g_oauthed_api_request_queue[0];
 
   // Set up parameters to send.
-  //
-  // FIXME: Simplify this signing procedure.
   $('#request_form').attr('action', request.uri);
   $('#request_form').attr('method', request.method);
   $('#request_form #additional_arguments').empty();
