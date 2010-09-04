@@ -1046,7 +1046,7 @@ function show_balloon(opt_from, subject)  //{{{2
 
   (node_balloon
    .fadeIn()
-   .animate({opapcity: 0}, 10 * 1000)  // FIXME: Use $.delay() in jQuery 1.4
+   .delay(10 * 1000)
    .slideUp(function () {$(this).remove();}));
   return;
 }
