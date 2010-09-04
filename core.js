@@ -105,30 +105,6 @@ function after_post(d)  //{{{2
 
 
 
-function apply_preferences(via_external_configuration_p)  //{{{2
-{
-  var priorities = [];  // [[applying_priority, name], ...]
-  for (var name in g_preferences)
-    priorities.push([g_preferences[name].applying_priority, name]);
-  priorities.sort();
-
-  for (var _ in priorities)
-    g_preferences[priorities[_][1]].apply(via_external_configuration_p);
-
-  // Notify to user.
-  var actually_applied_p = (
-    g_preferences.external_configuration_uri.current_value == ''
-    || via_external_configuration_p
-  );
-  if (actually_applied_p)
-    log_notice('Preferences', 'Preferences have been saved');
-
-  return;
-}
-
-
-
-
 function authenticate()  //{{{2
 {
   request_twitter_api_with_oauth({
@@ -1235,6 +1211,52 @@ function Preference(name, default_value, _kw)  //{{{2
 
 
 
+function PreferenceForm()  //{{{2
+{
+  // Properties
+  this.preference_items = {};  // {name: Preference, ...}
+
+  // Methods
+  this.apply = function (via_external_configuration_p) {
+    var priorities = [];  // [[applying_priority, name], ...]
+    for (var name in this.preference_items)
+      priorities.push([this.preference_items[name].applying_priority, name]);
+    priorities.sort();
+
+    for (var _ in priorities) {
+      this.preference_items[priorities[_][1]].apply(
+        via_external_configuration_p
+      );
+    }
+
+    // Notify to user.
+    var actually_applied_p = (
+      this.preference_items.external_configuration_uri.current_value == ''
+      || via_external_configuration_p
+    );
+    if (actually_applied_p)
+      log_notice('Preferences', 'Preferences have been saved');
+
+    return;
+  };
+
+  this.register = function (name, default_value, options) {
+    var p = new Preference(name, default_value, options);
+    this.preference_items[name] = p;
+    this[name] = p;  // For ease of access.
+  };
+
+  // Initialization
+  var _this = this;
+  $('#form_preferences').submit(function (event) {
+    _this.apply();
+    return false;
+  });
+}
+
+
+
+
 
 
 
@@ -1740,11 +1762,9 @@ $(document).ready(function () {  //{{{2
     initialize_preferences: {  //{{{
       requirements: ['initialize_columns', 'initialize_misc'],
       procedure: function () {
-        $('#form_preferences').submit(function (event) {
-          apply_preferences();
-          return false;
-        });
-        g_preferences.update_interval_sec = new Preference(
+        g_preferences = new PreferenceForm();
+
+        g_preferences.register(
           'update_interval_sec',
           DEFAULT_UPDATE_INTERVAL_SEC,
           {
@@ -1754,11 +1774,11 @@ $(document).ready(function () {  //{{{2
             }
           }
         );
-        g_preferences.request_time_out_interval_sec = new Preference(
+        g_preferences.register(
           'request_time_out_interval_sec',
           15
         );
-        g_preferences.custom_stylesheet = new Preference(
+        g_preferences.register(
           'custom_stylesheet',
           '/* .user_icon {display: inline;} ... */',
           {
@@ -1774,7 +1794,7 @@ $(document).ready(function () {  //{{{2
             rows: 10
           }
         );
-        g_preferences.plugins = new Preference(
+        g_preferences.register(
           'plugins',
           '',
           {
@@ -1786,7 +1806,7 @@ $(document).ready(function () {  //{{{2
             rows: 10
           }
         );
-        g_preferences.censorship_law = new Preference(
+        g_preferences.register(
           'censorship_law',
           [
             '# Lines start with "#" are comments, so that they are ignored.',
@@ -1828,7 +1848,7 @@ $(document).ready(function () {  //{{{2
             rows: 10
           }
         );
-        g_preferences.censored_columns = new Preference(
+        g_preferences.register(
           'censored_columns',
           [
             '# Lines start with "#" are comments, so that they are ignored.',
@@ -1850,7 +1870,9 @@ $(document).ready(function () {  //{{{2
             ''
           ].join('\n'),
           {
-            applying_priority: g_preferences.censorship_law.applying_priority + 1,
+            applying_priority: (
+              g_preferences.censorship_law.applying_priority + 1
+            ),
             form_type: 'textarea',
             on_application: function () {
               set_up_censored_columns(this.current_value);
@@ -1858,7 +1880,7 @@ $(document).ready(function () {  //{{{2
             rows: 10
           }
         );
-        g_preferences.external_configuration_uri = new Preference(
+        g_preferences.register(
           'external_configuration_uri',
           '',
           {
