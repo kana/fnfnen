@@ -1235,7 +1235,7 @@ function PreferenceForm()  //{{{2
       || via_external_configuration_p
     );
     if (actually_applied_p && opt_mode != 'initialization')
-      log_notice('Preferences', 'Preferences have been saved');
+      log_notice('Preferences', 'Saved');
   };
 
   this.register = function (name, default_value, options) {
