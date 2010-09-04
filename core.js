@@ -1049,7 +1049,7 @@ function log(type, from, subject, opt_body)  //{{{2
   node_log.append(node_body);
   $('#column_error_log').prepend(node_log);
 
-  show_balloon(subject);
+  show_balloon(from, subject);
 }
 
 
@@ -1073,11 +1073,20 @@ function log_notice(from, subject, opt_body)  //{{{2
 
 
 
-function show_balloon(text)  //{{{2
+function show_balloon(opt_from, subject)  //{{{2
 {
+  var from = subject ? opt_from : null;
+  var subject = subject ? subject : opt_from;
+
+  var node_from = create_element('span').addClass('from').text(from);
+  var node_subject = create_element('span').addClass('subject').text(subject);
+
   var node_balloon = create_element('div');
   node_balloon.addClass('balloon');
-  node_balloon.text(text);
+  if (from)
+    node_balloon.append(node_from);
+  node_balloon.append(node_subject);
+
   $('#balloon_container').append(node_balloon);
   node_balloon.fadeOut(10 * 1000, function () {$(this).remove();});
   return;

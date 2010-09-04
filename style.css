@@ -195,6 +195,11 @@ dd.submit {margin: 0;}
 .invisible {display: none;}
 
 
+.balloon .from {font-weight: bolder;}
+.balloon .from:after {content: ': ';}
+.balloon .subject {}
+
+
 .log .date:after {content: ': ';}
 .log .type:after {content: ': ';}
 .log .from:after {content: ': ';}
