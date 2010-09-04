@@ -1307,6 +1307,7 @@ function request_twitter_api_with_oauth(request)  //{{{2
     callback: request.callback || nop,
     from: request.from || '?',
     method: normalized_method,  // required
+    original: request,
     parameters: $.extend({},  // To avoid destructive side effect.
                          OAUTHED_API_DEFAULT_PARAMETERS,
                          request.parameters,
@@ -1357,6 +1358,10 @@ function process_queued_api_request_with_oauth()  //{{{2
   // XmlHttpRequest for many cases and XmlHttpRequest is usually restricted
   // with same origin poricy.
 
+  var notify_error = function (data) {
+    log_error(request.from, data.error, pps(request.original));
+  };
+
   // error_timer doubles the parts of a timer id and a lock.
   // Though the way to lock is not perfect yet.
   var error_timer = null;
@@ -1366,7 +1371,7 @@ function process_queued_api_request_with_oauth()  //{{{2
         error_timer = null;  // Prevents "loaded" handler.
 
         var data = {error: 'Request time out'};
-        log_error(request.from, data.error);
+        notify_error(data);
         request.callback(data);
 
         finish_processing_a_request();
@@ -1382,7 +1387,7 @@ function process_queued_api_request_with_oauth()  //{{{2
         error_timer = null;
 
         if (data.error)
-          log_error(request.from, data.error);
+          notify_error(data);
         request.callback(data);
         setTimeout(finish_processing_a_request, 0);
       }
@@ -1403,7 +1408,7 @@ function process_queued_api_request_with_oauth()  //{{{2
           : null  // Investigating is not allowed because of same origin policy.
         );
         if (response && response.error)
-          log_error(request.from, data.error);
+          notify_error(data);
         request.callback(response);
 
         setTimeout(finish_processing_a_request, 0);
@@ -1582,6 +1587,32 @@ function map(list, f)  //{{{2
 function nop()  //{{{2
 {
   return;
+}
+
+
+
+
+function pps(x)  //{{{2
+{
+  // pps = Pretty-Print into a String.
+  // FIXME: Mature.
+
+  if (x == null) {
+    return 'null';
+  } if (typeof(x) == 'function') {
+    return x.name || '\u03bb';
+  } if (typeof(x) == 'string') {
+    return "'" + x.replace(/'/g, "\\'") + "'";
+  } else if (x instanceof Array) {
+    return '[' + x.map(function (xc) {return pps(xc);}).join(', ') + ']';
+  } else if (typeof(x) == 'object') {
+    var ss = [];
+    for (var key in x)
+      ss.push(key + ': ' + pps(x[key]));
+    return '{' + ss.join(', ') + '}';
+  } else {
+    return x.toString();
+  }
 }
 
 
