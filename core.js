@@ -56,6 +56,7 @@ var DEFAULT_UPDATE_INTERVAL_SEC = 5 * 60;
 var DUMMY_SINCE_ID = 1;
 var GLOBAL_VARIABLES = window;
 var HOME_COLUMN_NAME = 'Home';
+var LAST_APPLYING_PRIORITY = 1000;
 var MAX_COUNT_HOME = 200;
 var MAX_COUNT_MENTIONS = 200;
 var MAX_TWEET_CONTENT = 140;
@@ -1860,7 +1861,7 @@ $(document).ready(function () {  //{{{2
           '',
           {
             // Should apply at the last to override already applied values.
-            applying_priority: g_preferences.censored_columns + 1,
+            applying_priority: LAST_APPLYING_PRIORITY,
             on_application: function (via_external_configuration_p) {
               if (!via_external_configuration_p) {
                 if (this.current_value) {
