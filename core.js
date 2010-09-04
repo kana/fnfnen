@@ -1014,7 +1014,7 @@ function select_column(column_name)  //{{{2
 
 
 // Log  {{{1
-function log(type, from, subject)  //{{{2
+function log(type, from, message)  //{{{2
 {
   var node_log = create_element('div');
   node_log.addClass('log');
@@ -1032,25 +1032,25 @@ function log(type, from, subject)  //{{{2
   node_from.addClass('from');
   node_from.text(from);
 
-  var node_subject = create_element('span');
-  node_subject.addClass('subject');
-  node_subject.text(subject);
+  var node_message = create_element('span');
+  node_message.addClass('message');
+  node_message.text(message);
 
   node_log.append(node_date);
   node_log.append(node_type);
   node_log.append(node_from);
-  node_log.append(node_subject);
+  node_log.append(node_message);
   $('#column_error_log').prepend(node_log);
 
-  show_balloon(from, subject);
+  show_balloon(from, message);
 }
 
 
 
 
-function log_error(from, subject)  //{{{2
+function log_error(from, message)  //{{{2
 {
-  log('error', from, subject);
+  log('error', from, message);
 
   column_selector('Error Log').not('.active').addClass('unread');
 }
@@ -1058,28 +1058,28 @@ function log_error(from, subject)  //{{{2
 
 
 
-function log_notice(from, subject)  //{{{2
+function log_notice(from, message)  //{{{2
 {
-  log('notice', from, subject);
+  log('notice', from, message);
 }
 
 
 
 
-function show_balloon(opt_from, subject)  //{{{2
+function show_balloon(opt_from, message)  //{{{2
 {
-  var from = subject ? opt_from : null;
-  var subject = subject ? subject : opt_from;
+  var from = message ? opt_from : null;
+  var message = message ? message : opt_from;
 
   var node_from = create_element('span').addClass('from').text(from);
-  var node_subject = create_element('span').addClass('subject').text(subject);
+  var node_message = create_element('span').addClass('message').text(message);
 
   var node_balloon = create_element('div');
   node_balloon.addClass('balloon');
   node_balloon.hide();
   if (from)
     node_balloon.append(node_from);
-  node_balloon.append(node_subject);
+  node_balloon.append(node_message);
 
   $('#balloon_container').append(node_balloon);
 
