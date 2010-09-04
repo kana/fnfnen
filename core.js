@@ -89,21 +89,6 @@ var g_user = null;
 
 
 // Core  {{{1
-function after_post(response)  //{{{2
-{
-  if (response == null)  // Response is unknown because of same origin policy.
-    show_balloon('Post', 'Tweet has been posted');
-  else if (response.error == null)
-    update_with_given_tweet(response);
-  else
-    nop();
-
-  return;
-}
-
-
-
-
 function apply_preferences(via_external_configuration_p)  //{{{2
 {
   var priorities = [];  // [[applying_priority, name], ...]
@@ -131,22 +116,16 @@ function apply_preferences(via_external_configuration_p)  //{{{2
 function authenticate()  //{{{2
 {
   request_twitter_api_with_oauth({
-    callback: callback_authenticate,
+    callback: function (response) {
+      if (response.error == null) {
+        g_user = response;
+        update();
+      }
+    },
     from: 'Authentication',
     method: 'get',
     uri: TWITTER_API_URI + 'account/verify_credentials.json',
   });
-  return;
-}
-
-function callback_authenticate(response)
-{
-  if (response.error)
-    return;
-
-  g_user = response;
-
-  update();
   return;
 }
 
@@ -186,7 +165,14 @@ function before_post()  //{{{2
     parameters.in_reply_to_status_id = g_tweet_id_to_reply;
 
   request_twitter_api_with_oauth({
-    callback: after_post,
+    callback: function (response) {
+      if (response == null)  // NB: Same origin policy.
+        show_balloon('Post', 'Tweet has been posted');
+      else if (response.error == null)
+        update_with_given_tweet(response);
+      else
+        ;
+    },
     from: 'Post',
     method: $('#post_form').attr('method'),
     parameters: parameters,
@@ -540,20 +526,6 @@ function callback_update(response, name_since_id, queue_id)  //{{{3
 }
 
 
-function callback_update_home(response)  //{{{3
-{
-  callback_update(response, 'g_since_id_home', QUEUE_ID_HOME);
-  return;
-}
-
-
-function callback_update_mentions(response)  //{{{3
-{
-  callback_update(response, 'g_since_id_mentions', QUEUE_ID_MENTIONS);
-  return;
-}
-
-
 function merge_tweets_n2o(tweet_sets)  //{{{3
 {
   // Assumption - There is no duplicate in tweet_sets.
@@ -614,7 +586,9 @@ function update()  //{{{3
     return authenticate();
 
   request_twitter_api_with_oauth({
-    callback: callback_update_home,
+    callback: function (response) {
+      callback_update(response, 'g_since_id_home', QUEUE_ID_HOME);
+    },
     from: 'Update (home)',
     method: 'get',
     parameters: {
@@ -624,7 +598,9 @@ function update()  //{{{3
     uri: TWITTER_API_URI + 'statuses/home_timeline.json',
   });
   request_twitter_api_with_oauth({
-    callback: callback_update_mentions,
+    callback: function (response) {
+      callback_update(response, 'g_since_id_mentions', QUEUE_ID_MENTIONS);
+    },
     from: 'Update (mentions)',
     method: 'get',
     parameters: {
