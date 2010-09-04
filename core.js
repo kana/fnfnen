@@ -1349,7 +1349,7 @@ function process_queued_api_request_with_oauth()  //{{{2
         finish_processing_a_request();
       }
     },
-    10 * 1000
+    g_preferences.request_time_out_interval_sec.current_value * 1000
   );
 
   if (request.method == 'GET') {
@@ -1722,6 +1722,10 @@ $(document).ready(function () {  //{{{2
               reset_automatic_update_timer(this.current_value);
             }
           }
+        );
+        g_preferences.request_time_out_interval_sec = new Preference(
+          'request_time_out_interval_sec',
+          10
         );
         g_preferences.custom_stylesheet = new Preference(
           'custom_stylesheet',
