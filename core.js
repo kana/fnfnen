@@ -366,6 +366,9 @@ function show_conversation(tweet_id)  //{{{2
   select_column(column_name);
 
   add_tweets_n2o_into_column(node_column, tweets_in_conoversation_n2o);
+
+  complete_missing_tweets_in_a_conversation(tweets_in_conoversation_n2o,
+                                            node_column);
 }
 
 
@@ -376,7 +379,7 @@ function list_tweets_in_conversation_n2o(tweet_id)
   var id = tweet_id;
   while (id != null) {
     var tweet = tweet_db.get(id);
-    if (tweet == null)  // FIXME: Fetch tweet.
+    if (tweet == null)
       break;
 
     tweets_in_conoversation_n2o.push(tweet);
@@ -385,6 +388,47 @@ function list_tweets_in_conversation_n2o(tweet_id)
   }
 
   return tweets_in_conoversation_n2o;
+}
+
+
+function complete_missing_tweets_in_a_conversation(tweets_n2o, node_column)
+{
+  var fetch_next_tweet = function (tweets_n2o) {
+    var oldest_tweet = tweets_n2o[tweets_n2o.length - 1];
+    var next_tweet_id = oldest_tweet.in_reply_to_status_id;
+    if (next_tweet_id) {
+      var next_tweets_n2o = list_tweets_in_conversation_n2o(next_tweet_id);
+      if (1 <= next_tweets_n2o.length) {
+        // A part of conversation including next_tweet_id is already loaded.
+        // Reuse it to make a response quickly.
+        append_tweets_n2o(next_tweets_n2o);
+      } else {
+        // Specified tweet (next_tweet_id) is not loaded.  Fetch it.
+        request_twitter_api_with_oauth({
+          callback: function (response) {
+            if (response.error == null)
+              append_tweets_n2o([response]);
+          },
+          from: 'Conversation',
+          method: 'get',
+          uri: TWITTER_API_URI + 'statuses/show/' + next_tweet_id + '.json',
+        });
+      }
+    }
+  };
+  var append_tweets_n2o = function (next_tweets_n2o) {
+    tweet_db.add(next_tweets_n2o);
+
+    // Conversation column may be deleted by user while completing tweets.
+    var column_exists_p = (0 < node_column.parent().length);
+    if (column_exists_p) {
+      add_tweets_n2o_into_column(node_column, next_tweets_n2o, 'append');
+      fetch_next_tweet(next_tweets_n2o);
+    }
+  };
+
+  if (1 <= tweets_n2o.length)
+    fetch_next_tweet(tweets_n2o);
 }
 
 
@@ -795,11 +839,13 @@ function update_censored_columns(tweets_n2o) //{{{2
 
 
 // Columns  {{{1
-function add_tweets_n2o_into_column(node_column, tweets_n2o)  //{{{2
+function add_tweets_n2o_into_column(node_column, tweets_n2o, opt_place)  //{{{2
 {
+  var place = opt_place || 'prepend';  // MUST be 'append' or 'prepend'.
+
   var node_tweets = node_from_tweets_n2o(tweets_n2o);
   node_tweets.hide();
-  node_column.prepend(node_tweets);
+  node_column[place](node_tweets);
   node_tweets.slideDown();
 
   // Scroll to the head of the latest tweet hub.
