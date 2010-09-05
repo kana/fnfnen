@@ -45,12 +45,6 @@ License: MIT license  {{{
 
 
 
-<form id="secret" method="post" action="." onsubmit="return false;">
-  <div>
-    Consumer secret: <input name="consumer_secret" type="text" value="" class="restorable"/>
-    <input name="token_secret" type="hidden" value=""/>
-  </div>
-</form>
 <form id="request" method="post" action="https://api.twitter.com/oauth/request_token" onsubmit="return before_request(this, $('#secret').get(0)) && consumer.sign_form(this, $('#secret').get(0))">
   <div>
     Consumer key: <input name="oauth_consumer_key" type="text" value="" class="restorable"/>
@@ -60,6 +54,14 @@ License: MIT license  {{{
     <input name="oauth_nonce" type="hidden"/>
     <input name="oauth_signature" type="hidden"/>
   </div>
+</form>
+<form id="secret" method="post" action="." onsubmit="return false;">
+  <div>
+    Consumer secret: <input name="consumer_secret" type="text" value="" class="restorable"/>
+    <input name="token_secret" type="hidden" value=""/>
+  </div>
+</form>
+<form id="activater" method="post" action="." onsubmit="$('#request').submit(); return false;">
   <div>
     <input type="submit" value="Get Request Token"/>
   </div>
