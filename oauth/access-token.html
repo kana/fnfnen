@@ -48,7 +48,7 @@ License: MIT license  {{{
 
 
 
-<form id="request" method="POST" action="http://api.twitter.com/oauth/access_token" onsubmit="return consumer.sign_form(this, $('#secret').get(0));">
+<form id="request" method="post" action="http://api.twitter.com/oauth/access_token" onsubmit="return consumer.sign_form(this, $('#secret').get(0));">
   <div>
     Consumer key: <input name="oauth_consumer_key" type="text" value="" class="restorable"/>
     <input name="oauth_nonce" type="hidden"/>
@@ -59,7 +59,7 @@ License: MIT license  {{{
     <input name="oauth_verifier" type="hidden"/>
   </div>
 </form>
-<form id="secret" method="POST" action="." onsubmit="return false">
+<form id="secret" method="post" action="." onsubmit="return false">
   <div>
     Consumer secret: <input name="consumer_secret" type="text" value="" class="restorable"/>
     <input name="token_secret" type="hidden" value=""/>

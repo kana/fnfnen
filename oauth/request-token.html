@@ -45,7 +45,7 @@ License: MIT license  {{{
 
 
 
-<form id="request" method="post" action="https://api.twitter.com/oauth/request_token" onsubmit="return before_request(this, $('#secret').get(0)) && consumer.sign_form(this, $('#secret').get(0))">
+<form id="request" method="post" action="https://api.twitter.com/oauth/request_token" onsubmit="return before_request(this, $('#secret').get(0)) &amp;&amp; consumer.sign_form(this, $('#secret').get(0))">
   <div>
     Consumer key: <input name="oauth_consumer_key" type="text" value="" class="restorable"/>
     <input name="oauth_callback" type="hidden" value=""/>
