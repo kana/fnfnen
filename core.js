@@ -397,15 +397,23 @@ function complete_missing_tweets_in_a_conversation(tweets_n2o, node_column)
     var oldest_tweet = tweets_n2o[tweets_n2o.length - 1];
     var next_tweet_id = oldest_tweet.in_reply_to_status_id;
     if (next_tweet_id) {
-      request_twitter_api_with_oauth({
-        callback: function (response) {
-          if (response.error == null)
-            append_tweets_n2o([response]);
-        },
-        from: 'Conversation',
-        method: 'get',
-        uri: TWITTER_API_URI + 'statuses/show/' + next_tweet_id + '.json',
-      });
+      var next_tweets_n2o = list_tweets_in_conversation_n2o(next_tweet_id);
+      if (1 <= next_tweets_n2o.length) {
+        // A part of conversation including next_tweet_id is already loaded.
+        // Reuse it to make a response quickly.
+        append_tweets_n2o(next_tweets_n2o);
+      } else {
+        // Specified tweet (next_tweet_id) is not loaded.  Fetch it.
+        request_twitter_api_with_oauth({
+          callback: function (response) {
+            if (response.error == null)
+              append_tweets_n2o([response]);
+          },
+          from: 'Conversation',
+          method: 'get',
+          uri: TWITTER_API_URI + 'statuses/show/' + next_tweet_id + '.json',
+        });
+      }
     }
   };
   var append_tweets_n2o = function (next_tweets_n2o) {
