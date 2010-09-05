@@ -418,10 +418,13 @@ function complete_missing_tweets_in_a_conversation(tweets_n2o, node_column)
   };
   var append_tweets_n2o = function (next_tweets_n2o) {
     tweet_db.add(next_tweets_n2o);
-    // FIXME: Stop completing missing tweets in a conversation if the
-    // conversation column is deleted by user.
-    add_tweets_n2o_into_column(node_column, next_tweets_n2o, 'append');
-    fetch_next_tweet(next_tweets_n2o);
+
+    // Conversation column may be deleted by user while completing tweets.
+    var column_exists_p = (0 < node_column.parent().length);
+    if (column_exists_p) {
+      add_tweets_n2o_into_column(node_column, next_tweets_n2o, 'append');
+      fetch_next_tweet(next_tweets_n2o);
+    }
   };
 
   if (1 <= tweets_n2o.length)
