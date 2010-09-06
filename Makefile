@@ -29,7 +29,7 @@ publish:
 	git stash save; \
 	version=$$(git describe --always --dirty --tags); \
 	sed -e "s/@@VERSION@[@]/$$version/g" -i \
-	  $$(git ls-files | grep -v 'fnfnen.html'); \
+	  $$(git ls-files | sed -e '/^\(fnfnen.html\|jasmine\)$$/d'); \
 	git commit -am "Publish with $$version"; \
 	git push . HEAD:gh-pages -f; \
 	git reset --hard HEAD~1; \
