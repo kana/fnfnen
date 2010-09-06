@@ -1622,6 +1622,10 @@ function initialize(steps)  //{{{2
 
 
 $(document).ready(function () {  //{{{2
+  var executed_in_valid_application_page_p = /fnfnen/.test($('title').text());
+  if (!executed_in_valid_application_page_p)
+    return;  // Skip bootstrap; it seems to be executed as a part of tests.
+
   var initialization_steps = {
     initialize_columns: {  //{{{
       requirements: [],
