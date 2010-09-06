@@ -1,13 +1,26 @@
-# Makefile
+# Makefile to maintain fnfnen
+#
+# Requirements:
+#   GNU make 3.81 or later
 
-all: first
-.PHONY: all first
+.DEFAULT_GOAL := all
+.PHONY: all lint
 
 
-first: ,,fnfnen.html,checked
+
+
+all: lint
+
+
+
+
+lint: ,,fnfnen.html,checked
 
 ,,%,checked: %
 	htmllint -f htmllintrc $<
 	touch $@
+
+
+
 
 # __END__
