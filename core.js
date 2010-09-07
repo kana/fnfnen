@@ -273,20 +273,29 @@ function make_links_in_text(text)  //{{{2
     /https?:\/\/[\w!#$%&'*+,.\/:;=?@~-]+|@(\w+)/g,
     function (matched_string, screen_name) {
       if (screen_name) {
-        return ('<a class="screen_name"'
-                + ' href="'
-                + TWITTER_UI_URI
-                + screen_name
-                + '">'
-                + matched_string
-                + '</a>');
+        return html_from_jsxn([
+          [
+            'a',
+            [
+              '@',
+              ['class', 'screen_name'],
+              ['href', TWITTER_UI_URI + screen_name],
+            ],
+            matched_string,
+          ],
+        ]);
       } else {
-        return ('<a class="link"'
-                + ' href="'
-                + matched_string
-                + '">'
-                + matched_string
-                + '</a>');
+        return html_from_jsxn([
+          [
+            'a',
+            [
+              '@',
+              ['class', 'link'],
+              ['href', matched_string],
+            ],
+            matched_string,
+          ],
+        ]);
       }
     }
   );
