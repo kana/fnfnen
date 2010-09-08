@@ -53,24 +53,26 @@ License: MIT license  {{{
   <script type="text/javascript">
     $('#spec_runner').ready(function () {
       var cache_table = {};
+      var check_and_reload = function (uri) {
+        var r = new XMLHttpRequest();
+        r.open('GET', uri, false);
+        r.onload = function () {
+          if (cache_table[uri]) {
+            if ((cache_table[uri] != r.responseText))
+              window.spec_runner.location.reload(true);
+          }
+          cache_table[uri] = r.responseText;
+        };
+        r.send();
+      };
+
       setInterval(
         function () {
-          if ($('#reload_flag:checked').length == 0)
-            return;
-
-          $('#spec_runner').contents().find('script[src]').each(function () {
-            var r = new XMLHttpRequest();
-            var uri = this.src;
-            r.open('GET', uri, false);
-            r.onload = function () {
-              if (cache_table[uri]) {
-                if ((cache_table[uri] != r.responseText))
-                  window.spec_runner.location.reload(true);
-              }
-              cache_table[uri] = r.responseText;
-            };
-            r.send();
-          });
+          if (0 < $('#reload_flag:checked').length) {
+            $('#spec_runner').contents().find('script[src]').each(function () {
+              check_and_reload(this.src);
+            });
+          }
         },
         10 * 1000
       );
