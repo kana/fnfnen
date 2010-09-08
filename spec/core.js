@@ -1,4 +1,108 @@
 describe('Core', function () {
+  describe('html_from_tweet', function () {
+    var tweet = {
+      created_at: 'Wed Sep 08 14:01:49 +0000 2010',
+      id: 81,
+      in_reply_to_status_id: null,
+      favorited: false,
+      text: '@ujm hi http://hi.hi/#hi hi',
+      user: {
+        screen_name: 'kana1',
+        profile_image_url: './avatar.png',
+      },
+    };
+    var t_user_icon = [
+      '<a',
+      ' class="user_icon"',
+      ' href="http://twitter.com/kana1"',
+      '>',
+      '<img',
+      ' alt="@kana1"',
+      ' height="48"',
+      ' src="./avatar.png"',
+      ' width="48"',
+      '/>',
+      '</a>',
+    ];
+    var t_screen_name = [
+      '<a class="screen_name" href="http://twitter.com/kana1">',
+      'kana1',
+      '</a>',
+    ];
+    var t_text = [
+      '<span class="text">',
+      '<a class="screen_name" href="http://twitter.com/ujm">',
+      '@ujm',
+      '</a>',
+      ' hi ',
+      '<a class="link" href="http://hi.hi/#hi">',
+      'http://hi.hi/#hi',
+      '</a>',
+      ' hi',
+      '</span>',
+    ];
+    var t_posted_time = [
+      '<a class="posted_time" href="http://twitter.com/kana1/status/81">',
+      '2010-09-08 23:01:49',
+      '</a>',
+    ];
+    var t_button_to_reply = [
+      '<a class="button reply" href="javascript:set_up_to_reply(',
+      '\'kana1\',',
+      '81',
+      ')">',
+      '&#x21b5;',
+      '</a>',
+    ];
+    var t_button_to_toggle_favorite = [
+      '<a class="button favorite" href="javascript:toggle_favorite(81)">',
+      '\u2606',
+      '</a>',
+    ];
+
+    it('should return a HTML snippet from a tweet', function () {
+      var t = $.extend({}, tweet);
+      expect(html_from_tweet(t)).toEqual(string_from_tree([
+        t_user_icon,
+        t_screen_name,
+        t_text,
+        t_posted_time,
+        t_button_to_reply,
+        t_button_to_toggle_favorite,
+      ]));
+    });
+    it('should reflect "favorited" status', function () {
+      var t = $.extend({}, tweet, {favorited: true});
+      expect(html_from_tweet(t)).toEqual(string_from_tree([
+        t_user_icon,
+        t_screen_name,
+        t_text,
+        t_posted_time,
+        t_button_to_reply,
+        '<a class="button favorite" href="javascript:toggle_favorite(81)">',
+        '\u2605',
+        '</a>',
+      ]));
+    });
+    it('should reflect "in_reply_to_status_id" status', function () {
+      var t = $.extend({}, tweet, {in_reply_to_status_id: 8181});
+      expect(html_from_tweet(t)).toEqual(string_from_tree([
+        t_user_icon,
+        t_screen_name,
+        t_text,
+        t_posted_time,
+        t_button_to_reply,
+        [
+          '<a class="button conversation" href="javascript:show_conversation(',
+          '81',
+          ')">',
+          '&#x267b;',
+          '</a>',
+        ],
+        t_button_to_toggle_favorite,
+      ]));
+    });
+  });
   describe('make_links_in_text', function () {
     var _ = make_links_in_text;
 
