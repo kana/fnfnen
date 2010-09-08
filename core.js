@@ -204,63 +204,96 @@ function fnfnen_external_configuration(data)  //{{{2
 
 function html_from_tweet(tweet)  //{{{2
 {
-  return (''
-          // user icon
-          + '<a class="user_icon"'
-          + ' href="' + TWITTER_UI_URI + tweet.user.screen_name + '"'
-          + '>'
-          + '<img'
-          + ' alt="' + '@' + tweet.user.screen_name + '"'
-          + ' height="48"'
-          + ' src="' + tweet.user.profile_image_url + '"'
-          + ' width="48"'
-          + '/>'
-          + '</a>'
-          // screen name
-          + '<a class="screen_name"'
-          + ' href="' + TWITTER_UI_URI + tweet.user.screen_name + '"'
-          + '>'
-          + tweet.user.screen_name
-          + '</a>'
-          // text
-          + '<span class="text">'
-          + make_links_in_text(tweet.text)
-          + '</span>'
-          // posted time
-          + '<a class="posted_time"'
-          + ' href="'
-          +    TWITTER_UI_URI
-          +    tweet.user.screen_name
-          +    '/status/'
-          +    tweet.id
-          +    '"'
-          + '>'
-          + human_readable_format_from_date(new Date(tweet.created_at))
-          + '</a>'
-          // button to reply
-          + '<a class="button reply"'
-          + ' href="javascript:set_up_to_reply('
-          +   "'" + tweet.user.screen_name + "'" + ','
-          +   tweet.id
-          + ')"'
-          + '>'
-          + '&#x21b5;'  // Carriage return symbol
-          + '</a>'
-          // button to show the conversation
-          + (tweet.in_reply_to_status_id
-             ? (''
-                + '<a class="button conversation"'
-                + ' href="javascript:show_conversation(' + tweet.id + ')"'
-                + '>'
-                + '&#x267b;'  // Black universal recycling symbol
-                + '</a>')
-             : '')
-          // button to toggle favorite
-          + '<a class="button favorite"'
-          + ' href="javascript:toggle_favorite(' + tweet.id + ')">'
-          + favorite_symbol(tweet.favorited)
-          + '</a>'
-         );
+  return html_from_jsxn([
+    // user icon
+    [
+      'a',
+      [
+        '@',
+        ['class', 'user_icon'],
+        ['href', TWITTER_UI_URI + tweet.user.screen_name],
+      ],
+      [
+        'img',
+        [
+          '@',
+          ['alt', '@' + tweet.user.screen_name],
+          ['height', 48],
+          ['src', tweet.user.profile_image_url],
+          ['width', 48],
+        ],
+      ],
+    ],
+    // screen name
+    [
+      'a',
+      [
+        '@',
+        ['class', 'screen_name'],
+        ['href', TWITTER_UI_URI + tweet.user.screen_name],
+      ],
+      tweet.user.screen_name,
+    ],
+    // text
+    [
+      'span',
+      [
+        '@',
+        ['class', 'text'],
+      ],
+      make_links_in_text(tweet.text),
+    ],
+    // posted time
+    [
+      'a',
+      [
+        '@',
+        ['class', 'posted_time'],
+        ['href',
+          TWITTER_UI_URI + tweet.user.screen_name + '/status/' + tweet.id],
+      ],
+      human_readable_format_from_date(new Date(tweet.created_at)),
+    ],
+    // button to reply
+    [
+      'a',
+      [
+        '@',
+        ['class', 'button reply'],
+        ['href', string_from_tree([
+          'javascript:set_up_to_reply(',
+            "'", tweet.user.screen_name, "'", ',',
+            tweet.id,
+          ')',
+        ])]
+      ],
+      '&#x21b5;',  // Carriage return symbol
+    ],
+    // button to show the conversation
+    (
+      tweet.in_reply_to_status_id
+      ? [
+        'a',
+        [
+          '@',
+          ['class', 'button conversation'],
+          ['href', 'javascript:show_conversation(' + tweet.id + ')'],
+        ],
+        '&#x267b;',  // Black universal recycling symbol
+      ]
+      : ''
+    ),
+    // button to toggle favorite
+    [
+      'a',
+      [
+        '@',
+        ['class', 'button favorite'],
+        ['href', 'javascript:toggle_favorite(' + tweet.id + ')'],
+      ],
+      favorite_symbol(tweet.favorited),
+    ],
+  ]);
 }
 
 
