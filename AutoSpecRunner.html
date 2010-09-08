@@ -72,6 +72,7 @@ License: MIT license  {{{
             $('#spec_runner').contents().find('script[src]').each(function () {
               check_and_reload(this.src);
             });
+            check_and_reload($('#spec_runner').attr('src'));
           }
         },
         10 * 1000
