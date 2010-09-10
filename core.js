@@ -1526,6 +1526,25 @@ function favorite_symbol(favorite_p)  //{{{2
 
 
 
+function html_from_jsxn(jsxn)  //{{{2
+{
+  // jsxn := [element, ...]
+  //
+  // element := [name, attribute-list?, child-of-element, ...]
+  // attribute-list := ['@', attribute, ...]
+  // attribute := [name, value]
+  // child-of-element := element | text
+  //
+  // name := string
+  // text := string
+  // value := string
+
+  return string_from_tree(tree_from_jsxn(jsxn));
+}
+
+
+
+
 function human_readable_format_from_date(date)  //{{{2
 {
   return (date.getFullYear()
@@ -1596,6 +1615,20 @@ function scroll(y_coordinate)  //{{{2
 
 
 
+function string_from_tree(tree)  //{{{2
+{
+  // tree := string or [tree, ...]
+  if (typeof(tree) == 'string')
+    return tree;
+  else if (typeof(tree) == 'number')
+    return tree.toString();
+  else
+    return tree.map(string_from_tree).join('');
+}
+
+
+
+
 function to_string(value)  //{{{2
 {
   if (value == null)
@@ -1604,6 +1637,57 @@ function to_string(value)  //{{{2
     return 'undefined';
   else
     return value.toString();
+}
+
+
+
+
+function tree_from_jsxn(jsxn)  //{{{2
+{
+  return jsxn.map(tree_from_jsxn_element);
+}
+
+
+
+
+function tree_from_jsxn_attribute(jsxn_attribute)  //{{{2
+{
+  var name = jsxn_attribute[0];
+  var value = jsxn_attribute[1];  // FIXME: Escape special characters.
+  return [' ', name, '=', '"', value, '"'];
+}
+
+
+
+
+function tree_from_jsxn_element(jsxn_element)  //{{{2
+{
+  if (typeof(jsxn_element) == 'string') {
+    return jsxn_element;  // FIXME: Escape special characters.
+  } else {
+    var name = jsxn_element[0];
+    var _attribute_list = jsxn_element[1];
+    var has_attribute_list_p = (_attribute_list instanceof Array
+                              && _attribute_list[0] == '@');
+    var attribute_list = (has_attribute_list_p
+                          ? _attribute_list.slice(1)  // ['@', [...], ...]
+                          : []);
+    var child_of_element_list = jsxn_element.slice(has_attribute_list_p
+                                                   ? 2
+                                                   : 1);
+
+    if (0 < child_of_element_list.length) {
+      return [
+        '<', name, attribute_list.map(tree_from_jsxn_attribute), '>',
+        child_of_element_list.map(tree_from_jsxn_element),
+        '</', name, '>',
+      ];
+    } else {
+      return [
+        '<', name, attribute_list.map(tree_from_jsxn_attribute), '/>',
+      ];
+    }
+  }
 }
 
 

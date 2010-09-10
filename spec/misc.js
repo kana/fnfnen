@@ -30,6 +30,16 @@ describe('Misc.', function () {
       expect(favorite_symbol(false)).toEqual('\u2606');  // white (empty) star
     });
   });
+  describe('html_from_jsxn', function () {
+    it('should convert a HTML snippet string from a jsxn tree', function () {
+      var _ = html_from_jsxn;
+
+      expect(_([])).toEqual('');
+      expect(_(['t', 'e', 'x', 't'])).toEqual('text');
+      expect(_([['t'], 'e', ['x'], 't'])).toEqual('<t/>e<x/>t');
+      expect(_([['t', ['@', ['e', 'x']]], 't'])).toEqual('<t e="x"/>t');
+    });
+  });
   describe('human_readable_format_from_date', function () {
     describe('pad', function () {
       it('should pad 0s properly', function () {
@@ -61,6 +71,78 @@ describe('Misc.', function () {
   describe('scroll', function () {
     it('should vertically scroll to the specified position', function () {
       // expect().toEqual('FIXME: Not implemented yet');
+    });
+  });
+  describe('string_from_tree', function () {
+    it('should return a given string as is', function () {
+      expect(string_from_tree('string')).toEqual('string');
+    });
+    it('should convert a string from a number', function () {
+      expect(string_from_tree(123)).toEqual('123');
+    });
+    it('should convert a string from an array', function () {
+      expect(string_from_tree([1, 2, 3])).toEqual('123');
+      expect(string_from_tree(['a', 'b', 'c'])).toEqual('abc');
+      expect(string_from_tree(['a', 1, 'b', 2, 'c', 3])).toEqual('a1b2c3');
+    });
+    it('should convert a string from a nested array', function () {
+      expect(string_from_tree(['a', [1, ['b'], 2], 'c', 3])).toEqual('a1b2c3');
+    });
+  });
+  describe('tree_from_jsxn', function () {
+    it('should convert a HTML snippet string from a jsxn tree', function () {
+      var _ = function (jsxn) {
+        return string_from_tree(tree_from_jsxn(jsxn));
+      };
+
+      expect(_([])).toEqual('');
+      expect(_(['t', 'e', 'x', 't'])).toEqual('text');
+      expect(_([['t'], 'e', ['x'], 't'])).toEqual('<t/>e<x/>t');
+      expect(_([['t', ['@', ['e', 'x']]], 't'])).toEqual('<t e="x"/>t');
+    });
+  });
+  describe('tree_from_jsxn_attribute', function () {
+    it('should convert a proper tree from a jsxn attribute', function () {
+      var _ = function (jsxn_attribute) {
+        return string_from_tree(tree_from_jsxn_attribute(jsxn_attribute));
+      };
+
+      expect(_(['name', 'value'])).toEqual(' name="value"');
+      expect(_(['name', 'v"alu"e'])).toEqual(' name="v"alu"e"');
+      expect(_(['width', 48])).toEqual(' width="48"');
+    });
+  });
+  describe('tree_from_jsxn_element', function () {
+    var _ = function (jsxn_element) {
+      return string_from_tree(tree_from_jsxn_element(jsxn_element));
+    };
+
+    it('should convert a proper tree from a jsxn text node', function () {
+      expect(_('simple text node')).toEqual('simple text node');
+      expect(_('simple<text>node')).toEqual('simple<text>node');
+    });
+    it('should convert jsxn element without any content', function () {
+      expect(_(['e'])).toEqual('<e/>');
+    });
+    it('should convert jsxn element with attribute list', function () {
+      expect(_(['e', ['@']])).toEqual('<e/>');
+      expect(_(['e', ['@', ['a1', 'v1']]])).toEqual('<e a1="v1"/>');
+      expect(_(['e', ['@', ['a1', 'v1'], ['a2', 'v2']]]))
+        .toEqual('<e a1="v1" a2="v2"/>');
+    });
+    it('should convert jsxn element with children', function () {
+      expect(_(['e', 't'])).toEqual('<e>t</e>');
+      expect(_(['e', 't', 'x'])).toEqual('<e>tx</e>');
+
+      expect(_(['e', ['c']])).toEqual('<e><c/></e>');
+      expect(_(['e', 't', ['c', 'x'], 'y'])).toEqual('<e>t<c>x</c>y</e>');
+    });
+    it('should convert jsxn element with attribute and children', function () {
+      expect(_(['e', ['@'], 't', 'x'])).toEqual('<e>tx</e>');
+      expect(_(['e', ['@', ['a', 'v']], 't', 'x'])).toEqual('<e a="v">tx</e>');
+
+      expect(_(['e', ['@', ['a1', 'v1']], ['c', ['@', ['a2', 'v2']]]]))
+        .toEqual('<e a1="v1"><c a2="v2"/></e>');
     });
   });
   describe('to_string', function () {
