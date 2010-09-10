@@ -86,6 +86,7 @@ describe('Misc.', function () {
 
 
 
-// __END__  {{{1
+// __END__
 // vim: expandtab shiftwidth=2 softtabstop=2
-// vim: foldmethod=marker
+// vim: foldmethod=expr
+// vim: foldexpr=getline(v\:lnum)=~#'\\v(<describe>|<it>).*<function>\\s*\\([^()]*\\)\\s*\\{'?'a1'\:(getline(v\:lnum)=~#'^\\s*});'?'s1'\:'=')
