@@ -1396,14 +1396,14 @@ function process_queued_api_request_with_oauth()  //{{{2
       if (error_timer) {
         error_timer = null;  // Prevents "loaded" handler.
 
-        var response = {error: 'Request time out'};
+        var response = {error: 'Request timeout'};
         log_error(request.from, response.error);
         request.callback(response);
 
         finish_processing_a_request();
       }
     },
-    g_preferences.request_time_out_interval_sec.current_value * 1000
+    g_preferences.request_timeout_interval_sec.current_value * 1000
   );
 
   if (request.method == 'GET') {
@@ -1753,7 +1753,7 @@ $(document).ready(function () {  //{{{2
           }
         );
         g_preferences.register(
-          'request_time_out_interval_sec',
+          'request_timeout_interval_sec',
           15
         );
         g_preferences.register(
