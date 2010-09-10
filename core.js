@@ -1397,7 +1397,9 @@ function process_queued_api_request_with_oauth()  //{{{2
         error_timer = null;  // Prevents "loaded" handler.
 
         var response = {error: 'Request timeout'};
-        log_error(request.from, response.error);
+          // Request timeout often occurs.  It's not worth to mention to user.
+          // Treat it as an informative message instead of an error.
+        log_notice(request.from, response.error);
         request.callback(response);
 
         finish_processing_a_request();
