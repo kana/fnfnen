@@ -63,6 +63,7 @@ var MAX_COUNT_MENTIONS = 200;
 var MAX_TWEET_CONTENT = 140;
 var MINIMUM_UPDATE_INTERVAL_SEC = 1 * 60;
 var TWITTER_API_URI = 'http://api.twitter.com/1/';
+var TWITTER_SEARCH_URI = 'http://search.twitter.com/search?q=';
 var TWITTER_UI_URI = 'http://twitter.com/';
 
 
@@ -303,8 +304,8 @@ function make_links_in_text(text)  //{{{2
 {
   // FIXME: Regular expression for URI.
   return text.replace(
-    /https?:\/\/[\w!#$%&'*+,.\/:;=?@~-]+|@(\w+)/g,
-    function (matched_string, screen_name) {
+    /https?:\/\/[\w!#$%&'*+,.\/:;=?@~-]+|@(\w+)|#(\w+)/g,
+    function (matched_string, screen_name, hashtag) {
       if (screen_name) {
         return html_from_jsxn([
           [
@@ -313,6 +314,19 @@ function make_links_in_text(text)  //{{{2
               '@',
               ['class', 'screen_name'],
               ['href', TWITTER_UI_URI + screen_name],
+            ],
+            matched_string,
+          ],
+        ]);
+      } else if (hashtag) {
+        return html_from_jsxn([
+          [
+            'a',
+            [
+              '@',
+              ['class', 'hashtag'],
+              ['href',
+               TWITTER_SEARCH_URI + encodeURIComponent(matched_string)],
             ],
             matched_string,
           ],

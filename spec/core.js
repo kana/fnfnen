@@ -145,6 +145,29 @@ describe('Core', function () {
         ].join(' ')
       );
     });
+    it('should make a link for each hashtag in a string', function () {
+      var t = TWITTER_UI_URI;
+      var ts = TWITTER_SEARCH_URI;
+
+      expect(_('@kana1 #hi!')).toEqual(
+        [
+          '<a class="screen_name" href="' + t + 'kana1">@kana1</a>',
+          ' ',
+          '<a class="hashtag" href="' + ts + '%23hi">#hi</a>',
+          '!',
+        ].join('')
+      );
+      expect(_('@kana1 #hi #hey!')).toEqual(
+        [
+          '<a class="screen_name" href="' + t + 'kana1">@kana1</a>',
+          ' ',
+          '<a class="hashtag" href="' + ts + '%23hi">#hi</a>',
+          ' ',
+          '<a class="hashtag" href="' + ts + '%23hey">#hey</a>',
+          '!',
+        ].join('')
+      );
+    });
   });
 });
 
