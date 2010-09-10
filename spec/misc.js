@@ -8,7 +8,6 @@ describe('Misc.', function () {
       expect(_(b + 'favorite/create/123.json')).toEqual('favorite/create/123');
     });
   });
-
   describe('create_element', function () {
     it('should create a DOM element wrapped by jQuery', function () {
       var e = create_element('div');
@@ -18,7 +17,6 @@ describe('Misc.', function () {
       expect(e[0] instanceof HTMLDivElement).toBeTruthy();
     });
   });
-
   describe('englishize', function () {
     it('should convert an identifier to a phrase in English', function () {
       expect(englishize('foo_bar_baz')).toEqual('Foo bar baz');
@@ -26,14 +24,12 @@ describe('Misc.', function () {
       expect(englishize('foo_uri')).toEqual('Foo URI');
     });
   });
-
   describe('favorite_symbol', function () {
     it('should return a character to express favorite status', function () {
       expect(favorite_symbol(true)).toEqual('\u2605');  // black (filled) star
       expect(favorite_symbol(false)).toEqual('\u2606');  // white (empty) star
     });
   });
-
   describe('human_readable_format_from_date', function () {
     describe('pad', function () {
       it('should pad 0s properly', function () {
@@ -44,19 +40,16 @@ describe('Misc.', function () {
         expect(pad(800).toString()).toEqual('800');
       });
     });
-
     it('should convert a date to human readable format', function () {
       expect(human_readable_format_from_date(new Date(2010, 8-1, 1, 9, 30, 2)))
         .toEqual('2010-08-01 09:30:02');
     });
   });
-
   describe('load_cross_domain_script', function () {
     it('should load a script in cross domain', function () {
       // expect().toEqual('FIXME: Not implemented yet');
     });
   });
-
   describe('nop', function () {
     it('should do nothing', function () {
       expect(nop instanceof Function).toBeTruthy();
@@ -65,13 +58,11 @@ describe('Misc.', function () {
       expect(nop(1, '2')).toBe(undefined);
     });
   });
-
   describe('scroll', function () {
     it('should vertically scroll to the specified position', function () {
       // expect().toEqual('FIXME: Not implemented yet');
     });
   });
-
   describe('to_string', function () {
     it('should convert any value to a string', function () {
       expect(to_string(1)).toEqual('1');
