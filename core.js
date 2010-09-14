@@ -122,10 +122,9 @@ function before_post()  //{{{2
 
   if (MAX_TWEET_CONTENT < text.length) {
     // Warn and disable to post a too long tweet.
-    for (var i = 0; i < 3; i++) {
-      $('#tweet_content_counter').fadeOut('fast');
-      $('#tweet_content_counter').fadeIn('fast');
-    }
+    g_preferences.animation_too_long_tweet_warning.animate(
+      $('#tweet_content_counter')
+    );
     return;
   }
 
@@ -1859,6 +1858,22 @@ $(document).ready(function () {  //{{{2
               set_up_censored_columns(this.current_value);
             },
             rows: 10
+          }
+        );
+        g_preferences.register(
+          'animation_too_long_tweet_warning',
+          ('.fadeOut("fast").fadeIn("fast")'
+           + '.fadeOut("fast").fadeIn("fast")'
+           + '.fadeOut("fast").fadeIn("fast")'),
+          {
+            on_application: function () {
+              // FIXME: In case of syntax error.
+              this.animate = eval([
+                '(function (node) {',
+                  'node', this.current_value, ';',
+                '})',
+              ].join(''));
+            }
           }
         );
         g_preferences.register(
