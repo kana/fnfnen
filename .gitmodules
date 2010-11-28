@@ -1,3 +1,6 @@
 [submodule "jasmine"]
 	path = jasmine
 	url = http://github.com/pivotal/jasmine.git
+[submodule "prafbe"]
+	path = prafbe
+	url = ../prafbe
