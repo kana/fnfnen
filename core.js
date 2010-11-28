@@ -338,6 +338,8 @@ function learn_tweet(tweet_id, right_tweet_p)  //{{{2
   var tweet = tweet_db.get(tweet_id);
   prafbe.learn(dict, tweet.text);
   g_prafbe_learning_count++;
+  save_prafbe_learning_result();
+
   log_notice(
     'Prafbe',
     ('Learned as '
@@ -1314,6 +1316,24 @@ function calculate_spam_probability(tweet)  //{{{2
 
 
 
+function load_prafbe_learning_result()  //{{{2
+{
+  g_prafbe_right_dict = $.evalJSON($.storage('prafbe_right_dict') || '{}');
+  g_prafbe_wrong_dict = $.evalJSON($.storage('prafbe_wrong_dict') || '{}');
+}
+
+
+
+
+function save_prafbe_learning_result()  //{{{2
+{
+  $.storage('prafbe_right_dict', $.toJSON(g_prafbe_right_dict));
+  $.storage('prafbe_wrong_dict', $.toJSON(g_prafbe_wrong_dict));
+}
+
+
+
+
 
 
 
@@ -2017,6 +2037,13 @@ $(document).ready(function () {  //{{{2
           g_parameters[key] = value;
         }
         return;
+      },
+    },  //}}}
+    initialize_prafbe_learning_result: {  //{{{
+      requirements: [],
+      procedure: function () {
+        load_prafbe_learning_result();
+        save_prafbe_learning_result();
       },
     },  //}}}
     initialize_preferences: {  //{{{
