@@ -31,7 +31,24 @@
 // Set: $.storage('name', value);
 // Delete: $.storage('name', null);
 jQuery.storage = function (name, value, options) {
-  return jQuery.storage.handleWithCookie(name, value, options);
+  if (window.localStorage) {
+    return jQuery.storage.handleWithWebStorage(name, value, options);
+  } else {
+    return jQuery.storage.handleWithCookie(name, value, options);
+  }
+};
+
+jQuery.storage.handleWithWebStorage = function (name, value, options) {
+  if (typeof value == 'undefined') {
+    return window.localStorage[name];
+  } else {
+    if (value != null) {
+      window.localStorage[name] = value;
+    } else {
+      delete window.localStorage[name];
+    }
+    return;
+  }
 };
 
 // jQuery.storage.handleWithCookie is based on jQuery.cookie written by:
