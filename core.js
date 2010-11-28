@@ -430,7 +430,6 @@ function node_from_tweet(tweet)  //{{{2
     var node_tweet = create_element('div');
 
     node_tweet.data('json', tweet);
-    node_tweet.html(html_from_tweet(tweet));
 
     node_tweet.addClass('tweet');
     node_tweet.addClass(class_name_from_tweet_id(tweet.id));
@@ -439,6 +438,10 @@ function node_from_tweet(tweet)  //{{{2
     if (tweet_mine_p(tweet))
       node_tweet.addClass('mine');
     node_tweet.addClass(censorship_classes_from_tweet(tweet).join(' '));
+
+    // tweet may be modified in-place by censorship_classes_from_tweet(),
+    // so that html_from_tweet() should be called after it.
+    node_tweet.html(html_from_tweet(tweet));
 
     return node_tweet;
 }
@@ -811,6 +814,13 @@ function censorship_classes_from_tweet(tweet)  //{{{2
     if (rule.pattern.test(to_string(value)))
       classes.push.apply(classes, rule.classes);
   }
+
+  var p = calculate_spam_probability(tweet);
+  classes.push(
+    g_preferences.spam_probability_threshold.current_value <= p
+    ? 'spam'
+    : 'nonspam'
+  );
 
   return classes;
 }
@@ -1252,6 +1262,44 @@ function raise_event(event_name, kw)  //{{{2
 function register_plugin(plugin)  //{{{2
 {
   g_plugins.push(plugin);
+}
+
+
+
+
+
+
+
+
+// Prafbe  {{{1
+function calculate_spam_probability(tweet)  //{{{2
+{
+  var p = tweet.prafbe_result;
+  if (p == null
+      || tweet.prafbe_learning_count == null
+      || tweet.prafbe_learning_count < g_prafbe_learning_count)
+  {
+    var tokens = prafbe.tokenize(tweet.text);
+    var itokens = prafbe.list_most_interesting_tokens(
+      g_prafbe_right_dict,
+      g_prafbe_wrong_dict,
+      tokens,
+      15
+    );
+    var ps = itokens.map(function (x) {
+      return prafbe.calculate_spamness(
+        g_prafbe_right_dict,
+        g_prafbe_wrong_dict,
+        x
+      );
+    });
+    p = prafbe.calculate_spam_probability(ps);
+  }
+
+  tweet.prafbe_learning_count = g_prafbe_learning_count;
+  tweet.prafbe_result = p;
+
+  return p;
 }
 
 
