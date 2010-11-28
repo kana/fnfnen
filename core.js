@@ -209,6 +209,15 @@ function fnfnen_external_configuration(data)  //{{{2
 function html_from_tweet(tweet)  //{{{2
 {
   return html_from_jsxn([
+    // prafbe information
+    [
+      'span',
+      [
+        '@',
+        ['class', 'debug prafbe'],
+      ],
+      format_probability(tweet.prafbe_result),
+    ],
     // user icon
     [
       'a',
@@ -1701,6 +1710,15 @@ function favorite_symbol(favorite_p)  //{{{2
           ? '\u2605'  // black (filled) star
           : '\u2606'  // white (empty) star
           );
+}
+
+
+
+
+function format_probability(p)  //{{{2
+{
+  var v = Math.min(Math.round(p * 10000) / 10000, 0.9999);
+  return (v.toString() + '0000').replace(/^\d+\.?(\d\d\d\d).*$/, '$1');
 }
 
 

@@ -185,6 +185,8 @@ dd.submit {margin: 0;}
 
 .tweet .button {font-weight: bolder; text-decoration: none;}
 
+.tweet .debug {display: none;}
+
 
 #tweet_content_counter {font-weight: bolder;}
 

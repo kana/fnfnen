@@ -30,6 +30,19 @@ describe('Misc.', function () {
       expect(favorite_symbol(false)).toEqual('\u2606');  // white (empty) star
     });
   });
+  describe('format_probability', function () {
+    it('should format probability nicely', function () {
+      expect(format_probability(0.1234)).toEqual('1234');
+      expect(format_probability(0.1234321)).toEqual('1234');
+      expect(format_probability(0.12345)).toEqual('1235');
+      expect(format_probability(0.9)).toEqual('9000');
+      expect(format_probability(0.99)).toEqual('9900');
+      expect(format_probability(0.999)).toEqual('9990');
+      expect(format_probability(0.9999)).toEqual('9999');
+      expect(format_probability(0.99999)).toEqual('9999');
+      expect(format_probability(1.0)).toEqual('9999');
+    });
+  });
   describe('html_from_jsxn', function () {
     it('should convert a HTML snippet string from a jsxn tree', function () {
       var _ = html_from_jsxn;
