@@ -31,9 +31,9 @@ function before_authentication(form)
 {
   var token_text = form.oauth_token.value;
   if (token_text.match(/^oauth_token=([^&]+)&oauth_token_secret=([^&]+)/)) {
-    $.cookie('form_oauth_token_value', token_text);  // For later boot.
-    $.cookie('request_token', RegExp.$1);  // For phase 2.
-    $.cookie('request_secret', RegExp.$2);  // For phase 2.
+    $.storage('form_oauth_token_value', token_text);  // For later boot.
+    $.storage('request_token', RegExp.$1);  // For phase 2.
+    $.storage('request_secret', RegExp.$2);  // For phase 2.
     form.oauth_token.value = RegExp.$1;
     return true;
   } else {
@@ -52,10 +52,10 @@ function before_request(request_form, secret_form)
     '/phase2.html'
   );
 
-  $.cookie('form_consumer_secret_value',
-           secret_form.consumer_secret.value);
-  $.cookie('form_oauth_consumer_key_value',
-           request_form.oauth_consumer_key.value);
+  $.storage('form_consumer_secret_value',
+            secret_form.consumer_secret.value);
+  $.storage('form_oauth_consumer_key_value',
+            request_form.oauth_consumer_key.value);
 
   return true;
 }

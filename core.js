@@ -1195,7 +1195,7 @@ function Preference(name, default_value, opt_kw)  //{{{2
 
   this.applying_priority = kw.applying_priority || DEFAULT_APPLYING_PRIORITY;
   this.columns = kw.columns || 80;
-  this.current_value = $.cookie(name) || default_value;
+  this.current_value = $.storage(name) || default_value;
   this.default_value = default_value;
   this.form_type = kw.form_type || 'text';
   this.maximum_value = kw.maximum_value || Number.MAX_VALUE;
@@ -1260,7 +1260,7 @@ function Preference(name, default_value, opt_kw)  //{{{2
   };
 
   this.save = function () {
-    $.cookie(this.name, this.current_value);
+    $.storage(this.name, this.current_value);
   };
 
   this.set_form = function () {
@@ -1843,10 +1843,10 @@ $(document).ready(function () {  //{{{2
     initialize_oauth: {  //{{{
       requirements: [],
       procedure: function () {
-        var oauth_consumer_key = $.cookie('form_oauth_consumer_key_value');
-        var oauth_consumer_secret = $.cookie('form_consumer_secret_value');
-        var oauth_token = $.cookie('access_token');
-        var oauth_token_secret = $.cookie('access_secret');
+        var oauth_consumer_key = $.storage('form_oauth_consumer_key_value');
+        var oauth_consumer_secret = $.storage('form_consumer_secret_value');
+        var oauth_token = $.storage('access_token');
+        var oauth_token_secret = $.storage('access_secret');
         if (oauth_consumer_key == null
             || oauth_consumer_secret == null
             || oauth_token == null

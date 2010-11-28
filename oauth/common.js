@@ -77,7 +77,7 @@ function restore_form_values()
 {
   $('.restorable').each(function(){
     var k = this.name;
-    var form_k_value = $.cookie('form_' + k + '_value');
+    var form_k_value = $.storage('form_' + k + '_value');
     if (form_k_value != null)
       $('.restorable[name="' + k + '"]').val(form_k_value);
   });
