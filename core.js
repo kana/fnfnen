@@ -1329,6 +1329,9 @@ function save_prafbe_learning_result()  //{{{2
 {
   $.storage('prafbe_right_dict', $.toJSON(g_prafbe_right_dict));
   $.storage('prafbe_wrong_dict', $.toJSON(g_prafbe_wrong_dict));
+
+  $('#prafbe_right_dict').val($.toJSON(g_prafbe_right_dict));
+  $('#prafbe_wrong_dict').val($.toJSON(g_prafbe_wrong_dict));
 }
 
 
