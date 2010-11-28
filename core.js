@@ -74,6 +74,9 @@ var TWITTER_UI_URI = 'http://twitter.com/';
 var g_external_configuration = {/* preference_name: value */};
 var g_parameters = {'automatic_update': true};
 var g_plugins = [/* plugin = {event_name: function, ...}, ... */];
+var g_prafbe_learning_count = 0;
+var g_prafbe_right_dict = {};
+var g_prafbe_wrong_dict = {};
 var g_preferences = {/* name: preference, ... */};
 var g_since_id_home = DUMMY_SINCE_ID;  // BUGS: Tweet #1 cannot be shown.
 var g_since_id_mentions = DUMMY_SINCE_ID;  // BUGS: Tweet #1 cannot be shown.
@@ -294,7 +297,78 @@ function html_from_tweet(tweet)  //{{{2
       ],
       favorite_symbol(tweet.favorited),
     ],
+    // button to learn a right tweet
+    [
+      'a',
+      [
+        '@',
+        ['class', 'button prafbe'],
+        ['href', 'javascript:learn_tweet(' + tweet.id + ', true)'],
+      ],
+      '&#x25b3;',
+    ],
+    // button to learn a wrong tweet
+    [
+      'a',
+      [
+        '@',
+        ['class', 'button prafbe'],
+        ['href', 'javascript:learn_tweet(' + tweet.id + ', false)'],
+      ],
+      '&#x25bd;',
+    ],
   ]);
+}
+
+
+
+
+function learn_tweet(tweet_id, right_tweet_p)  //{{{2
+{
+  var dict = right_tweet_p ? g_prafbe_right_dict : g_prafbe_wrong_dict;
+  var tweet = tweet_db.get(tweet_id);
+  prafbe.learn(dict, tweet.text);
+  g_prafbe_learning_count++;
+  log_notice(
+    'Prafbe',
+    ('Learned as '
+     + (right_tweet_p ? 'good' : 'bad')
+     + ' tweet: @'
+     + tweet.user.screen_name
+     + ': '
+     + tweet.text)
+  );
+
+  var update_view = function (tweet_id) {
+    // $('foo').replaceWith($('#bar')) replaces all foo elements with #bar,
+    // but #bar is not cloned for each foo element.  So it actually removes
+    // all foo elements then moves #bar to the location of the last foo.
+    // Therefore node_tweet must be cloned for each time.
+    var node_tweet = node_from_tweet(tweet_db.get(tweet_id));
+    $('.' + class_name_from_tweet_id(tweet_id))
+      .replaceWith(function () {return node_tweet.clone();});
+  };
+  if (false) {  // FIXME: Add preference.
+    for (var i in tweet_db.db)
+      update_view(i);
+  } else {
+    update_view(tweet_id);
+  }
+
+  if (false) {
+    var keys = [];
+    for (var i in dict)
+      keys.push(i);
+    keys.sort();
+
+    log_notice(
+      keys
+      .map(function (x) {return x + ': ' + dict[x];})
+      .join(', ')
+    );
+  }
+
+  return;
 }
 
 

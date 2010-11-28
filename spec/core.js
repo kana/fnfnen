@@ -59,6 +59,16 @@ describe('Core', function () {
       '\u2606',
       '</a>',
     ];
+    var t_button_to_learn_tweet_as_right = [
+      '<a class="button prafbe" href="javascript:learn_tweet(81, true)">',
+      '&#x25b3;',
+      '</a>',
+    ];
+    var t_button_to_learn_tweet_as_wrong = [
+      '<a class="button prafbe" href="javascript:learn_tweet(81, false)">',
+      '&#x25bd;',
+      '</a>',
+    ];
 
     it('should return a HTML snippet from a tweet', function () {
       var t = $.extend({}, tweet);
@@ -69,6 +79,8 @@ describe('Core', function () {
         t_posted_time,
         t_button_to_reply,
         t_button_to_toggle_favorite,
+        t_button_to_learn_tweet_as_right,
+        t_button_to_learn_tweet_as_wrong,
       ]));
     });
     it('should reflect "favorited" status', function () {
@@ -82,6 +94,8 @@ describe('Core', function () {
         '<a class="button favorite" href="javascript:toggle_favorite(81)">',
         '\u2605',
         '</a>',
+        t_button_to_learn_tweet_as_right,
+        t_button_to_learn_tweet_as_wrong,
       ]));
     });
     it('should reflect "in_reply_to_status_id" status', function () {
@@ -100,6 +114,8 @@ describe('Core', function () {
           '</a>',
         ],
         t_button_to_toggle_favorite,
+        t_button_to_learn_tweet_as_right,
+        t_button_to_learn_tweet_as_wrong,
       ]));
     });
   });
