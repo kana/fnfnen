@@ -2004,6 +2004,10 @@ $(document).ready(function () {  //{{{2
           }
         );
         g_preferences.register(
+          'spam_probability_threshold',
+          0.90
+        );
+        g_preferences.register(
           'external_configuration_uri',
           '',
           {
