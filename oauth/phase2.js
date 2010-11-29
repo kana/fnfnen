@@ -38,11 +38,11 @@ function get_argument(key)
 
 function fill_request(form_request, form_secret)
 {
-  form_request.oauth_token.value = $.cookie('request_token');
-  form_secret.token_secret.value = $.cookie('request_secret');
+  form_request.oauth_token.value = $.storage('request_token');
+  form_secret.token_secret.value = $.storage('request_secret');
 
-  $.cookie('request_token', null);
-  $.cookie('request_secret', null);
+  $.storage('request_token', null);
+  $.storage('request_secret', null);
 
   if (get_argument('oauth_token') != form_request.oauth_token.value) {
     alert(
@@ -64,8 +64,8 @@ function before_log_in(form)
   var value = form.oauth_access_token_result.value;
 
   if (value.match(/^oauth_token=([^&]+)&oauth_token_secret=([^&]+)/)) {
-    $.cookie('access_token', RegExp.$1);
-    $.cookie('access_secret', RegExp.$2);
+    $.storage('access_token', RegExp.$1);
+    $.storage('access_secret', RegExp.$2);
     location.href = '../index.html';
   } else {
     alert('Pasted value is not a valid one.  Please retry all steps.');
