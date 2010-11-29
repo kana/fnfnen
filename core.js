@@ -1486,11 +1486,17 @@ function process_queued_api_request_with_oauth()  //{{{2
         clearTimeout(error_timer);  // Prevents error_timer handler.
         error_timer = null;
 
-        var response = (
-          location.protocol == 'file:'
-          ? eval('(' + $('#request_iframe').contents().text() + ')')
-          : null  // Investigating is not allowed because of same origin policy.
-        );
+        var response;
+        try {
+          // Normally it's not allowed to read a frame content from a script
+          // which comes from different domain because of same origin policy.
+          // A script which comes from file:// is not restricted by same
+          // origin policy, so that the script can read any frame content.
+          // But it seems to depend on the implementation of each web browser.
+          response = eval('(' + $('#request_iframe').contents().text() + ')');
+        } catch (e) {
+          response = null;
+        }
         if (response && response.error)
           log_error(request.from, response.error);
         request.callback(response);
