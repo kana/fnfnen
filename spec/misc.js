@@ -8,6 +8,18 @@ describe('Misc.', function () {
       expect(_(b + 'favorite/create/123.json')).toEqual('favorite/create/123');
     });
   });
+  describe('class_name_from_column_name', function () {
+    it('should convert column name nicely', function () {
+      expect(class_name_from_column_name('abc')).toEqual('abc');
+      expect(class_name_from_column_name('123')).toEqual('123');
+      expect(class_name_from_column_name('_-_')).toEqual('_-_');
+
+      expect(class_name_from_column_name('DEF')).toEqual('def');
+      expect(class_name_from_column_name('?!?!')).toEqual('');
+
+      expect(class_name_from_column_name('Love me?')).toEqual('loveme');
+    });
+  });
   describe('create_element', function () {
     it('should create a DOM element wrapped by jQuery', function () {
       var e = create_element('div');
