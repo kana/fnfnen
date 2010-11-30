@@ -958,6 +958,14 @@ function append_column(node_column, opt_position)  //{{{2
 
 
 
+function class_name_from_column_name(column_name)  //{{{2
+{
+  return column_name.toLowerCase().replace(/[^0-9a-z_-]/g, '');
+}
+
+
+
+
 function column(opt_column_name)  //{{{2
 {
   if (opt_column_name) {
@@ -993,6 +1001,7 @@ function create_column(column_name, additional_classes)  //{{{2
   node_column.addClass('column');
   if (additional_classes)
     node_column.addClass(additional_classes);
+  node_column.addClass(class_name_from_column_name(column_name));
 
   node_column.hide();
 
