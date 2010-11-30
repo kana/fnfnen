@@ -74,6 +74,9 @@ var TWITTER_UI_URI = 'http://twitter.com/';
 var g_external_configuration = {/* preference_name: value */};
 var g_parameters = {'automatic_update': true};
 var g_plugins = [/* plugin = {event_name: function, ...}, ... */];
+var g_prafbe_learning_count = 0;
+var g_prafbe_right_dict = {};
+var g_prafbe_wrong_dict = {};
 var g_preferences = {/* name: preference, ... */};
 var g_since_id_home = DUMMY_SINCE_ID;  // BUGS: Tweet #1 cannot be shown.
 var g_since_id_mentions = DUMMY_SINCE_ID;  // BUGS: Tweet #1 cannot be shown.
@@ -206,6 +209,15 @@ function fnfnen_external_configuration(data)  //{{{2
 function html_from_tweet(tweet)  //{{{2
 {
   return html_from_jsxn([
+    // prafbe information
+    [
+      'span',
+      [
+        '@',
+        ['class', 'debug prafbe'],
+      ],
+      format_probability(tweet.prafbe_result),
+    ],
     // user icon
     [
       'a',
@@ -294,7 +306,84 @@ function html_from_tweet(tweet)  //{{{2
       ],
       favorite_symbol(tweet.favorited),
     ],
+    // button to learn a right tweet
+    [
+      'a',
+      [
+        '@',
+        ['class', 'button prafbe'],
+        ['href', 'javascript:learn_tweet(' + tweet.id + ', true)'],
+      ],
+      (tweet.prafbe_learned_as_right_p ? '&#x25b2;' : '&#x25b3;'),
+    ],
+    // button to learn a wrong tweet
+    [
+      'a',
+      [
+        '@',
+        ['class', 'button prafbe'],
+        ['href', 'javascript:learn_tweet(' + tweet.id + ', false)'],
+      ],
+      (tweet.prafbe_learned_as_wrong_p ? '&#x25bc;' : '&#x25bd;'),
+    ],
   ]);
+}
+
+
+
+
+function learn_tweet(tweet_id, right_tweet_p)  //{{{2
+{
+  var dict = right_tweet_p ? g_prafbe_right_dict : g_prafbe_wrong_dict;
+  var tweet = tweet_db.get(tweet_id);
+  prafbe.learn(dict, tweet.text);
+  g_prafbe_learning_count++;
+  save_prafbe_learning_result();
+  if (right_tweet_p)
+    tweet.prafbe_learned_as_right_p = true;
+  else
+    tweet.prafbe_learned_as_wrong_p = true;
+
+  log_notice(
+    'Prafbe',
+    ('Learned as '
+     + (right_tweet_p ? 'good' : 'bad')
+     + ' tweet: @'
+     + tweet.user.screen_name
+     + ': '
+     + tweet.text)
+  );
+
+  var update_view = function (tweet_id) {
+    // $('foo').replaceWith($('#bar')) replaces all foo elements with #bar,
+    // but #bar is not cloned for each foo element.  So it actually removes
+    // all foo elements then moves #bar to the location of the last foo.
+    // Therefore node_tweet must be cloned for each time.
+    var node_tweet = node_from_tweet(tweet_db.get(tweet_id));
+    $('.' + class_name_from_tweet_id(tweet_id))
+      .replaceWith(function () {return node_tweet.clone();});
+  };
+  if (false) {  // FIXME: Add preference.
+    for (var i in tweet_db.db)
+      update_view(i);
+  } else {
+    update_view(tweet_id);
+  }
+
+  if (false) {
+    var keys = [];
+    for (var i in dict)
+      keys.push(i);
+    keys.sort();
+
+    log_notice(
+      keys
+      .map(function (x) {return x + ': ' + dict[x];})
+      .join(', ')
+    );
+  }
+
+  return;
 }
 
 
@@ -356,7 +445,6 @@ function node_from_tweet(tweet)  //{{{2
     var node_tweet = create_element('div');
 
     node_tweet.data('json', tweet);
-    node_tweet.html(html_from_tweet(tweet));
 
     node_tweet.addClass('tweet');
     node_tweet.addClass(class_name_from_tweet_id(tweet.id));
@@ -365,6 +453,10 @@ function node_from_tweet(tweet)  //{{{2
     if (tweet_mine_p(tweet))
       node_tweet.addClass('mine');
     node_tweet.addClass(censorship_classes_from_tweet(tweet).join(' '));
+
+    // tweet may be modified in-place by censorship_classes_from_tweet(),
+    // so that html_from_tweet() should be called after it.
+    node_tweet.html(html_from_tweet(tweet));
 
     return node_tweet;
 }
@@ -737,6 +829,14 @@ function censorship_classes_from_tweet(tweet)  //{{{2
     if (rule.pattern.test(to_string(value)))
       classes.push.apply(classes, rule.classes);
   }
+
+  var p = calculate_spam_probability(tweet);
+  classes.push(
+    g_preferences.spam_probability_threshold.current_value <= p
+    ? 'spam'
+    : 'nonspam'
+  );
+  classes.push('score' + Math.min(Math.round(p * 10), 9));
 
   return classes;
 }
@@ -1187,6 +1287,65 @@ function register_plugin(plugin)  //{{{2
 
 
 
+// Prafbe  {{{1
+function calculate_spam_probability(tweet)  //{{{2
+{
+  var p = tweet.prafbe_result;
+  if (p == null
+      || tweet.prafbe_learning_count == null
+      || tweet.prafbe_learning_count < g_prafbe_learning_count)
+  {
+    var tokens = prafbe.tokenize(tweet.text);
+    var itokens = prafbe.list_most_interesting_tokens(
+      g_prafbe_right_dict,
+      g_prafbe_wrong_dict,
+      tokens,
+      15
+    );
+    var ps = itokens.map(function (x) {
+      return prafbe.calculate_spamness(
+        g_prafbe_right_dict,
+        g_prafbe_wrong_dict,
+        x
+      );
+    });
+    p = prafbe.calculate_spam_probability(ps);
+  }
+
+  tweet.prafbe_learning_count = g_prafbe_learning_count;
+  tweet.prafbe_result = p;
+
+  return p;
+}
+
+
+
+
+function load_prafbe_learning_result()  //{{{2
+{
+  g_prafbe_right_dict = $.evalJSON($.storage('prafbe_right_dict') || '{}');
+  g_prafbe_wrong_dict = $.evalJSON($.storage('prafbe_wrong_dict') || '{}');
+}
+
+
+
+
+function save_prafbe_learning_result()  //{{{2
+{
+  $.storage('prafbe_right_dict', $.toJSON(g_prafbe_right_dict));
+  $.storage('prafbe_wrong_dict', $.toJSON(g_prafbe_wrong_dict));
+
+  $('#prafbe_right_dict').val($.toJSON(g_prafbe_right_dict));
+  $('#prafbe_wrong_dict').val($.toJSON(g_prafbe_wrong_dict));
+}
+
+
+
+
+
+
+
+
 // Preference  {{{1
 // FIXME: Warn about some preferences require to reload fnfnen to take effect.
 function Preference(name, default_value, opt_kw)  //{{{2
@@ -1590,6 +1749,15 @@ function favorite_symbol(favorite_p)  //{{{2
 
 
 
+function format_probability(p)  //{{{2
+{
+  var v = Math.min(Math.round(p * 10000) / 10000, 0.9999);
+  return (v.toString() + '0000').replace(/^\d+\.?(\d\d\d\d).*$/, '$1');
+}
+
+
+
+
 function html_from_jsxn(jsxn)  //{{{2
 {
   // jsxn := [element, ...]
@@ -1885,6 +2053,13 @@ $(document).ready(function () {  //{{{2
         return;
       },
     },  //}}}
+    initialize_prafbe_learning_result: {  //{{{
+      requirements: [],
+      procedure: function () {
+        load_prafbe_learning_result();
+        save_prafbe_learning_result();
+      },
+    },  //}}}
     initialize_preferences: {  //{{{
       requirements: ['initialize_columns', 'initialize_misc'],
       procedure: function () {
@@ -2008,6 +2183,10 @@ $(document).ready(function () {  //{{{2
             },
             rows: 10
           }
+        );
+        g_preferences.register(
+          'spam_probability_threshold',
+          0.90
         );
         g_preferences.register(
           'external_configuration_uri',

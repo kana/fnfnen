@@ -10,7 +10,9 @@ describe('Core', function () {
         screen_name: 'kana1',
         profile_image_url: './avatar.png',
       },
+      prafbe_result: 0.1234321,
     };
+    var t_prafbe_information = '<span class="debug prafbe">1234</span>';
     var t_user_icon = [
       '<a',
       ' class="user_icon"',
@@ -59,21 +61,35 @@ describe('Core', function () {
       '\u2606',
       '</a>',
     ];
+    var t_button_to_learn_tweet_as_right = [
+      '<a class="button prafbe" href="javascript:learn_tweet(81, true)">',
+      '&#x25b3;',
+      '</a>',
+    ];
+    var t_button_to_learn_tweet_as_wrong = [
+      '<a class="button prafbe" href="javascript:learn_tweet(81, false)">',
+      '&#x25bd;',
+      '</a>',
+    ];
 
     it('should return a HTML snippet from a tweet', function () {
       var t = $.extend({}, tweet);
       expect(html_from_tweet(t)).toEqual(string_from_tree([
+        t_prafbe_information,
         t_user_icon,
         t_screen_name,
         t_text,
         t_posted_time,
         t_button_to_reply,
         t_button_to_toggle_favorite,
+        t_button_to_learn_tweet_as_right,
+        t_button_to_learn_tweet_as_wrong,
       ]));
     });
     it('should reflect "favorited" status', function () {
       var t = $.extend({}, tweet, {favorited: true});
       expect(html_from_tweet(t)).toEqual(string_from_tree([
+        t_prafbe_information,
         t_user_icon,
         t_screen_name,
         t_text,
@@ -82,11 +98,14 @@ describe('Core', function () {
         '<a class="button favorite" href="javascript:toggle_favorite(81)">',
         '\u2605',
         '</a>',
+        t_button_to_learn_tweet_as_right,
+        t_button_to_learn_tweet_as_wrong,
       ]));
     });
     it('should reflect "in_reply_to_status_id" status', function () {
       var t = $.extend({}, tweet, {in_reply_to_status_id: 8181});
       expect(html_from_tweet(t)).toEqual(string_from_tree([
+        t_prafbe_information,
         t_user_icon,
         t_screen_name,
         t_text,
@@ -100,6 +119,58 @@ describe('Core', function () {
           '</a>',
         ],
         t_button_to_toggle_favorite,
+        t_button_to_learn_tweet_as_right,
+        t_button_to_learn_tweet_as_wrong,
+      ]));
+    });
+    it('should reflect "prafbe_result" status', function () {
+      var t = $.extend({}, tweet, {prafbe_result: 0.9876});
+      expect(html_from_tweet(t)).toEqual(string_from_tree([
+        '<span class="debug prafbe">9876</span>',
+        t_user_icon,
+        t_screen_name,
+        t_text,
+        t_posted_time,
+        t_button_to_reply,
+        t_button_to_toggle_favorite,
+        t_button_to_learn_tweet_as_right,
+        t_button_to_learn_tweet_as_wrong,
+      ]));
+    });
+    it('should reflect "prafbe_learned_as_right_p" status', function () {
+      var t = $.extend({}, tweet, {prafbe_learned_as_right_p: true});
+      expect(html_from_tweet(t)).toEqual(string_from_tree([
+        t_prafbe_information,
+        t_user_icon,
+        t_screen_name,
+        t_text,
+        t_posted_time,
+        t_button_to_reply,
+        t_button_to_toggle_favorite,
+        [
+          '<a class="button prafbe" href="javascript:learn_tweet(81, true)">',
+          '&#x25b2;',
+          '</a>',
+        ],
+        t_button_to_learn_tweet_as_wrong,
+      ]));
+    });
+    it('should reflect "prafbe_learned_as_wrong_p" status', function () {
+      var t = $.extend({}, tweet, {prafbe_learned_as_wrong_p: true});
+      expect(html_from_tweet(t)).toEqual(string_from_tree([
+        t_prafbe_information,
+        t_user_icon,
+        t_screen_name,
+        t_text,
+        t_posted_time,
+        t_button_to_reply,
+        t_button_to_toggle_favorite,
+        t_button_to_learn_tweet_as_right,
+        [
+          '<a class="button prafbe" href="javascript:learn_tweet(81, false)">',
+          '&#x25bc;',
+          '</a>',
+        ],
       ]));
     });
   });

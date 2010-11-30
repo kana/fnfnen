@@ -30,6 +30,11 @@ publish:
 	version=$$(git describe --always --dirty --tags); \
 	sed -e "s/@@VERSION@[@]/$$version/g" -i \
 	  $$(git ls-files | sed -e '/^\(fnfnen.html\|jasmine\)$$/d'); \
+	git rm prafbe.js; \
+	cp prafbe/prafbe.js .; \
+	git add prafbe.js; \
+	git rm --cached prafbe; \
+	git config --file .gitmodules --remove-section submodule.prafbe; \
 	git commit -am "Publish with $$version"; \
 	git push . HEAD:gh-pages -f; \
 	git reset --hard HEAD~1; \
