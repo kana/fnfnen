@@ -836,6 +836,7 @@ function censorship_classes_from_tweet(tweet)  //{{{2
     ? 'spam'
     : 'nonspam'
   );
+  classes.push('score' + Math.min(Math.round(p * 10), 9));
 
   return classes;
 }
