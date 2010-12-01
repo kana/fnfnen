@@ -156,9 +156,9 @@ body
 
 
 #form_preferences {margin: 1em  0;}
-dd {margin-left: 5%;  margin-bottom: 1em;}
+dd {margin-left: 5%;}
+dd, #button_to_toggle_advanced_preferences {margin-bottom: 1em;}
 dd.submit {margin: 0;}
-#form_preferences .debug {display: none;}
 
 
 .log

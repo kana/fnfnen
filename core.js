@@ -1419,8 +1419,9 @@ function Preference(name, default_value, opt_kw)  //{{{2
     var node_dd = create_element('dd');
     node_dd.append(node_input);
 
-    $('#form_preferences > dl > dd.submit').before(node_dt);
-    $('#form_preferences > dl > dd.submit').before(node_dd);
+    $('#form_preferences #advanced_preferences_header').
+      before(node_dt).
+      before(node_dd);
   }
 
   this.node = function () {
@@ -1998,6 +1999,15 @@ $(document).ready(function () {  //{{{2
     return;  // Skip bootstrap; it seems to be executed as a part of tests.
 
   var initialization_steps = {
+    initialize_advanced_preferences: {  //{{{
+      requirements: [],
+      procedure: function () {
+        $('#advanced_preferences_content').hide();
+        $('#button_to_toggle_advanced_preferences').click(function () {
+          $('#advanced_preferences_content').slideToggle();
+        });
+      },
+    },  //}}}
     initialize_columns: {  //{{{
       requirements: [],
       procedure: function () {

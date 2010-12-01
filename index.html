@@ -106,10 +106,17 @@ License: MIT license  {{{
           ...
         -->
 
-        <dt class="debug">Prafbe right dict (readonly)</dt>
-        <dd class="debug"><textarea id="prafbe_right_dict" cols="80" rows="3" readonly="readonly">{}</textarea></dd>
-        <dt class="debug">Prafbe wrong dict (readonly)</dt>
-        <dd class="debug"><textarea id="prafbe_wrong_dict" cols="80" rows="3" readonly="readonly">{}</textarea></dd>
+        <dt id="advanced_preferences_header">
+          <input id="button_to_toggle_advanced_preferences" type="button" value="Toggle advanced preferences"/>
+        </dt>
+        <dd>
+          <dl id="advanced_preferences_content">
+            <dt>Prafbe right dict (readonly)</dt>
+            <dd><textarea id="prafbe_right_dict" cols="80" rows="3" readonly="readonly">{}</textarea></dd>
+            <dt>Prafbe wrong dict (readonly)</dt>
+            <dd><textarea id="prafbe_wrong_dict" cols="80" rows="3" readonly="readonly">{}</textarea></dd>
+          </dl>
+        </dd>
 
         <dd class="submit">
           <input type="submit" value="Apply"/>
