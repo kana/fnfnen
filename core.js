@@ -1366,6 +1366,7 @@ function Preference(name, default_value, opt_kw)  //{{{2
   this.current_value = $.storage(name) || default_value;
   this.default_value = default_value;
   this.form_type = kw.form_type || 'text';
+  this.is_advanced_p = (kw.is_advanced_p != null ? kw.is_advanced_p : false);
   this.maximum_value = kw.maximum_value || Number.MAX_VALUE;
   this.minimum_value = kw.minimum_value || Number.MIN_VALUE;
   this.name = name;
@@ -1419,9 +1420,15 @@ function Preference(name, default_value, opt_kw)  //{{{2
     var node_dd = create_element('dd');
     node_dd.append(node_input);
 
-    $('#form_preferences #advanced_preferences_header').
-      before(node_dt).
-      before(node_dd);
+    if (this.is_advanced_p) {
+      $('#form_preferences #advanced_preferences_content').
+        append(node_dt).
+        append(node_dd);
+    } else {
+      $('#form_preferences #advanced_preferences_header').
+        before(node_dt).
+        before(node_dd);
+    }
   }
 
   this.node = function () {
