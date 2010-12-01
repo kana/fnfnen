@@ -1366,6 +1366,7 @@ function Preference(name, default_value, opt_kw)  //{{{2
   this.current_value = $.storage(name) || default_value;
   this.default_value = default_value;
   this.form_type = kw.form_type || 'text';
+  this.is_advanced_p = (kw.is_advanced_p != null ? kw.is_advanced_p : false);
   this.maximum_value = kw.maximum_value || Number.MAX_VALUE;
   this.minimum_value = kw.minimum_value || Number.MIN_VALUE;
   this.name = name;
@@ -1419,8 +1420,15 @@ function Preference(name, default_value, opt_kw)  //{{{2
     var node_dd = create_element('dd');
     node_dd.append(node_input);
 
-    $('#form_preferences > dl > dd.submit').before(node_dt);
-    $('#form_preferences > dl > dd.submit').before(node_dd);
+    if (this.is_advanced_p) {
+      $('#form_preferences #advanced_preferences_content').
+        append(node_dt).
+        append(node_dd);
+    } else {
+      $('#form_preferences #advanced_preferences_header').
+        before(node_dt).
+        before(node_dd);
+    }
   }
 
   this.node = function () {
@@ -1998,6 +2006,15 @@ $(document).ready(function () {  //{{{2
     return;  // Skip bootstrap; it seems to be executed as a part of tests.
 
   var initialization_steps = {
+    initialize_advanced_preferences: {  //{{{
+      requirements: [],
+      procedure: function () {
+        $('#advanced_preferences_content').hide();
+        $('#button_to_toggle_advanced_preferences').click(function () {
+          $('#advanced_preferences_content').slideToggle();
+        });
+      },
+    },  //}}}
     initialize_columns: {  //{{{
       requirements: [],
       procedure: function () {
@@ -2195,7 +2212,10 @@ $(document).ready(function () {  //{{{2
         );
         g_preferences.register(
           'spam_probability_threshold',
-          0.90
+          0.90,
+          {
+            is_advanced_p: true,
+          }
         );
         g_preferences.register(
           'external_configuration_uri',
@@ -2203,6 +2223,7 @@ $(document).ready(function () {  //{{{2
           {
             // Should apply at the last to override already applied values.
             applying_priority: LAST_APPLYING_PRIORITY,
+            is_advanced_p: true,
             on_application: function (via_external_configuration_p) {
               if (!via_external_configuration_p) {
                 if (this.current_value) {
