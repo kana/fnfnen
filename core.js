@@ -2212,7 +2212,10 @@ $(document).ready(function () {  //{{{2
         );
         g_preferences.register(
           'spam_probability_threshold',
-          0.90
+          0.90,
+          {
+            is_advanced_p: true,
+          }
         );
         g_preferences.register(
           'external_configuration_uri',
@@ -2220,6 +2223,7 @@ $(document).ready(function () {  //{{{2
           {
             // Should apply at the last to override already applied values.
             applying_priority: LAST_APPLYING_PRIORITY,
+            is_advanced_p: true,
             on_application: function (via_external_configuration_p) {
               if (!via_external_configuration_p) {
                 if (this.current_value) {
