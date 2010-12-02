@@ -1410,7 +1410,8 @@ function Preference(name, default_value, opt_kw)  //{{{2
 
   this.initialize_form = function () {
     var node_dt = create_element('dt');
-    node_dt.text(englishize(this.name));
+    node_dt.text(englishize(this.name)
+                 + (this.read_only_p ? ' (read only)' : ''));
 
     var node_input;
     if (this.form_type == 'textarea') {
