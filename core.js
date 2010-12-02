@@ -359,16 +359,6 @@ function learn_tweet(tweet_id, right_tweet_p, interactive_p)  //{{{2
     // It's caller's duty to save non-interactive learning result.
     save_prafbe_learning_result();
 
-    log_notice(
-      'Prafbe',
-      ('Learned as '
-       + (right_tweet_p ? 'good' : 'bad')
-       + ' tweet: @'
-       + tweet.user.screen_name
-       + ': '
-       + tweet.text)
-    );
-
     var update_view = function (tweet_id) {
       // $('foo').replaceWith($('#bar')) replaces all foo elements with #bar,
       // but #bar is not cloned for each foo element.  So it actually removes
