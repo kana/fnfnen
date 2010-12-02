@@ -830,11 +830,9 @@ function censorship_classes_from_tweet(tweet)  //{{{2
   }
 
   var p = calculate_spam_probability(tweet);
-  classes.push(
-    g_preferences.spam_probability_threshold.current_value <= p
-    ? 'spam'
-    : 'nonspam'
-  );
+  classes.push(is_spam_tweet_p(tweet)
+               ? 'spam'
+               : 'nonspam');
   classes.push('score' + Math.min(Math.round(p * 10), 9));
 
   return classes;
@@ -1324,6 +1322,15 @@ function calculate_spam_probability(tweet)  //{{{2
   tweet.prafbe_result = p;
 
   return p;
+}
+
+
+
+
+function is_spam_tweet_p(tweet)  //{{{2
+{
+  return (g_preferences.spam_probability_threshold.current_value
+          <= calculate_spam_probability(tweet));
 }
 
 
