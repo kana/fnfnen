@@ -1387,7 +1387,6 @@ function Preference(name, default_value, opt_kw)  //{{{2
 
   this.apply = function (via_external_configuration_p) {
     this.get_form();
-    this.set_form();
     this.save();
     if (via_external_configuration_p) {
       // Leave form content as-is.
@@ -1450,6 +1449,7 @@ function Preference(name, default_value, opt_kw)  //{{{2
 
   this.save = function () {
     $.storage(this.name, this.current_value);
+    this.set_form();
   };
 
   this.set_form = function () {
