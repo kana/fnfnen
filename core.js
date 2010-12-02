@@ -1370,6 +1370,7 @@ function Preference(name, default_value, opt_kw)  //{{{2
   this.minimum_value = kw.minimum_value || Number.MIN_VALUE;
   this.name = name;
   this.on_application = kw.on_application || nop;
+  this.read_only_p = kw.read_only_p || false;
   this.rows = kw.rows || 25;
   this.value_type = typeof(default_value);
 
@@ -1415,6 +1416,8 @@ function Preference(name, default_value, opt_kw)  //{{{2
     }
     node_input.attr('name', this.name);
     node_input.val(this.current_value);
+    if (this.read_only_p)
+      node_input.attr('readonly', 'readonly');
 
     var node_dd = create_element('dd');
     node_dd.append(node_input);
