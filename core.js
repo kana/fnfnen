@@ -672,7 +672,6 @@ function callback_update(response, name_since_id, queue_id)  //{{{3
         new_tweets_n2o[NEWEST_TWEET_INDEX].id
       );
     }
-    tweet_db.add(new_tweets_n2o);
   } else {
     return;
   }
@@ -726,7 +725,9 @@ function queue_tweets_n2o(tweets_n2o, queue_id)  //{{{3
   for (var i in VALID_QUEUE_IDS)
     full_p = full_p && (g_tweet_queues[VALID_QUEUE_IDS[i]] != null);
   if (full_p) {
-    update_censored_columns(merge_tweets_n2o(g_tweet_queues));
+    var merged_tweets_n2o = merge_tweets_n2o(g_tweet_queues);
+    tweet_db.add(merged_tweets_n2o);
+    update_censored_columns(merged_tweets_n2o);
 
     g_tweet_queues = {};
   }
