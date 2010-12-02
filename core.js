@@ -374,19 +374,6 @@ function learn_tweet(tweet_id, right_tweet_p)  //{{{2
     update_view(tweet_id);
   }
 
-  if (false) {
-    var keys = [];
-    for (var i in dict)
-      keys.push(i);
-    keys.sort();
-
-    log_notice(
-      keys
-      .map(function (x) {return x + ': ' + dict[x];})
-      .join(', ')
-    );
-  }
-
   return;
 }
 
