@@ -312,7 +312,7 @@ function html_from_tweet(tweet)  //{{{2
       [
         '@',
         ['class', 'button prafbe'],
-        ['href', 'javascript:learn_tweet(' + tweet.id + ', true)'],
+        ['href', 'javascript:learn_tweet(' + tweet.id + ', true, true)'],
       ],
       (0 < tweet.prafbe_learning_bias
        ? '&#x25b2;' + tweet.prafbe_learning_bias.toString()
@@ -324,7 +324,7 @@ function html_from_tweet(tweet)  //{{{2
       [
         '@',
         ['class', 'button prafbe'],
-        ['href', 'javascript:learn_tweet(' + tweet.id + ', false)'],
+        ['href', 'javascript:learn_tweet(' + tweet.id + ', false, true)'],
       ],
       (tweet.prafbe_learning_bias < 0
        ? '&#x25bc;' + Math.abs(tweet.prafbe_learning_bias).toString()
@@ -336,7 +336,7 @@ function html_from_tweet(tweet)  //{{{2
 
 
 
-function learn_tweet(tweet_id, right_tweet_p)  //{{{2
+function learn_tweet(tweet_id, right_tweet_p, interactive_p)  //{{{2
 {
   var tweet = tweet_db.get(tweet_id);
   tweet.prafbe_learning_bias = (tweet.prafbe_learning_bias || 0);
@@ -353,33 +353,37 @@ function learn_tweet(tweet_id, right_tweet_p)  //{{{2
       prafbe.unlearn(g_prafbe_right_dict, tweet.text);
   }
   g_prafbe_learning_count++;
-  save_prafbe_learning_result();
   tweet.prafbe_learning_bias += (right_tweet_p ? 1 : -1);
 
-  log_notice(
-    'Prafbe',
-    ('Learned as '
-     + (right_tweet_p ? 'good' : 'bad')
-     + ' tweet: @'
-     + tweet.user.screen_name
-     + ': '
-     + tweet.text)
-  );
+  if (interactive_p) {
+    // It's caller's duty to save non-interactive learning result.
+    save_prafbe_learning_result();
 
-  var update_view = function (tweet_id) {
-    // $('foo').replaceWith($('#bar')) replaces all foo elements with #bar,
-    // but #bar is not cloned for each foo element.  So it actually removes
-    // all foo elements then moves #bar to the location of the last foo.
-    // Therefore node_tweet must be cloned for each time.
-    var node_tweet = node_from_tweet(tweet_db.get(tweet_id));
-    $('.' + class_name_from_tweet_id(tweet_id))
-      .replaceWith(function () {return node_tweet.clone();});
-  };
-  if (false) {  // FIXME: Add preference.
-    for (var i in tweet_db.db)
-      update_view(i);
-  } else {
-    update_view(tweet_id);
+    log_notice(
+      'Prafbe',
+      ('Learned as '
+       + (right_tweet_p ? 'good' : 'bad')
+       + ' tweet: @'
+       + tweet.user.screen_name
+       + ': '
+       + tweet.text)
+    );
+
+    var update_view = function (tweet_id) {
+      // $('foo').replaceWith($('#bar')) replaces all foo elements with #bar,
+      // but #bar is not cloned for each foo element.  So it actually removes
+      // all foo elements then moves #bar to the location of the last foo.
+      // Therefore node_tweet must be cloned for each time.
+      var node_tweet = node_from_tweet(tweet_db.get(tweet_id));
+      $('.' + class_name_from_tweet_id(tweet_id))
+        .replaceWith(function () {return node_tweet.clone();});
+    };
+    if (false) {  // FIXME: Add preference.
+      for (var i in tweet_db.db)
+        update_view(i);
+    } else {
+      update_view(tweet_id);
+    }
   }
 
   return;
