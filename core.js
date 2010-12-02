@@ -1508,9 +1508,23 @@ function TweetDatabase()  //{{{2
   this.add = function (new_tweets) {
     for (i in new_tweets) {
       var tweet = new_tweets[i];
-      if (!this.has_p(tweet))
+      if (!this.has_p(tweet)) {
         this.db[tweet.id] = tweet;
+
+        // Learn new tweets automatically.
+        //
+        // To simplify the code, old tweets are treated as learned ones even
+        // if they aren't actually learned.  For example, show_conversation()
+        // may fetch tweets which are not learned yet.  But it's rare to occur
+        // and such old tweets should be filtered well.
+        if (g_preferences.last_learned_tweet_id.current_value < tweet.id) {
+          learn_tweet(tweet.id, !is_spam_tweet_p(tweet), false);
+          g_preferences.last_learned_tweet_id.current_value = tweet.id;
+        }
+      }
     }
+    g_preferences.last_learned_tweet_id.save();
+    save_prafbe_learning_result();
     return;
   };
 
@@ -2206,6 +2220,14 @@ $(document).ready(function () {  //{{{2
         g_preferences.register(
           'spam_probability_threshold',
           0.90
+        );
+        g_preferences.register(
+          'last_learned_tweet_id',
+          -13,
+          {
+            is_advanced_p: true,
+            read_only_p: true,
+          }
         );
         g_preferences.register(
           'external_configuration_uri',
