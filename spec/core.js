@@ -62,12 +62,14 @@ describe('Core', function () {
       '</a>',
     ];
     var t_button_to_learn_tweet_as_right = [
-      '<a class="button prafbe" href="javascript:learn_tweet(81, true)">',
+      '<a class="button prafbe"',
+      ' href="javascript:learn_tweet(81, true, true)">',
       '&#x25b3;',
       '</a>',
     ];
     var t_button_to_learn_tweet_as_wrong = [
-      '<a class="button prafbe" href="javascript:learn_tweet(81, false)">',
+      '<a class="button prafbe"',
+      ' href="javascript:learn_tweet(81, false, true)">',
       '&#x25bd;',
       '</a>',
     ];
@@ -148,7 +150,8 @@ describe('Core', function () {
         t_button_to_reply,
         t_button_to_toggle_favorite,
         [
-          '<a class="button prafbe" href="javascript:learn_tweet(81, true)">',
+          '<a class="button prafbe"',
+          ' href="javascript:learn_tweet(81, true, true)">',
           '&#x25b2;12',
           '</a>',
         ],
@@ -166,7 +169,8 @@ describe('Core', function () {
         t_button_to_toggle_favorite,
         t_button_to_learn_tweet_as_right,
         [
-          '<a class="button prafbe" href="javascript:learn_tweet(81, false)">',
+          '<a class="button prafbe"',
+          ' href="javascript:learn_tweet(81, false, true)">',
           '&#x25bc;34',
           '</a>',
         ],

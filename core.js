@@ -312,7 +312,7 @@ function html_from_tweet(tweet)  //{{{2
       [
         '@',
         ['class', 'button prafbe'],
-        ['href', 'javascript:learn_tweet(' + tweet.id + ', true)'],
+        ['href', 'javascript:learn_tweet(' + tweet.id + ', true, true)'],
       ],
       (0 < tweet.prafbe_learning_bias
        ? '&#x25b2;' + tweet.prafbe_learning_bias.toString()
@@ -324,7 +324,7 @@ function html_from_tweet(tweet)  //{{{2
       [
         '@',
         ['class', 'button prafbe'],
-        ['href', 'javascript:learn_tweet(' + tweet.id + ', false)'],
+        ['href', 'javascript:learn_tweet(' + tweet.id + ', false, true)'],
       ],
       (tweet.prafbe_learning_bias < 0
        ? '&#x25bc;' + Math.abs(tweet.prafbe_learning_bias).toString()
@@ -336,7 +336,7 @@ function html_from_tweet(tweet)  //{{{2
 
 
 
-function learn_tweet(tweet_id, right_tweet_p)  //{{{2
+function learn_tweet(tweet_id, right_tweet_p, interactive_p)  //{{{2
 {
   var tweet = tweet_db.get(tweet_id);
   tweet.prafbe_learning_bias = (tweet.prafbe_learning_bias || 0);
@@ -353,33 +353,37 @@ function learn_tweet(tweet_id, right_tweet_p)  //{{{2
       prafbe.unlearn(g_prafbe_right_dict, tweet.text);
   }
   g_prafbe_learning_count++;
-  save_prafbe_learning_result();
   tweet.prafbe_learning_bias += (right_tweet_p ? 1 : -1);
 
-  log_notice(
-    'Prafbe',
-    ('Learned as '
-     + (right_tweet_p ? 'good' : 'bad')
-     + ' tweet: @'
-     + tweet.user.screen_name
-     + ': '
-     + tweet.text)
-  );
+  if (interactive_p) {
+    // It's caller's duty to save non-interactive learning result.
+    save_prafbe_learning_result();
 
-  var update_view = function (tweet_id) {
-    // $('foo').replaceWith($('#bar')) replaces all foo elements with #bar,
-    // but #bar is not cloned for each foo element.  So it actually removes
-    // all foo elements then moves #bar to the location of the last foo.
-    // Therefore node_tweet must be cloned for each time.
-    var node_tweet = node_from_tweet(tweet_db.get(tweet_id));
-    $('.' + class_name_from_tweet_id(tweet_id))
-      .replaceWith(function () {return node_tweet.clone();});
-  };
-  if (false) {  // FIXME: Add preference.
-    for (var i in tweet_db.db)
-      update_view(i);
-  } else {
-    update_view(tweet_id);
+    log_notice(
+      'Prafbe',
+      ('Learned as '
+       + (right_tweet_p ? 'good' : 'bad')
+       + ' tweet: @'
+       + tweet.user.screen_name
+       + ': '
+       + tweet.text)
+    );
+
+    var update_view = function (tweet_id) {
+      // $('foo').replaceWith($('#bar')) replaces all foo elements with #bar,
+      // but #bar is not cloned for each foo element.  So it actually removes
+      // all foo elements then moves #bar to the location of the last foo.
+      // Therefore node_tweet must be cloned for each time.
+      var node_tweet = node_from_tweet(tweet_db.get(tweet_id));
+      $('.' + class_name_from_tweet_id(tweet_id))
+        .replaceWith(function () {return node_tweet.clone();});
+    };
+    if (false) {  // FIXME: Add preference.
+      for (var i in tweet_db.db)
+        update_view(i);
+    } else {
+      update_view(tweet_id);
+    }
   }
 
   return;
@@ -830,11 +834,9 @@ function censorship_classes_from_tweet(tweet)  //{{{2
   }
 
   var p = calculate_spam_probability(tweet);
-  classes.push(
-    g_preferences.spam_probability_threshold.current_value <= p
-    ? 'spam'
-    : 'nonspam'
-  );
+  classes.push(is_spam_tweet_p(tweet)
+               ? 'spam'
+               : 'nonspam');
   classes.push('score' + Math.min(Math.round(p * 10), 9));
 
   return classes;
@@ -1329,6 +1331,15 @@ function calculate_spam_probability(tweet)  //{{{2
 
 
 
+function is_spam_tweet_p(tweet)  //{{{2
+{
+  return (g_preferences.spam_probability_threshold.current_value
+          <= calculate_spam_probability(tweet));
+}
+
+
+
+
 function load_prafbe_learning_result()  //{{{2
 {
   g_prafbe_right_dict = $.evalJSON($.storage('prafbe_right_dict') || '{}');
@@ -1505,9 +1516,23 @@ function TweetDatabase()  //{{{2
   this.add = function (new_tweets) {
     for (i in new_tweets) {
       var tweet = new_tweets[i];
-      if (!this.has_p(tweet))
+      if (!this.has_p(tweet)) {
         this.db[tweet.id] = tweet;
+
+        // Learn new tweets automatically.
+        //
+        // To simplify the code, old tweets are treated as learned ones even
+        // if they aren't actually learned.  For example, show_conversation()
+        // may fetch tweets which are not learned yet.  But it's rare to occur
+        // and such old tweets should be filtered well.
+        if (g_preferences.last_learned_tweet_id.current_value < tweet.id) {
+          learn_tweet(tweet.id, !is_spam_tweet_p(tweet), false);
+          g_preferences.last_learned_tweet_id.current_value = tweet.id;
+        }
+      }
     }
+    g_preferences.last_learned_tweet_id.save();
+    save_prafbe_learning_result();
     return;
   };
 
@@ -2214,6 +2239,14 @@ $(document).ready(function () {  //{{{2
           0.90,
           {
             is_advanced_p: true,
+          }
+        );
+        g_preferences.register(
+          'last_learned_tweet_id',
+          -13,
+          {
+            is_advanced_p: true,
+            read_only_p: true,
           }
         );
         g_preferences.register(
