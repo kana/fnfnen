@@ -663,9 +663,7 @@ function callback_update(response, name_since_id, queue_id)  //{{{3
 
   var new_tweets_n2o = [];
   if (response.error == null) {
-    new_tweets_n2o = response.filter(
-      function (tweet) {return !tweet_db.has_p(tweet);}
-    );
+    new_tweets_n2o = response;
 
     if (0 < new_tweets_n2o.length) {
       var NEWEST_TWEET_INDEX = 0;
