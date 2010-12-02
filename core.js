@@ -314,8 +314,8 @@ function html_from_tweet(tweet)  //{{{2
         ['class', 'button prafbe'],
         ['href', 'javascript:learn_tweet(' + tweet.id + ', true)'],
       ],
-      (tweet.prafbe_right_count
-       ? '&#x25b2;' + tweet.prafbe_right_count.toString()
+      (0 < tweet.prafbe_learning_bias
+       ? '&#x25b2;' + tweet.prafbe_learning_bias.toString()
        : '&#x25b3;'),
     ],
     // button to learn a wrong tweet
@@ -326,8 +326,8 @@ function html_from_tweet(tweet)  //{{{2
         ['class', 'button prafbe'],
         ['href', 'javascript:learn_tweet(' + tweet.id + ', false)'],
       ],
-      (tweet.prafbe_wrong_count
-       ? '&#x25bc;' + tweet.prafbe_wrong_count.toString()
+      (tweet.prafbe_learning_bias < 0
+       ? '&#x25bc;' + Math.abs(tweet.prafbe_learning_bias).toString()
        : '&#x25bd;'),
     ],
   ]);
@@ -340,13 +340,11 @@ function learn_tweet(tweet_id, right_tweet_p)  //{{{2
 {
   var dict = right_tweet_p ? g_prafbe_right_dict : g_prafbe_wrong_dict;
   var tweet = tweet_db.get(tweet_id);
+  tweet.prafbe_learning_bias = (tweet.prafbe_learning_bias || 0);
   prafbe.learn(dict, tweet.text);
   g_prafbe_learning_count++;
   save_prafbe_learning_result();
-  if (right_tweet_p)
-    tweet.prafbe_right_count = (tweet.prafbe_right_count || 0) + 1;
-  else
-    tweet.prafbe_wrong_count = (tweet.prafbe_wrong_count || 0) + 1;
+  tweet.prafbe_learning_bias += (right_tweet_p ? 1 : -1);
 
   log_notice(
     'Prafbe',
