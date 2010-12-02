@@ -1525,12 +1525,17 @@ function TweetDatabase()  //{{{2
         // if they aren't actually learned.  For example, show_conversation()
         // may fetch tweets which are not learned yet.  But it's rare to occur
         // and such old tweets should be filtered well.
-        if (g_preferences.last_learned_tweet_id.current_value < tweet.id) {
+        if (g_preferences.last_learned_tweet_id.current_value < tweet.id)
           learn_tweet(tweet.id, !is_spam_tweet_p(tweet), false);
-          g_preferences.last_learned_tweet_id.current_value = tweet.id;
-        }
       }
     }
+
+    var tweet_ids = new_tweets.map(function (t) {return t.id;});
+    tweet_ids.push(g_preferences.last_learned_tweet_id.current_value);
+    g_preferences.last_learned_tweet_id.current_value = (
+      tweet_ids.reduce(function (a, b) {return Math.max(a, b);})
+    );
+
     g_preferences.last_learned_tweet_id.save();
     save_prafbe_learning_result();
     return;
