@@ -314,8 +314,8 @@ function html_from_tweet(tweet)  //{{{2
         ['class', 'button prafbe'],
         ['href', 'javascript:learn_tweet(' + tweet.id + ', true)'],
       ],
-      (tweet.prafbe_right_count
-       ? '&#x25b2;' + tweet.prafbe_right_count.toString()
+      (0 < tweet.prafbe_learning_bias
+       ? '&#x25b2;' + tweet.prafbe_learning_bias.toString()
        : '&#x25b3;'),
     ],
     // button to learn a wrong tweet
@@ -326,8 +326,8 @@ function html_from_tweet(tweet)  //{{{2
         ['class', 'button prafbe'],
         ['href', 'javascript:learn_tweet(' + tweet.id + ', false)'],
       ],
-      (tweet.prafbe_wrong_count
-       ? '&#x25bc;' + tweet.prafbe_wrong_count.toString()
+      (tweet.prafbe_learning_bias < 0
+       ? '&#x25bc;' + Math.abs(tweet.prafbe_learning_bias).toString()
        : '&#x25bd;'),
     ],
   ]);
@@ -338,15 +338,23 @@ function html_from_tweet(tweet)  //{{{2
 
 function learn_tweet(tweet_id, right_tweet_p)  //{{{2
 {
-  var dict = right_tweet_p ? g_prafbe_right_dict : g_prafbe_wrong_dict;
   var tweet = tweet_db.get(tweet_id);
-  prafbe.learn(dict, tweet.text);
+  tweet.prafbe_learning_bias = (tweet.prafbe_learning_bias || 0);
+
+  if (right_tweet_p) {
+    if (0 <= tweet.prafbe_learning_bias)
+      prafbe.learn(g_prafbe_right_dict, tweet.text);
+    else
+      prafbe.unlearn(g_prafbe_wrong_dict, tweet.text);
+  } else {
+    if (tweet.prafbe_learning_bias <= 0)
+      prafbe.learn(g_prafbe_wrong_dict, tweet.text);
+    else
+      prafbe.unlearn(g_prafbe_right_dict, tweet.text);
+  }
   g_prafbe_learning_count++;
   save_prafbe_learning_result();
-  if (right_tweet_p)
-    tweet.prafbe_right_count = (tweet.prafbe_right_count || 0) + 1;
-  else
-    tweet.prafbe_wrong_count = (tweet.prafbe_wrong_count || 0) + 1;
+  tweet.prafbe_learning_bias += (right_tweet_p ? 1 : -1);
 
   log_notice(
     'Prafbe',
@@ -372,19 +380,6 @@ function learn_tweet(tweet_id, right_tweet_p)  //{{{2
       update_view(i);
   } else {
     update_view(tweet_id);
-  }
-
-  if (false) {
-    var keys = [];
-    for (var i in dict)
-      keys.push(i);
-    keys.sort();
-
-    log_notice(
-      keys
-      .map(function (x) {return x + ': ' + dict[x];})
-      .join(', ')
-    );
   }
 
   return;

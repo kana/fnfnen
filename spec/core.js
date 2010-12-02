@@ -137,9 +137,9 @@ describe('Core', function () {
         t_button_to_learn_tweet_as_wrong,
       ]));
     });
-    it('should reflect "prafbe_right_count" status', function () {
-      var t = $.extend({}, tweet, {prafbe_right_count: 12});
-      expect(html_from_tweet(t)).toEqual(string_from_tree([
+    it('should reflect "prafbe_learning_bias" status', function () {
+      var t1 = $.extend({}, tweet, {prafbe_learning_bias: 12});
+      expect(html_from_tweet(t1)).toEqual(string_from_tree([
         t_prafbe_information,
         t_user_icon,
         t_screen_name,
@@ -154,10 +154,9 @@ describe('Core', function () {
         ],
         t_button_to_learn_tweet_as_wrong,
       ]));
-    });
-    it('should reflect "prafbe_wrong_count" status', function () {
-      var t = $.extend({}, tweet, {prafbe_wrong_count: 34});
-      expect(html_from_tweet(t)).toEqual(string_from_tree([
+
+      var t2 = $.extend({}, tweet, {prafbe_learning_bias: -34});
+      expect(html_from_tweet(t2)).toEqual(string_from_tree([
         t_prafbe_information,
         t_user_icon,
         t_screen_name,
