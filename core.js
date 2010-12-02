@@ -662,13 +662,10 @@ var g_tweet_queues = {/* queue_id: tweets_n2o = [newest, ..., oldest] */};
 function callback_update(response, name_since_id, queue_id)  //{{{3
 {
   // response = [{newest-tweet}, ..., {oldest-tweet}]
-  $('#last_updated_time').text('Last updated: ' + new Date().toString());
 
   var new_tweets_n2o = [];
   if (response.error == null) {
-    new_tweets_n2o = response.filter(
-      function (tweet) {return !tweet_db.has_p(tweet);}
-    );
+    new_tweets_n2o = response;
 
     if (0 < new_tweets_n2o.length) {
       var NEWEST_TWEET_INDEX = 0;
@@ -677,7 +674,6 @@ function callback_update(response, name_since_id, queue_id)  //{{{3
         new_tweets_n2o[NEWEST_TWEET_INDEX].id
       );
     }
-    tweet_db.add(new_tweets_n2o);
   } else {
     return;
   }
@@ -689,21 +685,28 @@ function callback_update(response, name_since_id, queue_id)  //{{{3
 
 function merge_tweets_n2o(tweet_sets)  //{{{3
 {
-  // Assumption - There is no duplicate in tweet_sets.
-  var merged_tweets_n2o = [];  // newest, ..., oldest
+  var tweet_table = {};
+  var tweet_ids = [];
+  for (var i in tweet_sets) {
+    var tweets = tweet_sets[i];
+    for (var j in tweets) {
+      var t = tweets[j];
+      if (tweet_table[t.id] == null) {
+        tweet_table[t.id] = t;
+        tweet_ids.push(t.id);
+      }
+    }
+  }
 
-  for (var i in tweet_sets)
-    merged_tweets_n2o.push.apply(merged_tweets_n2o, tweet_sets[i]);
+  tweet_ids.sort(function (a, b) {return a - b;});
+  tweet_ids.reverse();
 
-  merged_tweets_n2o.sort(function (l, r) {
-    if (l.id < r.id)
-      return -1;
-    else if (l.id == r.id)
-      return 0;
-    else
-      return 1;
-  });
-  merged_tweets_n2o.reverse();
+    // newest, ..., oldest
+  var merged_tweets_n2o = tweet_ids.map(
+    function (id) {
+      return tweet_table[id];
+    }
+  );
 
   return merged_tweets_n2o;
 }
@@ -724,7 +727,11 @@ function queue_tweets_n2o(tweets_n2o, queue_id)  //{{{3
   for (var i in VALID_QUEUE_IDS)
     full_p = full_p && (g_tweet_queues[VALID_QUEUE_IDS[i]] != null);
   if (full_p) {
-    update_censored_columns(merge_tweets_n2o(g_tweet_queues));
+    var merged_tweets_n2o = merge_tweets_n2o(g_tweet_queues);
+
+    $('#last_updated_time').text('Last updated: ' + new Date().toString());
+    tweet_db.add(merged_tweets_n2o);
+    update_censored_columns(merged_tweets_n2o);
 
     g_tweet_queues = {};
   }
@@ -850,7 +857,7 @@ function fill_column_with_censored_tweets(node_column, required_classes) //{{{2
   var ids = [];
   for (var id in tweet_db.db)
     ids.push(id);
-  ids.sort();  // BUGS: This doesn't work for ids with different length.
+  ids.sort(function (a, b) {return a - b;});
   ids.reverse();
   var ids_n2o = ids;
   var tweets_n2o = ids_n2o.map(function (_) {return tweet_db.get(_);});
