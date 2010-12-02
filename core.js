@@ -659,7 +659,6 @@ var g_tweet_queues = {/* queue_id: tweets_n2o = [newest, ..., oldest] */};
 function callback_update(response, name_since_id, queue_id)  //{{{3
 {
   // response = [{newest-tweet}, ..., {oldest-tweet}]
-  $('#last_updated_time').text('Last updated: ' + new Date().toString());
 
   var new_tweets_n2o = [];
   if (response.error == null) {
@@ -726,6 +725,8 @@ function queue_tweets_n2o(tweets_n2o, queue_id)  //{{{3
     full_p = full_p && (g_tweet_queues[VALID_QUEUE_IDS[i]] != null);
   if (full_p) {
     var merged_tweets_n2o = merge_tweets_n2o(g_tweet_queues);
+
+    $('#last_updated_time').text('Last updated: ' + new Date().toString());
     tweet_db.add(merged_tweets_n2o);
     update_censored_columns(merged_tweets_n2o);
 
