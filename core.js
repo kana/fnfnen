@@ -338,10 +338,20 @@ function html_from_tweet(tweet)  //{{{2
 
 function learn_tweet(tweet_id, right_tweet_p)  //{{{2
 {
-  var dict = right_tweet_p ? g_prafbe_right_dict : g_prafbe_wrong_dict;
   var tweet = tweet_db.get(tweet_id);
   tweet.prafbe_learning_bias = (tweet.prafbe_learning_bias || 0);
-  prafbe.learn(dict, tweet.text);
+
+  if (right_tweet_p) {
+    if (0 <= tweet.prafbe_learning_bias)
+      prafbe.learn(g_prafbe_right_dict, tweet.text);
+    else
+      prafbe.unlearn(g_prafbe_wrong_dict, tweet.text);
+  } else {
+    if (tweet.prafbe_learning_bias <= 0)
+      prafbe.learn(g_prafbe_wrong_dict, tweet.text);
+    else
+      prafbe.unlearn(g_prafbe_right_dict, tweet.text);
+  }
   g_prafbe_learning_count++;
   save_prafbe_learning_result();
   tweet.prafbe_learning_bias += (right_tweet_p ? 1 : -1);
