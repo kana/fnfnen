@@ -699,7 +699,7 @@ function merge_tweets_n2o(tweet_sets)  //{{{3
     }
   }
 
-  tweet_ids.sort();  // BUGS: This doesn't work for ids with different length.
+  tweet_ids.sort(function (a, b) {return a - b;});
   tweet_ids.reverse();
 
     // newest, ..., oldest
@@ -856,7 +856,7 @@ function fill_column_with_censored_tweets(node_column, required_classes) //{{{2
   var ids = [];
   for (var id in tweet_db.db)
     ids.push(id);
-  ids.sort();  // BUGS: This doesn't work for ids with different length.
+  ids.sort(function (a, b) {return a - b;});
   ids.reverse();
   var ids_n2o = ids;
   var tweets_n2o = ids_n2o.map(function (_) {return tweet_db.get(_);});
