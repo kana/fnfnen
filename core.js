@@ -686,21 +686,28 @@ function callback_update(response, name_since_id, queue_id)  //{{{3
 
 function merge_tweets_n2o(tweet_sets)  //{{{3
 {
-  // Assumption - There is no duplicate in tweet_sets.
-  var merged_tweets_n2o = [];  // newest, ..., oldest
+  var tweet_table = {};
+  var tweet_ids = [];
+  for (var i in tweet_sets) {
+    var tweets = tweet_sets[i];
+    for (var j in tweets) {
+      var t = tweets[j];
+      if (tweet_table[t.id] == null) {
+        tweet_table[t.id] = t;
+        tweet_ids.push(t.id);
+      }
+    }
+  }
 
-  for (var i in tweet_sets)
-    merged_tweets_n2o.push.apply(merged_tweets_n2o, tweet_sets[i]);
+  tweet_ids.sort();  // BUGS: This doesn't work for ids with different length.
+  tweet_ids.reverse();
 
-  merged_tweets_n2o.sort(function (l, r) {
-    if (l.id < r.id)
-      return -1;
-    else if (l.id == r.id)
-      return 0;
-    else
-      return 1;
-  });
-  merged_tweets_n2o.reverse();
+    // newest, ..., oldest
+  var merged_tweets_n2o = tweet_ids.map(
+    function (id) {
+      return tweet_table[id];
+    }
+  );
 
   return merged_tweets_n2o;
 }
