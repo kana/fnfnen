@@ -369,7 +369,7 @@ function learn_tweet(tweet_id, right_tweet_p, interactive_p)  //{{{2
         .replaceWith(function () {return node_tweet.clone();});
     };
     if (false) {  // FIXME: Add preference.
-      for (var i in tweet_db.db)
+      for (var i in tweet_db.ids())
         update_view(i);
     } else {
       update_view(tweet_id);
@@ -845,7 +845,7 @@ function censorship_classes_from_tweet(tweet)  //{{{2
 function fill_column_with_censored_tweets(node_column, required_classes) //{{{2
 {
   var ids = [];
-  for (var id in tweet_db.db)
+  for (var id in tweet_db.ids())
     ids.push(id);
   ids.sort(function (a, b) {return a - b;});
   ids.reverse();
@@ -1514,11 +1514,13 @@ function PreferenceForm()  //{{{2
 // Tweet Database  {{{1
 function TweetDatabase()  //{{{2
 {
+  this._db = {};  // tweet_id: tweet
+
   this.add = function (new_tweets) {
     for (i in new_tweets) {
       var tweet = new_tweets[i];
       if (!this.has_p(tweet)) {
-        this.db[tweet.id] = tweet;
+        this._db[tweet.id] = tweet;
 
         // Learn new tweets automatically.
         //
@@ -1542,15 +1544,17 @@ function TweetDatabase()  //{{{2
     return;
   };
 
-  this.db = {};  // tweet_id: tweet
-
   this.get = function (id) {
-    return this.db[id];
+    return this._db[id];
   };
 
   this.has_p = function (_) {
     var id = typeof(_) == 'string' ? _ : _.id;
-    return this.db[id] != null;
+    return this._db[id] != null;
+  };
+
+  this.ids = function () {
+    return this._db;
   };
 }
 
