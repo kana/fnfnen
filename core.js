@@ -1368,69 +1368,71 @@ function Preference(id, default_value, opt_kw)  //{{{2
 {
   var kw = opt_kw || {};
 
-  this.applying_priority = kw.applying_priority || DEFAULT_APPLYING_PRIORITY;
-  this.columns = kw.columns || 80;
-  this.current_value = $.storage(id) || default_value;
-  this.default_value = default_value;
-  this.form_type = kw.form_type || 'text';
-  this.id = id;
-  this.is_advanced_p = (kw.is_advanced_p != null ? kw.is_advanced_p : false);
-  this.maximum_value = kw.maximum_value || Number.MAX_VALUE;
-  this.minimum_value = kw.minimum_value || Number.MIN_VALUE;
-  this.on_application = kw.on_application || nop;
-  this.read_only_p = kw.read_only_p || false;
-  this.rows = kw.rows || 25;
-  this.value_type = typeof(default_value);
+  var _ = function () {};
 
-  this.apply = function (via_external_configuration_p) {
-    this.get_form();
-    this.save();
+  _.applying_priority = kw.applying_priority || DEFAULT_APPLYING_PRIORITY;
+  _.columns = kw.columns || 80;
+  _.current_value = $.storage(id) || default_value;
+  _.default_value = default_value;
+  _.form_type = kw.form_type || 'text';
+  _.id = id;
+  _.is_advanced_p = (kw.is_advanced_p != null ? kw.is_advanced_p : false);
+  _.maximum_value = kw.maximum_value || Number.MAX_VALUE;
+  _.minimum_value = kw.minimum_value || Number.MIN_VALUE;
+  _.on_application = kw.on_application || nop;
+  _.read_only_p = kw.read_only_p || false;
+  _.rows = kw.rows || 25;
+  _.value_type = typeof(default_value);
+
+  _.apply = function (via_external_configuration_p) {
+    _.get_form();
+    _.save();
     if (via_external_configuration_p) {
       // Leave form content as-is.
       // But use external configuration if it is available.
-      var value = g_external_configuration[this.id];
+      var value = g_external_configuration[_.id];
       if (value != undefined)
-        this.current_value = value;  // FIXME: Do validation like get_form().
+        _.current_value = value;  // FIXME: Do validation like get_form().
     }
-    this.on_application(via_external_configuration_p);
+    _.on_application(via_external_configuration_p);
   };
 
-  this.get_form = function () {
-    var v = this.node().val();
-    if (this.value_type == 'number') {
+  _.get_form = function () {
+    var v = _.node().val();
+    if (_.value_type == 'number') {
       if (isNaN(v))
-        v = this.current_value;
-      if (v < this.minimum_value)
-        v = this.minimum_value;
-      if (this.maximum_value < v)
-        v = this.maximum_value;
+        v = _.current_value;
+      if (v < _.minimum_value)
+        v = _.minimum_value;
+      if (_.maximum_value < v)
+        v = _.maximum_value;
     }
-    this.current_value = v;
+    _.current_value = v;
   };
 
-  this.initialize_form = function () {
+  _.initialize_form = function () {
     var node_dt = create_element('dt');
-    node_dt.text(englishize(this.id)
-                 + (this.read_only_p ? ' (read only)' : ''));
+    node_dt.text(englishize(_.id)
+                 + (_.read_only_p ? ' (read only)' : ''));
 
     var node_input;
-    if (this.form_type == 'textarea') {
+    if (_.form_type == 'textarea') {
       node_input = create_element('textarea');
-      node_input.attr('cols', this.columns);
-      node_input.attr('rows', this.rows);
+      node_input.attr('cols', _.columns);
+      node_input.attr('rows', _.rows);
     } else {
       node_input = create_element('input');
-      node_input.attr('type', this.form_type);
+      node_input.attr('type', _.form_type);
     }
-    node_input.attr('name', this.id);
-    node_input.val(this.current_value);
-    if (this.read_only_p)
+    node_input.attr('name', _.id);
+    node_input.val(_.current_value);
+    if (_.read_only_p)
       node_input.attr('readonly', 'readonly');
 
     var node_dd = create_element('dd');
     node_dd.append(node_input);
 
-    if (this.is_advanced_p) {
+    if (_.is_advanced_p) {
       $('#form_preferences #advanced_preferences_content').
         append(node_dt).
         append(node_dd);
@@ -1441,18 +1443,20 @@ function Preference(id, default_value, opt_kw)  //{{{2
     }
   }
 
-  this.node = function () {
-    return $(':input[name="' + this.id + '"]');
+  _.node = function () {
+    return $(':input[name="' + _.id + '"]');
   };
 
-  this.save = function () {
-    $.storage(this.id, this.current_value);
-    this.set_form();
+  _.save = function () {
+    $.storage(_.id, _.current_value);
+    _.set_form();
   };
 
-  this.set_form = function () {
-    this.node().val(this.current_value);
+  _.set_form = function () {
+    _.node().val(_.current_value);
   };
+
+  return _;
 }
 
 
