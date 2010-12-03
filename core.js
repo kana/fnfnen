@@ -119,7 +119,7 @@ function before_post()  //{{{2
     // Update timeline manually.
     update();
     reset_automatic_update_timer(
-      g_preferences.update_interval_sec.current_value
+      g_preferences.update_interval_sec()
     );
     return;
   }
@@ -1330,7 +1330,7 @@ function calculate_spam_probability(tweet)  //{{{2
 
 function is_spam_tweet_p(tweet)  //{{{2
 {
-  return (g_preferences.spam_probability_threshold.current_value
+  return (g_preferences.spam_probability_threshold()
           <= calculate_spam_probability(tweet));
 }
 
@@ -1496,7 +1496,7 @@ function PreferenceForm()  //{{{2
 
     // Notify to user.
     var actually_applied_p = (
-      this.preference_items.external_configuration_uri.current_value == ''
+      this.preference_items.external_configuration_uri() == ''
       || via_external_configuration_p
     );
     if (actually_applied_p && opt_mode != 'initialization')
@@ -1540,18 +1540,17 @@ function TweetDatabase()  //{{{2
         // if they aren't actually learned.  For example, show_conversation()
         // may fetch tweets which are not learned yet.  But it's rare to occur
         // and such old tweets should be filtered well.
-        if (g_preferences.last_learned_tweet_id.current_value < tweet.id)
+        if (g_preferences.last_learned_tweet_id() < tweet.id)
           learn_tweet(tweet.id, !is_spam_tweet_p(tweet), false);
       }
     }
 
     var tweet_ids = new_tweets.map(function (t) {return t.id;});
-    tweet_ids.push(g_preferences.last_learned_tweet_id.current_value);
-    g_preferences.last_learned_tweet_id.current_value = (
+    tweet_ids.push(g_preferences.last_learned_tweet_id());
+    g_preferences.last_learned_tweet_id(
       tweet_ids.reduce(function (a, b) {return Math.max(a, b);})
     );
 
-    g_preferences.last_learned_tweet_id.save();
     save_prafbe_learning_result();
     return;
   };
@@ -1681,7 +1680,7 @@ function process_queued_api_request_with_oauth()  //{{{2
         finish_processing_a_request();
       }
     },
-    g_preferences.request_timeout_interval_sec.current_value * 1000
+    g_preferences.request_timeout_interval_sec() * 1000
   );
 
   if (request.method == 'GET') {
@@ -2141,7 +2140,7 @@ $(document).ready(function () {  //{{{2
           {
             minimum_value: MINIMUM_UPDATE_INTERVAL_SEC,
             on_application: function () {
-              reset_automatic_update_timer(this.current_value);
+              reset_automatic_update_timer(this());
             }
           }
         );
@@ -2162,7 +2161,7 @@ $(document).ready(function () {  //{{{2
               var node_style = create_element('style');
               node_style.attr('title', id);
               node_style.attr('type', 'text/css');
-              node_style.text(this.current_value);
+              node_style.text(this());
               $('head').append(node_style);
             },
             rows: 10
@@ -2174,7 +2173,7 @@ $(document).ready(function () {  //{{{2
           {
             form_type: 'textarea',
             on_application: function () {
-              var plugin_uris = this.current_value.split('\n');
+              var plugin_uris = this().split('\n');
               load_plugins(plugin_uris);
             },
             rows: 10
@@ -2217,7 +2216,7 @@ $(document).ready(function () {  //{{{2
           {
             form_type: 'textarea',
             on_application: function () {
-              set_up_censorship_law(this.current_value);
+              set_up_censorship_law(this());
             },
             rows: 10
           }
@@ -2249,7 +2248,7 @@ $(document).ready(function () {  //{{{2
             ),
             form_type: 'textarea',
             on_application: function () {
-              set_up_censored_columns(this.current_value);
+              set_up_censored_columns(this());
             },
             rows: 10
           }
@@ -2278,9 +2277,9 @@ $(document).ready(function () {  //{{{2
             is_advanced_p: true,
             on_application: function (via_external_configuration_p) {
               if (!via_external_configuration_p) {
-                if (this.current_value) {
+                if (this()) {
                   // Loaded script should call fnfnen_external_configuration().
-                  load_cross_domain_script(this.current_value);
+                  load_cross_domain_script(this());
                 }
               }
             }
