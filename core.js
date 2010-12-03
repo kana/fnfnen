@@ -1364,19 +1364,19 @@ function save_prafbe_learning_result()  //{{{2
 
 // Preference  {{{1
 // FIXME: Warn about some preferences require to reload fnfnen to take effect.
-function Preference(name, default_value, opt_kw)  //{{{2
+function Preference(id, default_value, opt_kw)  //{{{2
 {
   var kw = opt_kw || {};
 
   this.applying_priority = kw.applying_priority || DEFAULT_APPLYING_PRIORITY;
   this.columns = kw.columns || 80;
-  this.current_value = $.storage(name) || default_value;
+  this.current_value = $.storage(id) || default_value;
   this.default_value = default_value;
   this.form_type = kw.form_type || 'text';
+  this.id = id;
   this.is_advanced_p = (kw.is_advanced_p != null ? kw.is_advanced_p : false);
   this.maximum_value = kw.maximum_value || Number.MAX_VALUE;
   this.minimum_value = kw.minimum_value || Number.MIN_VALUE;
-  this.name = name;
   this.on_application = kw.on_application || nop;
   this.read_only_p = kw.read_only_p || false;
   this.rows = kw.rows || 25;
@@ -1388,7 +1388,7 @@ function Preference(name, default_value, opt_kw)  //{{{2
     if (via_external_configuration_p) {
       // Leave form content as-is.
       // But use external configuration if it is available.
-      var value = g_external_configuration[this.name];
+      var value = g_external_configuration[this.id];
       if (value != undefined)
         this.current_value = value;  // FIXME: Do validation like get_form().
     }
@@ -1410,7 +1410,7 @@ function Preference(name, default_value, opt_kw)  //{{{2
 
   this.initialize_form = function () {
     var node_dt = create_element('dt');
-    node_dt.text(englishize(this.name)
+    node_dt.text(englishize(this.id)
                  + (this.read_only_p ? ' (read only)' : ''));
 
     var node_input;
@@ -1422,7 +1422,7 @@ function Preference(name, default_value, opt_kw)  //{{{2
       node_input = create_element('input');
       node_input.attr('type', this.form_type);
     }
-    node_input.attr('name', this.name);
+    node_input.attr('name', this.id);
     node_input.val(this.current_value);
     if (this.read_only_p)
       node_input.attr('readonly', 'readonly');
@@ -1442,11 +1442,11 @@ function Preference(name, default_value, opt_kw)  //{{{2
   }
 
   this.node = function () {
-    return $(':input[name="' + this.name + '"]');
+    return $(':input[name="' + this.id + '"]');
   };
 
   this.save = function () {
-    $.storage(this.name, this.current_value);
+    $.storage(this.id, this.current_value);
     this.set_form();
   };
 
@@ -1461,7 +1461,7 @@ function Preference(name, default_value, opt_kw)  //{{{2
 function PreferenceForm()  //{{{2
 {
   // Properties
-  this.preference_items = {};  // {name: Preference, ...}
+  this.preference_items = {};  // {id: Preference, ...}
 
   // Methods
   this.apply = function (opt_mode) {
@@ -1469,9 +1469,9 @@ function PreferenceForm()  //{{{2
                                         ? false
                                         : opt_mode);
 
-    var priorities = [];  // [[applying_priority, name], ...]
-    for (var name in this.preference_items)
-      priorities.push([this.preference_items[name].applying_priority, name]);
+    var priorities = [];  // [[applying_priority, id], ...]
+    for (var id in this.preference_items)
+      priorities.push([this.preference_items[id].applying_priority, id]);
     priorities.sort();
 
     for (var _ in priorities) {
@@ -1489,10 +1489,10 @@ function PreferenceForm()  //{{{2
       log_notice('Preferences', 'Saved');
   };
 
-  this.register = function (name, default_value, options) {
-    var p = new Preference(name, default_value, options);
-    this.preference_items[name] = p;
-    this[name] = p;  // For ease of access.
+  this.register = function (id, default_value, options) {
+    var p = new Preference(id, default_value, options);
+    this.preference_items[id] = p;
+    this[id] = p;  // For ease of access.
     p.initialize_form();
   };
 
@@ -1760,13 +1760,13 @@ function create_element(element_name)  //{{{2
 
 
 
-function englishize(name)  //{{{2
+function englishize(id)  //{{{2
 {
   // 'foo_bar_baz' ==> 'Foo bar baz'
   // 'foo_bar_sec' ==> 'Foo bar (sec.)'
   // 'foo_uri' ==> 'Foo URI'
 
-  var words = name.split('_');
+  var words = id.split('_');
 
   if (1 <= words.length) {
     for (var _ in words)
