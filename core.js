@@ -1390,9 +1390,10 @@ function Preference(id, default_value, opt_kw)  //{{{2
   _.maximum_value = kw.maximum_value || Number.MAX_VALUE;
   _.minimum_value = kw.minimum_value || Number.MIN_VALUE;
   _.on_application = kw.on_application || nop;
-  _.read_only_p = kw.read_only_p || false;
+  _.read_only_p = kw.read_only_p || false;  // User cannot modify value.
   _.rows = kw.rows || 25;
   _.value_type = typeof(default_value);
+  _.view_only_p = kw.view_only_p || false;  // Value will never be saved.
 
   _.apply = function (via_external_configuration_p) {
     _.get_form();
@@ -1458,7 +1459,8 @@ function Preference(id, default_value, opt_kw)  //{{{2
   };
 
   _.save = function () {
-    $.storage(_.id, _.current_value);
+    if (!(_.view_only_p))
+      $.storage(_.id, _.current_value);
     _.set_form();
   };
 
