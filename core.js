@@ -119,7 +119,7 @@ function before_post()  //{{{2
     // Update timeline manually.
     update();
     reset_automatic_update_timer(
-      g_preferences.update_interval_sec.current_value
+      g_preferences.update_interval_sec()
     );
     return;
   }
@@ -1330,7 +1330,7 @@ function calculate_spam_probability(tweet)  //{{{2
 
 function is_spam_tweet_p(tweet)  //{{{2
 {
-  return (g_preferences.spam_probability_threshold.current_value
+  return (g_preferences.spam_probability_threshold()
           <= calculate_spam_probability(tweet));
 }
 
@@ -1364,73 +1364,85 @@ function save_prafbe_learning_result()  //{{{2
 
 // Preference  {{{1
 // FIXME: Warn about some preferences require to reload fnfnen to take effect.
-function Preference(name, default_value, opt_kw)  //{{{2
+function Preference(id, default_value, opt_kw)  //{{{2
 {
   var kw = opt_kw || {};
 
-  this.applying_priority = kw.applying_priority || DEFAULT_APPLYING_PRIORITY;
-  this.columns = kw.columns || 80;
-  this.current_value = $.storage(name) || default_value;
-  this.default_value = default_value;
-  this.form_type = kw.form_type || 'text';
-  this.is_advanced_p = (kw.is_advanced_p != null ? kw.is_advanced_p : false);
-  this.maximum_value = kw.maximum_value || Number.MAX_VALUE;
-  this.minimum_value = kw.minimum_value || Number.MIN_VALUE;
-  this.name = name;
-  this.on_application = kw.on_application || nop;
-  this.read_only_p = kw.read_only_p || false;
-  this.rows = kw.rows || 25;
-  this.value_type = typeof(default_value);
+  var _ = function (opt_value) {
+    if (opt_value === undefined) {
+      return _.current_value;
+    } else {
+      var old_value = _.current_value;
+      _.current_value = opt_value;
+      _.save();
+      _.on_application();
+      return old_value;
+    }
+  };
 
-  this.apply = function (via_external_configuration_p) {
-    this.get_form();
-    this.save();
+  _.applying_priority = kw.applying_priority || DEFAULT_APPLYING_PRIORITY;
+  _.columns = kw.columns || 80;
+  _.current_value = $.storage(id) || default_value;
+  _.default_value = default_value;
+  _.form_type = kw.form_type || 'text';
+  _.id = id;
+  _.is_advanced_p = (kw.is_advanced_p != null ? kw.is_advanced_p : false);
+  _.maximum_value = kw.maximum_value || Number.MAX_VALUE;
+  _.minimum_value = kw.minimum_value || Number.MIN_VALUE;
+  _.on_application = kw.on_application || nop;
+  _.read_only_p = kw.read_only_p || false;
+  _.rows = kw.rows || 25;
+  _.value_type = typeof(default_value);
+
+  _.apply = function (via_external_configuration_p) {
+    _.get_form();
+    _.save();
     if (via_external_configuration_p) {
       // Leave form content as-is.
       // But use external configuration if it is available.
-      var value = g_external_configuration[this.name];
+      var value = g_external_configuration[_.id];
       if (value != undefined)
-        this.current_value = value;  // FIXME: Do validation like get_form().
+        _.current_value = value;  // FIXME: Do validation like get_form().
     }
-    this.on_application(via_external_configuration_p);
+    _.on_application(via_external_configuration_p);
   };
 
-  this.get_form = function () {
-    var v = this.node().val();
-    if (this.value_type == 'number') {
+  _.get_form = function () {
+    var v = _.node().val();
+    if (_.value_type == 'number') {
       if (isNaN(v))
-        v = this.current_value;
-      if (v < this.minimum_value)
-        v = this.minimum_value;
-      if (this.maximum_value < v)
-        v = this.maximum_value;
+        v = _.current_value;
+      if (v < _.minimum_value)
+        v = _.minimum_value;
+      if (_.maximum_value < v)
+        v = _.maximum_value;
     }
-    this.current_value = v;
+    _.current_value = v;
   };
 
-  this.initialize_form = function () {
+  _.initialize_form = function () {
     var node_dt = create_element('dt');
-    node_dt.text(englishize(this.name)
-                 + (this.read_only_p ? ' (read only)' : ''));
+    node_dt.text(englishize(_.id)
+                 + (_.read_only_p ? ' (read only)' : ''));
 
     var node_input;
-    if (this.form_type == 'textarea') {
+    if (_.form_type == 'textarea') {
       node_input = create_element('textarea');
-      node_input.attr('cols', this.columns);
-      node_input.attr('rows', this.rows);
+      node_input.attr('cols', _.columns);
+      node_input.attr('rows', _.rows);
     } else {
       node_input = create_element('input');
-      node_input.attr('type', this.form_type);
+      node_input.attr('type', _.form_type);
     }
-    node_input.attr('name', this.name);
-    node_input.val(this.current_value);
-    if (this.read_only_p)
+    node_input.attr('name', _.id);
+    node_input.val(_.current_value);
+    if (_.read_only_p)
       node_input.attr('readonly', 'readonly');
 
     var node_dd = create_element('dd');
     node_dd.append(node_input);
 
-    if (this.is_advanced_p) {
+    if (_.is_advanced_p) {
       $('#form_preferences #advanced_preferences_content').
         append(node_dt).
         append(node_dd);
@@ -1441,18 +1453,20 @@ function Preference(name, default_value, opt_kw)  //{{{2
     }
   }
 
-  this.node = function () {
-    return $(':input[name="' + this.name + '"]');
+  _.node = function () {
+    return $(':input[name="' + _.id + '"]');
   };
 
-  this.save = function () {
-    $.storage(this.name, this.current_value);
-    this.set_form();
+  _.save = function () {
+    $.storage(_.id, _.current_value);
+    _.set_form();
   };
 
-  this.set_form = function () {
-    this.node().val(this.current_value);
+  _.set_form = function () {
+    _.node().val(_.current_value);
   };
+
+  return _;
 }
 
 
@@ -1461,7 +1475,7 @@ function Preference(name, default_value, opt_kw)  //{{{2
 function PreferenceForm()  //{{{2
 {
   // Properties
-  this.preference_items = {};  // {name: Preference, ...}
+  this.preference_items = {};  // {id: Preference, ...}
 
   // Methods
   this.apply = function (opt_mode) {
@@ -1469,9 +1483,9 @@ function PreferenceForm()  //{{{2
                                         ? false
                                         : opt_mode);
 
-    var priorities = [];  // [[applying_priority, name], ...]
-    for (var name in this.preference_items)
-      priorities.push([this.preference_items[name].applying_priority, name]);
+    var priorities = [];  // [[applying_priority, id], ...]
+    for (var id in this.preference_items)
+      priorities.push([this.preference_items[id].applying_priority, id]);
     priorities.sort();
 
     for (var _ in priorities) {
@@ -1482,17 +1496,17 @@ function PreferenceForm()  //{{{2
 
     // Notify to user.
     var actually_applied_p = (
-      this.preference_items.external_configuration_uri.current_value == ''
+      this.preference_items.external_configuration_uri() == ''
       || via_external_configuration_p
     );
     if (actually_applied_p && opt_mode != 'initialization')
       log_notice('Preferences', 'Saved');
   };
 
-  this.register = function (name, default_value, options) {
-    var p = new Preference(name, default_value, options);
-    this.preference_items[name] = p;
-    this[name] = p;  // For ease of access.
+  this.register = function (id, default_value, options) {
+    var p = new Preference(id, default_value, options);
+    this.preference_items[id] = p;
+    this[id] = p;  // For ease of access.
     p.initialize_form();
   };
 
@@ -1528,18 +1542,17 @@ function TweetDatabase()  //{{{2
         // if they aren't actually learned.  For example, show_conversation()
         // may fetch tweets which are not learned yet.  But it's rare to occur
         // and such old tweets should be filtered well.
-        if (g_preferences.last_learned_tweet_id.current_value < tweet.id)
+        if (g_preferences.last_learned_tweet_id() < tweet.id)
           learn_tweet(tweet.id, !is_spam_tweet_p(tweet), false);
       }
     }
 
     var tweet_ids = new_tweets.map(function (t) {return t.id;});
-    tweet_ids.push(g_preferences.last_learned_tweet_id.current_value);
-    g_preferences.last_learned_tweet_id.current_value = (
+    tweet_ids.push(g_preferences.last_learned_tweet_id());
+    g_preferences.last_learned_tweet_id(
       tweet_ids.reduce(function (a, b) {return Math.max(a, b);})
     );
 
-    g_preferences.last_learned_tweet_id.save();
     save_prafbe_learning_result();
     return;
   };
@@ -1671,7 +1684,7 @@ function process_queued_api_request_with_oauth()  //{{{2
         finish_processing_a_request();
       }
     },
-    g_preferences.request_timeout_interval_sec.current_value * 1000
+    g_preferences.request_timeout_interval_sec() * 1000
   );
 
   if (request.method == 'GET') {
@@ -1764,13 +1777,13 @@ function create_element(element_name)  //{{{2
 
 
 
-function englishize(name)  //{{{2
+function englishize(id)  //{{{2
 {
   // 'foo_bar_baz' ==> 'Foo bar baz'
   // 'foo_bar_sec' ==> 'Foo bar (sec.)'
   // 'foo_uri' ==> 'Foo URI'
 
-  var words = name.split('_');
+  var words = id.split('_');
 
   if (1 <= words.length) {
     for (var _ in words)
@@ -2131,7 +2144,7 @@ $(document).ready(function () {  //{{{2
           {
             minimum_value: MINIMUM_UPDATE_INTERVAL_SEC,
             on_application: function () {
-              reset_automatic_update_timer(this.current_value);
+              reset_automatic_update_timer(this());
             }
           }
         );
@@ -2152,7 +2165,7 @@ $(document).ready(function () {  //{{{2
               var node_style = create_element('style');
               node_style.attr('title', id);
               node_style.attr('type', 'text/css');
-              node_style.text(this.current_value);
+              node_style.text(this());
               $('head').append(node_style);
             },
             rows: 10
@@ -2164,7 +2177,7 @@ $(document).ready(function () {  //{{{2
           {
             form_type: 'textarea',
             on_application: function () {
-              var plugin_uris = this.current_value.split('\n');
+              var plugin_uris = this().split('\n');
               load_plugins(plugin_uris);
             },
             rows: 10
@@ -2207,7 +2220,7 @@ $(document).ready(function () {  //{{{2
           {
             form_type: 'textarea',
             on_application: function () {
-              set_up_censorship_law(this.current_value);
+              set_up_censorship_law(this());
             },
             rows: 10
           }
@@ -2239,7 +2252,7 @@ $(document).ready(function () {  //{{{2
             ),
             form_type: 'textarea',
             on_application: function () {
-              set_up_censored_columns(this.current_value);
+              set_up_censored_columns(this());
             },
             rows: 10
           }
@@ -2268,9 +2281,9 @@ $(document).ready(function () {  //{{{2
             is_advanced_p: true,
             on_application: function (via_external_configuration_p) {
               if (!via_external_configuration_p) {
-                if (this.current_value) {
+                if (this()) {
                   // Loaded script should call fnfnen_external_configuration().
-                  load_cross_domain_script(this.current_value);
+                  load_cross_domain_script(this());
                 }
               }
             }
