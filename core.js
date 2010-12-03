@@ -1368,7 +1368,17 @@ function Preference(id, default_value, opt_kw)  //{{{2
 {
   var kw = opt_kw || {};
 
-  var _ = function () {};
+  var _ = function (opt_value) {
+    if (opt_value === undefined) {
+      return _.current_value;
+    } else {
+      var old_value = _.current_value;
+      _.current_value = opt_value;
+      _.save();
+      _.on_application();
+      return old_value;
+    }
+  };
 
   _.applying_priority = kw.applying_priority || DEFAULT_APPLYING_PRIORITY;
   _.columns = kw.columns || 80;
