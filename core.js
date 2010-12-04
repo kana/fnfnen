@@ -694,7 +694,6 @@ function merge_tweets_n2o(tweet_sets)  //{{{3
     // newest, ..., oldest
   var merged_tweets_n2o = (
     tweet_ids
-    .filter(function (id) {return !(tweet_db.has_p(id));})
     .map(function (id) {return tweet_table[id];})
   );
 
