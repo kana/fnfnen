@@ -2284,7 +2284,7 @@ $(document).ready(function () {  //{{{2
         );
         g_preferences.register(
           'last_learned_tweet_id',
-          -13,
+          '-13',  // Dummy tweet id which is less than any tweet id.
           {
             is_advanced_p: true,
             read_only_p: true,
