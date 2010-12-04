@@ -1358,9 +1358,38 @@ function save_prafbe_learning_result()  //{{{2
 
 
 
+function tokenize_object(object)  //{{{2
+{
+  var result = [];
+
+  for (var key in object) {
+    var value = object[key];
+    var tokens;
+    if (typeof value == 'string') {
+      tokens = prafbe.tokenize(value);
+    } else if (typeof value == 'object') {
+      tokens = tokenize_object(value);
+    } else {
+      tokens = [];
+    }
+
+    result.push.apply(
+      result,
+      tokens.map(function (x) {
+        return key + '*' + x;
+      })
+    );
+  }
+
+  return result;
+}
+
+
+
+
 function tokenize_tweet(tweet)  //{{{2
 {
-  return prafbe.tokenize(tweet.text);
+  return tokenize_object(tweet);
 }
 
 
