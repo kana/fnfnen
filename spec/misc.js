@@ -56,6 +56,20 @@ describe('Misc.', function () {
       expect(englishize('foo_uri')).toEqual('Foo URI');
     });
   });
+  describe('expand_template', function () {
+    it('should replace placeholders properly', function () {
+      expect(expand_template('{a}<{b}>{c}', {a: '1', b: '2', c: '3'})).
+      toEqual('1<2>3');
+      expect(expand_template('{a}<{a}>{a}', {a: '1'})).
+      toEqual('1<1>1');
+    });
+    it('should convert non-string values to strings', function () {
+      expect(expand_template('{a}', {a: 4})).toEqual('4');
+      expect(expand_template('{a}', {a: null})).toEqual('null');
+      expect(expand_template('{a}', {a: undefined})).toEqual('undefined');
+      expect(expand_template('{a}', {})).toEqual('undefined');
+    });
+  });
   describe('favorite_symbol', function () {
     it('should return a character to express favorite status', function () {
       expect(favorite_symbol(true)).toEqual('\u2605');  // black (filled) star

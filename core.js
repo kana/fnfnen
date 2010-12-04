@@ -1820,6 +1820,19 @@ function englishize(id)  //{{{2
 
 
 
+function expand_template(template, values)  //{{{2
+{
+  return template.replace(
+    /{([A-Za-z0-9_]+)}/g,
+    function (matched_text, p1) {
+      return values[p1];
+    }
+  );
+}
+
+
+
+
 function favorite_symbol(favorite_p)  //{{{2
 {
   return (favorite_p
