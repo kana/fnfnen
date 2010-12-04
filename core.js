@@ -1324,20 +1324,14 @@ function calculate_spam_probability(tweet)  //{{{2
       || tweet.prafbe_learning_count == null
       || tweet.prafbe_learning_count < g_prafbe_learning_count)
   {
-    var tokens = tokenize_tweet(tweet);
-    var itokens = prafbe.list_most_interesting_tokens(
+    var tokens = prafbe.list_most_interesting_tokens(
       g_preferences.prafbe_right_dict(),
       g_preferences.prafbe_wrong_dict(),
-      tokens,
-      15
+      tokenize_tweet(tweet),
+      15,
+      true
     );
-    var ps = itokens.map(function (x) {
-      return prafbe.calculate_spamness(
-        g_preferences.prafbe_right_dict(),
-        g_preferences.prafbe_wrong_dict(),
-        x
-      );
-    });
+    var ps = tokens.map(function (x) {return x[2];});
     p = prafbe.calculate_spam_probability(ps);
   }
 
