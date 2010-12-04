@@ -354,7 +354,18 @@ function learn_tweet(tweet_id, right_tweet_p, interactive_p)  //{{{2
     g_prafbe_learning_count++;
     tweet.prafbe_learning_bias += (right_tweet_p ? 1 : -1);
   };
-  step();
+  var old_status = is_spam_tweet_p(tweet);
+  var new_status = old_status;
+  while (new_status == old_status) {
+    step();
+
+    var learned_right_tweet_as_right_p = ((!old_status) && right_tweet_p);
+    var learned_wrong_tweet_as_wrong_p = (old_status && (!right_tweet_p));
+    if (learned_right_tweet_as_right_p || learned_wrong_tweet_as_wrong_p)
+      break;
+    if (tweet.prafbe_learning_bias != 0)
+      new_status = is_spam_tweet_p(tweet);
+  }
 
   if (interactive_p) {
     // It's caller's duty to save non-interactive learning result.
