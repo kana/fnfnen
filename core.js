@@ -633,7 +633,7 @@ function tweet_mention_p(tweet)  //{{{2
 
 function tweet_mine_p(tweet)  //{{{2
 {
-  return tweet.user.id == g_user.id;
+  return tweet.user.id_str == g_user.id_str;
 }
 
 
