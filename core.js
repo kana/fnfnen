@@ -1381,7 +1381,6 @@ function Preference(id, default_value, opt_kw)  //{{{2
 
   _.applying_priority = kw.applying_priority || DEFAULT_APPLYING_PRIORITY;
   _.columns = kw.columns || 80;
-  _.current_value = $.storage(id) || default_value;
   _.default_value = default_value;
   _.form_type = kw.form_type || 'text';
   _.id = id;
@@ -1407,8 +1406,24 @@ function Preference(id, default_value, opt_kw)  //{{{2
     _.on_application(via_external_configuration_p);
   };
 
+  _.decode = function (value) {
+    if (value != null) {
+      return (_.value_type == 'string'
+              ? value
+              : $.evalJSON(value));
+    } else {
+      return null;
+    }
+  };
+
+  _.encode = function (value) {
+    return (_.value_type == 'string'
+            ? value
+            : $.toJSON(value));
+  };
+
   _.get_form = function () {
-    var v = _.node().val();
+    var v = _.decode(_.node().val());
     if (_.value_type == 'number') {
       if (isNaN(v))
         v = _.current_value;
@@ -1435,7 +1450,7 @@ function Preference(id, default_value, opt_kw)  //{{{2
       node_input.attr('type', _.form_type);
     }
     node_input.attr('name', _.id);
-    node_input.val(_.current_value);
+    node_input.val(_.encode(_.current_value));
     if (_.read_only_p)
       node_input.attr('readonly', 'readonly');
 
@@ -1459,13 +1474,15 @@ function Preference(id, default_value, opt_kw)  //{{{2
 
   _.save = function () {
     if (!(_.view_only_p))
-      $.storage(_.id, _.current_value);
+      $.storage(_.id, _.encode(_.current_value));
     _.set_form();
   };
 
   _.set_form = function () {
-    _.node().val(_.current_value);
+    _.node().val(_.encode(_.current_value));
   };
+
+  _.current_value = _.decode($.storage(id)) || default_value;
 
   return _;
 }
