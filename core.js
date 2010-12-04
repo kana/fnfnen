@@ -54,7 +54,7 @@
 
 var DEFAULT_APPLYING_PRIORITY = 0;
 var DEFAULT_UPDATE_INTERVAL_SEC = 5 * 60;
-var DUMMY_SINCE_ID = 1;
+var DUMMY_SINCE_ID = '1';
 var GLOBAL_VARIABLES = window;
 var HOME_COLUMN_NAME = 'Home';
 var LAST_APPLYING_PRIORITY = 1000;
@@ -263,7 +263,7 @@ function html_from_tweet(tweet)  //{{{2
         '@',
         ['class', 'posted_time'],
         ['href',
-          TWITTER_UI_URI + tweet.user.screen_name + '/status/' + tweet.id],
+          TWITTER_UI_URI + tweet.user.screen_name + '/status/' + tweet.id_str],
       ],
       human_readable_format_from_date(new Date(tweet.created_at)),
     ],
@@ -276,7 +276,7 @@ function html_from_tweet(tweet)  //{{{2
         ['href', string_from_tree([
           'javascript:set_up_to_reply(',
             "'", tweet.user.screen_name, "'", ',',
-            tweet.id,
+            "'", tweet.id_str, "'",
           ')',
         ])]
       ],
@@ -290,7 +290,7 @@ function html_from_tweet(tweet)  //{{{2
         [
           '@',
           ['class', 'button conversation'],
-          ['href', 'javascript:show_conversation(' + tweet.id + ')'],
+          ['href', 'javascript:show_conversation(\'' + tweet.id_str + '\')'],
         ],
         '&#x267b;',  // Black universal recycling symbol
       ]
@@ -302,7 +302,7 @@ function html_from_tweet(tweet)  //{{{2
       [
         '@',
         ['class', 'button favorite'],
-        ['href', 'javascript:toggle_favorite(' + tweet.id + ')'],
+        ['href', 'javascript:toggle_favorite(\'' + tweet.id_str + '\')'],
       ],
       favorite_symbol(tweet.favorited),
     ],
@@ -312,7 +312,7 @@ function html_from_tweet(tweet)  //{{{2
       [
         '@',
         ['class', 'button prafbe'],
-        ['href', 'javascript:learn_tweet(' + tweet.id + ', true, true)'],
+        ['href', 'javascript:learn_tweet(\''+tweet.id_str+'\', true, true)'],
       ],
       (0 < tweet.prafbe_learning_bias
        ? '&#x25b2;' + tweet.prafbe_learning_bias.toString()
@@ -324,7 +324,7 @@ function html_from_tweet(tweet)  //{{{2
       [
         '@',
         ['class', 'button prafbe'],
-        ['href', 'javascript:learn_tweet(' + tweet.id + ', false, true)'],
+        ['href', 'javascript:learn_tweet(\''+tweet.id_str+'\', false, true)'],
       ],
       (tweet.prafbe_learning_bias < 0
        ? '&#x25bc;' + Math.abs(tweet.prafbe_learning_bias).toString()
@@ -440,7 +440,7 @@ function node_from_tweet(tweet)  //{{{2
     node_tweet.data('json', tweet);
 
     node_tweet.addClass('tweet');
-    node_tweet.addClass(class_name_from_tweet_id(tweet.id));
+    node_tweet.addClass(class_name_from_tweet_id(tweet.id_str));
     if (tweet_mention_p(tweet))
       node_tweet.addClass('mention');
     if (tweet_mine_p(tweet))
@@ -633,7 +633,7 @@ function tweet_mention_p(tweet)  //{{{2
 
 function tweet_mine_p(tweet)  //{{{2
 {
-  return tweet.user.id == g_user.id;
+  return tweet.user.id_str == g_user.id_str;
 }
 
 
@@ -661,7 +661,7 @@ function callback_update(response, name_since_id, queue_id)  //{{{3
       var NEWEST_TWEET_INDEX = 0;
       GLOBAL_VARIABLES[name_since_id] = Math.max(
         GLOBAL_VARIABLES[name_since_id],
-        new_tweets_n2o[NEWEST_TWEET_INDEX].id
+        new_tweets_n2o[NEWEST_TWEET_INDEX].id_str
       );
     }
   } else {
@@ -681,20 +681,19 @@ function merge_tweets_n2o(tweet_sets)  //{{{3
     var tweets = tweet_sets[i];
     for (var j in tweets) {
       var t = tweets[j];
-      if (tweet_table[t.id] == null) {
-        tweet_table[t.id] = t;
-        tweet_ids.push(t.id);
+      if (tweet_table[t.id_str] == null) {
+        tweet_table[t.id_str] = t;
+        tweet_ids.push(t.id_str);
       }
     }
   }
 
-  tweet_ids.sort(function (a, b) {return a - b;});
+  tweet_ids.sort(compare_tweet_ids);
   tweet_ids.reverse();
 
     // newest, ..., oldest
   var merged_tweets_n2o = (
     tweet_ids
-    .filter(function (id) {return !(tweet_db.has_p(id));})
     .map(function (id) {return tweet_table[id];})
   );
 
@@ -847,7 +846,7 @@ function fill_column_with_censored_tweets(node_column, required_classes) //{{{2
   var ids = [];
   for (var id in tweet_db.ids())
     ids.push(id);
-  ids.sort(function (a, b) {return a - b;});
+  ids.sort(compare_tweet_ids);
   ids.reverse();
   var ids_n2o = ids;
   var tweets_n2o = ids_n2o.map(function (_) {return tweet_db.get(_);});
@@ -1536,7 +1535,7 @@ function TweetDatabase()  //{{{2
     for (i in new_tweets) {
       var tweet = new_tweets[i];
       if (!this.has_p(tweet)) {
-        this._db[tweet.id] = tweet;
+        this._db[tweet.id_str] = tweet;
 
         // Learn new tweets automatically.
         //
@@ -1544,28 +1543,36 @@ function TweetDatabase()  //{{{2
         // if they aren't actually learned.  For example, show_conversation()
         // may fetch tweets which are not learned yet.  But it's rare to occur
         // and such old tweets should be filtered well.
-        if (g_preferences.last_learned_tweet_id() < tweet.id)
-          learn_tweet(tweet.id, !is_spam_tweet_p(tweet), false);
+        if (compare_tweet_ids(g_preferences.last_learned_tweet_id(),
+                              tweet.id_str)
+            < 0)
+        {
+          learn_tweet(tweet.id_str, !is_spam_tweet_p(tweet), false);
+        }
       }
     }
 
-    var tweet_ids = new_tweets.map(function (t) {return t.id;});
+    var tweet_ids = new_tweets.map(function (t) {return t.id_str;});
     tweet_ids.push(g_preferences.last_learned_tweet_id());
     g_preferences.last_learned_tweet_id(
-      tweet_ids.reduce(function (a, b) {return Math.max(a, b);})
+      tweet_ids.reduce(function (a, b) {
+        return (0 <= compare_tweet_ids(a, b)
+                ? a
+                : b);
+      })
     );
 
     save_prafbe_learning_result();
     return;
   };
 
-  this.get = function (id) {
-    return this._db[id];
+  this.get = function (id_str) {
+    return this._db[id_str];
   };
 
   this.has_p = function (_) {
-    var id = typeof(_) == 'string' ? _ : _.id;
-    return this._db[id] != null;
+    var id_str = typeof(_) == 'string' ? _ : _.id_str;
+    return this._db[id_str] != null;
   };
 
   this.ids = function () {
@@ -1774,6 +1781,15 @@ function api_name_from_uri(api_uri)  //{{{2
 function create_element(element_name)  //{{{2
 {
   return $(document.createElement(element_name));
+}
+
+
+
+
+function compare_tweet_ids(l, r)  //{{{2
+{
+  // Where l and r is tweet.id_str.
+  return (parseFloat(l) - parseFloat(r)) || l.localeCompare(r);
 }
 
 
@@ -2268,7 +2284,7 @@ $(document).ready(function () {  //{{{2
         );
         g_preferences.register(
           'last_learned_tweet_id',
-          -13,
+          '-13',  // Dummy tweet id which is less than any tweet id.
           {
             is_advanced_p: true,
             read_only_p: true,
