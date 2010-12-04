@@ -75,8 +75,6 @@ var g_external_configuration = {/* preference_name: value */};
 var g_parameters = {'automatic_update': true};
 var g_plugins = [/* plugin = {event_name: function, ...}, ... */];
 var g_prafbe_learning_count = 0;
-var g_prafbe_right_dict = {};
-var g_prafbe_wrong_dict = {};
 var g_preferences = {/* name: preference, ... */};
 var g_since_id_home = DUMMY_SINCE_ID;  // BUGS: Tweet #1 cannot be shown.
 var g_since_id_mentions = DUMMY_SINCE_ID;  // BUGS: Tweet #1 cannot be shown.
@@ -343,14 +341,14 @@ function learn_tweet(tweet_id, right_tweet_p, interactive_p)  //{{{2
 
   if (right_tweet_p) {
     if (0 <= tweet.prafbe_learning_bias)
-      prafbe.learn(g_prafbe_right_dict, tweet.text);
+      prafbe.learn(g_preferences.prafbe_right_dict(), tweet.text);
     else
-      prafbe.unlearn(g_prafbe_wrong_dict, tweet.text);
+      prafbe.unlearn(g_preferences.prafbe_wrong_dict(), tweet.text);
   } else {
     if (tweet.prafbe_learning_bias <= 0)
-      prafbe.learn(g_prafbe_wrong_dict, tweet.text);
+      prafbe.learn(g_preferences.prafbe_wrong_dict(), tweet.text);
     else
-      prafbe.unlearn(g_prafbe_right_dict, tweet.text);
+      prafbe.unlearn(g_preferences.prafbe_right_dict(), tweet.text);
   }
   g_prafbe_learning_count++;
   tweet.prafbe_learning_bias += (right_tweet_p ? 1 : -1);
@@ -1303,15 +1301,15 @@ function calculate_spam_probability(tweet)  //{{{2
   {
     var tokens = prafbe.tokenize(tweet.text);
     var itokens = prafbe.list_most_interesting_tokens(
-      g_prafbe_right_dict,
-      g_prafbe_wrong_dict,
+      g_preferences.prafbe_right_dict(),
+      g_preferences.prafbe_wrong_dict(),
       tokens,
       15
     );
     var ps = itokens.map(function (x) {
       return prafbe.calculate_spamness(
-        g_prafbe_right_dict,
-        g_prafbe_wrong_dict,
+        g_preferences.prafbe_right_dict(),
+        g_preferences.prafbe_wrong_dict(),
         x
       );
     });
@@ -1336,22 +1334,10 @@ function is_spam_tweet_p(tweet)  //{{{2
 
 
 
-function load_prafbe_learning_result()  //{{{2
-{
-  g_prafbe_right_dict = $.evalJSON($.storage('prafbe_right_dict') || '{}');
-  g_prafbe_wrong_dict = $.evalJSON($.storage('prafbe_wrong_dict') || '{}');
-}
-
-
-
-
 function save_prafbe_learning_result()  //{{{2
 {
-  $.storage('prafbe_right_dict', $.toJSON(g_prafbe_right_dict));
-  $.storage('prafbe_wrong_dict', $.toJSON(g_prafbe_wrong_dict));
-
-  $('#prafbe_right_dict').val($.toJSON(g_prafbe_right_dict));
-  $('#prafbe_wrong_dict').val($.toJSON(g_prafbe_wrong_dict));
+  g_preferences.prafbe_right_dict.save();
+  g_preferences.prafbe_wrong_dict.save();
 }
 
 
@@ -2091,6 +2077,7 @@ $(document).ready(function () {  //{{{2
     initialize_advanced_preferences: {  //{{{
       requirements: [],
       procedure: function () {
+        $('#advanced_preferences_content').empty();
         $('#advanced_preferences_content').hide();
         $('#button_to_toggle_advanced_preferences').click(function () {
           $('#advanced_preferences_content').slideToggle();
@@ -2159,13 +2146,6 @@ $(document).ready(function () {  //{{{2
           g_parameters[key] = value;
         }
         return;
-      },
-    },  //}}}
-    initialize_prafbe_learning_result: {  //{{{
-      requirements: [],
-      procedure: function () {
-        load_prafbe_learning_result();
-        save_prafbe_learning_result();
       },
     },  //}}}
     initialize_preferences: {  //{{{
@@ -2290,6 +2270,26 @@ $(document).ready(function () {  //{{{2
               set_up_censored_columns(this());
             },
             rows: 10
+          }
+        );
+        g_preferences.register(
+          'prafbe_right_dict',
+          {},
+          {
+            form_type: 'textarea',
+            is_advanced_p: true,
+            read_only_p: true,
+            rows: 3,
+          }
+        );
+        g_preferences.register(
+          'prafbe_wrong_dict',
+          {},
+          {
+            form_type: 'textarea',
+            is_advanced_p: true,
+            read_only_p: true,
+            rows: 3,
           }
         );
         g_preferences.register(
