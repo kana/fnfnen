@@ -1778,6 +1778,15 @@ function create_element(element_name)  //{{{2
 
 
 
+function compare_tweet_ids(l, r)  //{{{2
+{
+  // Where l and r is tweet.id_str.
+  return (parseFloat(l) - parseFloat(r)) || l.localeCompare(r);
+}
+
+
+
+
 function englishize(id)  //{{{2
 {
   // 'foo_bar_baz' ==> 'Foo bar baz'

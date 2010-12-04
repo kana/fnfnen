@@ -20,6 +20,26 @@ describe('Misc.', function () {
       expect(class_name_from_column_name('Love me?')).toEqual('loveme');
     });
   });
+  describe('compare_tweet_ids', function () {
+    it('should compare strings as numbers', function () {
+      expect(compare_tweet_ids('0', '1')).toBeLessThan(0);
+      expect(compare_tweet_ids('0', '0')).toEqual(0);
+      expect(compare_tweet_ids('1', '0')).toBeGreaterThan(0);
+    });
+    it('should work for numbers bigger than 53bit', function () {
+      var v0 = Math.pow(2, 53);
+      var v1 = v0 + 1;
+      expect(v0).toEqual(v1);  // +1 is too small so that it is truncated.
+
+      var s0 = v0.toString();
+      var s1 = s0.replace(/.$/, function (m) {return parseInt(m) + 1;});
+      expect(s0).not.toEqual(s1);
+      expect(compare_tweet_ids(s0, s0)).toEqual(0);
+      expect(compare_tweet_ids(s0, s1)).toBeLessThan(0);
+      expect(compare_tweet_ids(s1, s0)).toBeGreaterThan(0);
+      expect(compare_tweet_ids(s1, s1)).toEqual(0);
+    });
+  });
   describe('create_element', function () {
     it('should create a DOM element wrapped by jQuery', function () {
       var e = create_element('div');
