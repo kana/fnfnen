@@ -2,7 +2,8 @@ describe('Core', function () {
   describe('html_from_tweet', function () {
     var tweet = {
       created_at: 'Wed Sep 08 14:01:49 +0000 2010',
-      id: 81,
+      id: 18,
+      id_str: '81',
       in_reply_to_status_id: null,
       favorited: false,
       text: '@ujm hi http://hi.hi/#hi hi',
@@ -51,25 +52,25 @@ describe('Core', function () {
     var t_button_to_reply = [
       '<a class="button reply" href="javascript:set_up_to_reply(',
       '\'kana1\',',
-      '81',
+      '\'81\'',
       ')">',
       '&#x21b5;',
       '</a>',
     ];
     var t_button_to_toggle_favorite = [
-      '<a class="button favorite" href="javascript:toggle_favorite(81)">',
+      '<a class="button favorite" href="javascript:toggle_favorite(\'81\')">',
       '\u2606',
       '</a>',
     ];
     var t_button_to_learn_tweet_as_right = [
       '<a class="button prafbe"',
-      ' href="javascript:learn_tweet(81, true, true)">',
+      ' href="javascript:learn_tweet(\'81\', true, true)">',
       '&#x25b3;',
       '</a>',
     ];
     var t_button_to_learn_tweet_as_wrong = [
       '<a class="button prafbe"',
-      ' href="javascript:learn_tweet(81, false, true)">',
+      ' href="javascript:learn_tweet(\'81\', false, true)">',
       '&#x25bd;',
       '</a>',
     ];
@@ -97,7 +98,8 @@ describe('Core', function () {
         t_text,
         t_posted_time,
         t_button_to_reply,
-        '<a class="button favorite" href="javascript:toggle_favorite(81)">',
+        '<a class="button favorite"',
+        ' href="javascript:toggle_favorite(\'81\')">',
         '\u2605',
         '</a>',
         t_button_to_learn_tweet_as_right,
@@ -115,7 +117,7 @@ describe('Core', function () {
         t_button_to_reply,
         [
           '<a class="button conversation" href="javascript:show_conversation(',
-          '81',
+          '\'81\'',
           ')">',
           '&#x267b;',
           '</a>',
@@ -151,7 +153,7 @@ describe('Core', function () {
         t_button_to_toggle_favorite,
         [
           '<a class="button prafbe"',
-          ' href="javascript:learn_tweet(81, true, true)">',
+          ' href="javascript:learn_tweet(\'81\', true, true)">',
           '&#x25b2;12',
           '</a>',
         ],
@@ -170,7 +172,7 @@ describe('Core', function () {
         t_button_to_learn_tweet_as_right,
         [
           '<a class="button prafbe"',
-          ' href="javascript:learn_tweet(81, false, true)">',
+          ' href="javascript:learn_tweet(\'81\', false, true)">',
           '&#x25bc;34',
           '</a>',
         ],

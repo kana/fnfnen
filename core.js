@@ -263,7 +263,7 @@ function html_from_tweet(tweet)  //{{{2
         '@',
         ['class', 'posted_time'],
         ['href',
-          TWITTER_UI_URI + tweet.user.screen_name + '/status/' + tweet.id],
+          TWITTER_UI_URI + tweet.user.screen_name + '/status/' + tweet.id_str],
       ],
       human_readable_format_from_date(new Date(tweet.created_at)),
     ],
@@ -276,7 +276,7 @@ function html_from_tweet(tweet)  //{{{2
         ['href', string_from_tree([
           'javascript:set_up_to_reply(',
             "'", tweet.user.screen_name, "'", ',',
-            tweet.id,
+            "'", tweet.id_str, "'",
           ')',
         ])]
       ],
@@ -290,7 +290,7 @@ function html_from_tweet(tweet)  //{{{2
         [
           '@',
           ['class', 'button conversation'],
-          ['href', 'javascript:show_conversation(' + tweet.id + ')'],
+          ['href', 'javascript:show_conversation(\'' + tweet.id_str + '\')'],
         ],
         '&#x267b;',  // Black universal recycling symbol
       ]
@@ -302,7 +302,7 @@ function html_from_tweet(tweet)  //{{{2
       [
         '@',
         ['class', 'button favorite'],
-        ['href', 'javascript:toggle_favorite(' + tweet.id + ')'],
+        ['href', 'javascript:toggle_favorite(\'' + tweet.id_str + '\')'],
       ],
       favorite_symbol(tweet.favorited),
     ],
@@ -312,7 +312,7 @@ function html_from_tweet(tweet)  //{{{2
       [
         '@',
         ['class', 'button prafbe'],
-        ['href', 'javascript:learn_tweet(' + tweet.id + ', true, true)'],
+        ['href', 'javascript:learn_tweet(\''+tweet.id_str+'\', true, true)'],
       ],
       (0 < tweet.prafbe_learning_bias
        ? '&#x25b2;' + tweet.prafbe_learning_bias.toString()
@@ -324,7 +324,7 @@ function html_from_tweet(tweet)  //{{{2
       [
         '@',
         ['class', 'button prafbe'],
-        ['href', 'javascript:learn_tweet(' + tweet.id + ', false, true)'],
+        ['href', 'javascript:learn_tweet(\''+tweet.id_str+'\', false, true)'],
       ],
       (tweet.prafbe_learning_bias < 0
        ? '&#x25bc;' + Math.abs(tweet.prafbe_learning_bias).toString()
