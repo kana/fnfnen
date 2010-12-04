@@ -219,6 +219,7 @@ function fnfnen_external_configuration(data)  //{{{2
 
 function html_from_tweet(tweet)  //{{{2
 {
+  var bias = tweet_db.data(tweet, 'prafbe_learning_bias');
   var values = {
     prafbe_information: [
       'span',
@@ -226,7 +227,7 @@ function html_from_tweet(tweet)  //{{{2
         '@',
         ['class', 'debug prafbe'],
       ],
-      format_probability(tweet.prafbe_result),
+      format_probability(tweet_db.data(tweet, 'prafbe_result')),
     ],
     user_icon: [
       'a',
@@ -316,8 +317,8 @@ function html_from_tweet(tweet)  //{{{2
         ['class', 'button prafbe'],
         ['href', 'javascript:learn_tweet(\''+tweet.id_str+'\', true, true)'],
       ],
-      (0 < tweet.prafbe_learning_bias
-       ? '&#x25b2;' + tweet.prafbe_learning_bias.toString()
+      (0 < bias
+       ? '&#x25b2;' + bias.toString()
        : '&#x25b3;'),
     ],
     button_to_learn_as_a_wrong_tweet: [
@@ -327,8 +328,8 @@ function html_from_tweet(tweet)  //{{{2
         ['class', 'button prafbe'],
         ['href', 'javascript:learn_tweet(\''+tweet.id_str+'\', false, true)'],
       ],
-      (tweet.prafbe_learning_bias < 0
-       ? '&#x25bc;' + Math.abs(tweet.prafbe_learning_bias).toString()
+      (bias < 0
+       ? '&#x25bc;' + Math.abs(bias).toString()
        : '&#x25bd;'),
     ],
   };
@@ -347,23 +348,23 @@ function html_from_tweet(tweet)  //{{{2
 function learn_tweet(tweet_id, right_tweet_p, interactive_p)  //{{{2
 {
   var tweet = tweet_db.get(tweet_id);
-  tweet.prafbe_learning_bias = (tweet.prafbe_learning_bias || 0);
+  var bias = (tweet_db.data(tweet, 'prafbe_learning_bias') || 0);
 
   var tokens = tokenize_tweet(tweet);
   var step = function () {
     if (right_tweet_p) {
-      if (0 <= tweet.prafbe_learning_bias)
+      if (0 <= bias)
         prafbe.learn(g_preferences.prafbe_right_dict(), tokens);
       else
         prafbe.unlearn(g_preferences.prafbe_wrong_dict(), tokens);
     } else {
-      if (tweet.prafbe_learning_bias <= 0)
+      if (bias <= 0)
         prafbe.learn(g_preferences.prafbe_wrong_dict(), tokens);
       else
         prafbe.unlearn(g_preferences.prafbe_right_dict(), tokens);
     }
     g_prafbe_learning_count++;
-    tweet.prafbe_learning_bias += (right_tweet_p ? 1 : -1);
+    bias += (right_tweet_p ? 1 : -1);
   };
   var old_status = is_spam_tweet_p(tweet);
   var new_status = old_status;
@@ -374,9 +375,10 @@ function learn_tweet(tweet_id, right_tweet_p, interactive_p)  //{{{2
     var learned_wrong_tweet_as_wrong_p = (old_status && (!right_tweet_p));
     if (learned_right_tweet_as_right_p || learned_wrong_tweet_as_wrong_p)
       break;
-    if (tweet.prafbe_learning_bias != 0)
+    if (bias != 0)
       new_status = is_spam_tweet_p(tweet);
   }
+  tweet_db.data(tweet, 'prafbe_learning_bias', bias);
 
   if (interactive_p) {
     // It's caller's duty to save non-interactive learning result.
@@ -1319,11 +1321,9 @@ function register_plugin(plugin)  //{{{2
 // Prafbe  {{{1
 function calculate_spam_probability(tweet)  //{{{2
 {
-  var p = tweet.prafbe_result;
-  if (p == null
-      || tweet.prafbe_learning_count == null
-      || tweet.prafbe_learning_count < g_prafbe_learning_count)
-  {
+  var p = tweet_db.data(tweet, 'prafbe_result');
+  var c = tweet_db.data(tweet, 'prafbe_learning_count');
+  if (p == null || c == null || c < g_prafbe_learning_count) {
     var tokens = prafbe.list_most_interesting_tokens(
       g_preferences.prafbe_right_dict(),
       g_preferences.prafbe_wrong_dict(),
@@ -1335,8 +1335,8 @@ function calculate_spam_probability(tweet)  //{{{2
     p = prafbe.calculate_spam_probability(ps);
   }
 
-  tweet.prafbe_learning_count = g_prafbe_learning_count;
-  tweet.prafbe_result = p;
+  tweet_db.data(tweet, 'prafbe_learning_count', g_prafbe_learning_count);
+  tweet_db.data(tweet, 'prafbe_result', p);
 
   return p;
 }
