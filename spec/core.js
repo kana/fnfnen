@@ -251,6 +251,25 @@ describe('Core', function () {
     });
   });
 });
+describe('Prafbe', function () {
+  describe('tokenize_object', function () {
+    it('should tokenize string values', function () {
+      expect(tokenize_object({key: 'va*lue'})).
+      toEqual(['key*va', 'key*lue']);
+    });
+    it('should tokenize object values', function () {
+      expect(tokenize_object({key: {key2: 'va*lue'}})).
+      toEqual(['key*key2*va', 'key*key2*lue']);
+      expect(tokenize_object({key: ['va*lue']})).
+      toEqual(['key*0*va', 'key*0*lue']);
+    });
+    it('should ignore other types', function () {
+      expect(tokenize_object({key: 1})).toEqual([]);
+      expect(tokenize_object({key: null})).toEqual([]);
+      expect(tokenize_object({key: undefined})).toEqual([]);
+    });
+  });
+});
 
 
 

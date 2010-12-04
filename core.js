@@ -349,17 +349,18 @@ function learn_tweet(tweet_id, right_tweet_p, interactive_p)  //{{{2
   var tweet = tweet_db.get(tweet_id);
   tweet.prafbe_learning_bias = (tweet.prafbe_learning_bias || 0);
 
+  var tokens = tokenize_tweet(tweet);
   var step = function () {
     if (right_tweet_p) {
       if (0 <= tweet.prafbe_learning_bias)
-        prafbe.learn(g_preferences.prafbe_right_dict(), tweet.text);
+        prafbe.learn(g_preferences.prafbe_right_dict(), tokens);
       else
-        prafbe.unlearn(g_preferences.prafbe_wrong_dict(), tweet.text);
+        prafbe.unlearn(g_preferences.prafbe_wrong_dict(), tokens);
     } else {
       if (tweet.prafbe_learning_bias <= 0)
-        prafbe.learn(g_preferences.prafbe_wrong_dict(), tweet.text);
+        prafbe.learn(g_preferences.prafbe_wrong_dict(), tokens);
       else
-        prafbe.unlearn(g_preferences.prafbe_right_dict(), tweet.text);
+        prafbe.unlearn(g_preferences.prafbe_right_dict(), tokens);
     }
     g_prafbe_learning_count++;
     tweet.prafbe_learning_bias += (right_tweet_p ? 1 : -1);
@@ -1323,7 +1324,7 @@ function calculate_spam_probability(tweet)  //{{{2
       || tweet.prafbe_learning_count == null
       || tweet.prafbe_learning_count < g_prafbe_learning_count)
   {
-    var tokens = prafbe.tokenize(tweet.text);
+    var tokens = tokenize_tweet(tweet);
     var itokens = prafbe.list_most_interesting_tokens(
       g_preferences.prafbe_right_dict(),
       g_preferences.prafbe_wrong_dict(),
@@ -1362,6 +1363,43 @@ function save_prafbe_learning_result()  //{{{2
 {
   g_preferences.prafbe_right_dict.save();
   g_preferences.prafbe_wrong_dict.save();
+}
+
+
+
+
+function tokenize_object(object)  //{{{2
+{
+  var result = [];
+
+  for (var key in object) {
+    var value = object[key];
+    var tokens;
+    if (typeof value == 'string') {
+      tokens = prafbe.tokenize(value);
+    } else if (typeof value == 'object') {
+      tokens = tokenize_object(value);
+    } else {
+      tokens = [];
+    }
+
+    result.push.apply(
+      result,
+      tokens.map(function (x) {
+        return key + '*' + x;
+      })
+    );
+  }
+
+  return result;
+}
+
+
+
+
+function tokenize_tweet(tweet)  //{{{2
+{
+  return tokenize_object(tweet);
 }
 
 
