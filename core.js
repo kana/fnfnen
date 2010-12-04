@@ -208,9 +208,8 @@ function fnfnen_external_configuration(data)  //{{{2
 
 function html_from_tweet(tweet)  //{{{2
 {
-  return html_from_jsxn([
-    // prafbe information
-    [
+  var values = {
+    prafbe_information: [
       'span',
       [
         '@',
@@ -218,8 +217,7 @@ function html_from_tweet(tweet)  //{{{2
       ],
       format_probability(tweet.prafbe_result),
     ],
-    // user icon
-    [
+    user_icon: [
       'a',
       [
         '@',
@@ -237,8 +235,7 @@ function html_from_tweet(tweet)  //{{{2
         ],
       ],
     ],
-    // screen name
-    [
+    screen_name: [
       'a',
       [
         '@',
@@ -247,8 +244,7 @@ function html_from_tweet(tweet)  //{{{2
       ],
       tweet.user.screen_name,
     ],
-    // text
-    [
+    text: [
       'span',
       [
         '@',
@@ -256,8 +252,7 @@ function html_from_tweet(tweet)  //{{{2
       ],
       make_links_in_text(tweet.text),
     ],
-    // posted time
-    [
+    posted_time: [
       'a',
       [
         '@',
@@ -267,8 +262,7 @@ function html_from_tweet(tweet)  //{{{2
       ],
       human_readable_format_from_date(new Date(tweet.created_at)),
     ],
-    // button to reply
-    [
+    button_to_reply: [
       'a',
       [
         '@',
@@ -282,8 +276,7 @@ function html_from_tweet(tweet)  //{{{2
       ],
       '&#x21b5;',  // Carriage return symbol
     ],
-    // button to show the conversation
-    (
+    button_to_show_conversation: (
       tweet.in_reply_to_status_id
       ? [
         'a',
@@ -296,8 +289,7 @@ function html_from_tweet(tweet)  //{{{2
       ]
       : ''
     ),
-    // button to toggle favorite
-    [
+    button_to_toggle_favorite: [
       'a',
       [
         '@',
@@ -306,8 +298,7 @@ function html_from_tweet(tweet)  //{{{2
       ],
       favorite_symbol(tweet.favorited),
     ],
-    // button to learn a right tweet
-    [
+    button_to_learn_as_a_right_tweet: [
       'a',
       [
         '@',
@@ -318,8 +309,7 @@ function html_from_tweet(tweet)  //{{{2
        ? '&#x25b2;' + tweet.prafbe_learning_bias.toString()
        : '&#x25b3;'),
     ],
-    // button to learn a wrong tweet
-    [
+    button_to_learn_as_a_wrong_tweet: [
       'a',
       [
         '@',
@@ -330,7 +320,25 @@ function html_from_tweet(tweet)  //{{{2
        ? '&#x25bc;' + Math.abs(tweet.prafbe_learning_bias).toString()
        : '&#x25bd;'),
     ],
-  ]);
+  };
+  for (var i in values)
+    values[i] = html_from_jsxn([values[i]]);
+
+  return expand_template(
+    [
+      '{prafbe_information}',
+      '{user_icon}',
+      '{screen_name}',
+      '{text}',
+      '{posted_time}',
+      '{button_to_reply}',
+      '{button_to_show_conversation}',
+      '{button_to_toggle_favorite}',
+      '{button_to_learn_as_a_right_tweet}',
+      '{button_to_learn_as_a_wrong_tweet}',
+    ].join(''),
+    values
+  );
 }
 
 
