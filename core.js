@@ -339,19 +339,33 @@ function learn_tweet(tweet_id, right_tweet_p, interactive_p)  //{{{2
   var tweet = tweet_db.get(tweet_id);
   tweet.prafbe_learning_bias = (tweet.prafbe_learning_bias || 0);
 
-  if (right_tweet_p) {
-    if (0 <= tweet.prafbe_learning_bias)
-      prafbe.learn(g_preferences.prafbe_right_dict(), tweet.text);
-    else
-      prafbe.unlearn(g_preferences.prafbe_wrong_dict(), tweet.text);
-  } else {
-    if (tweet.prafbe_learning_bias <= 0)
-      prafbe.learn(g_preferences.prafbe_wrong_dict(), tweet.text);
-    else
-      prafbe.unlearn(g_preferences.prafbe_right_dict(), tweet.text);
+  var step = function () {
+    if (right_tweet_p) {
+      if (0 <= tweet.prafbe_learning_bias)
+        prafbe.learn(g_preferences.prafbe_right_dict(), tweet.text);
+      else
+        prafbe.unlearn(g_preferences.prafbe_wrong_dict(), tweet.text);
+    } else {
+      if (tweet.prafbe_learning_bias <= 0)
+        prafbe.learn(g_preferences.prafbe_wrong_dict(), tweet.text);
+      else
+        prafbe.unlearn(g_preferences.prafbe_right_dict(), tweet.text);
+    }
+    g_prafbe_learning_count++;
+    tweet.prafbe_learning_bias += (right_tweet_p ? 1 : -1);
+  };
+  var old_status = is_spam_tweet_p(tweet);
+  var new_status = old_status;
+  while (new_status == old_status) {
+    step();
+
+    var learned_right_tweet_as_right_p = ((!old_status) && right_tweet_p);
+    var learned_wrong_tweet_as_wrong_p = (old_status && (!right_tweet_p));
+    if (learned_right_tweet_as_right_p || learned_wrong_tweet_as_wrong_p)
+      break;
+    if (tweet.prafbe_learning_bias != 0)
+      new_status = is_spam_tweet_p(tweet);
   }
-  g_prafbe_learning_count++;
-  tweet.prafbe_learning_bias += (right_tweet_p ? 1 : -1);
 
   if (interactive_p) {
     // It's caller's duty to save non-interactive learning result.
