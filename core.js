@@ -66,6 +66,19 @@ var TWITTER_API_URI = 'http://api.twitter.com/1/';
 var TWITTER_SEARCH_URI = 'http://search.twitter.com/search?q=';
 var TWITTER_UI_URI = 'http://twitter.com/';
 
+var DEFAULT_TWEET_HTML_TEMPLATE = [
+  '{prafbe_information}',
+  '{user_icon}',
+  '{screen_name}',
+  '{text}',
+  '{posted_time}',
+  '{button_to_reply}',
+  '{button_to_show_conversation}',
+  '{button_to_toggle_favorite}',
+  '{button_to_learn_as_a_right_tweet}',
+  '{button_to_learn_as_a_wrong_tweet}',
+].join(''),
+
 
 
 
@@ -325,18 +338,7 @@ function html_from_tweet(tweet)  //{{{2
     values[i] = html_from_jsxn([values[i]]);
 
   return expand_template(
-    [
-      '{prafbe_information}',
-      '{user_icon}',
-      '{screen_name}',
-      '{text}',
-      '{posted_time}',
-      '{button_to_reply}',
-      '{button_to_show_conversation}',
-      '{button_to_toggle_favorite}',
-      '{button_to_learn_as_a_right_tweet}',
-      '{button_to_learn_as_a_wrong_tweet}',
-    ].join(''),
+    g_preferences.tweet_html_template(),
     values
   );
 }
@@ -2294,6 +2296,14 @@ $(document).ready(function () {  //{{{2
               set_up_censored_columns(this());
             },
             rows: 10
+          }
+        );
+        g_preferences.register(
+          'tweet_html_template',
+          DEFAULT_TWEET_HTML_TEMPLATE,
+          {
+            form_type: 'textarea',
+            rows: 3,
           }
         );
         g_preferences.register(
