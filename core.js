@@ -846,7 +846,7 @@ function fill_column_with_censored_tweets(node_column, required_classes) //{{{2
   var ids = [];
   for (var id in tweet_db.ids())
     ids.push(id);
-  ids.sort(function (a, b) {return a - b;});
+  ids.sort(compare_tweet_ids);
   ids.reverse();
   var ids_n2o = ids;
   var tweets_n2o = ids_n2o.map(function (_) {return tweet_db.get(_);});
