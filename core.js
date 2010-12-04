@@ -837,21 +837,28 @@ function censored_tweet_p(tweet, required_classes)  //{{{2
 
 function censorship_classes_from_tweet(tweet)  //{{{2
 {
-  var classes = [];
+  var classes;
 
-  for (var i in g_censorship_law) {
-    var rule = g_censorship_law[i];
+  if (tweet_db.data(tweet, 'censorship_law') != g_censorship_law) {
+    classes = [];
+    for (var i in g_censorship_law) {
+      var rule = g_censorship_law[i];
 
-    var keys = rule.property.split('.');
-    var value = tweet;
-    for (var j in keys) {
-      if (value == null || value == undefined)
-        break;
-      var value = value[keys[j]];
+      var keys = rule.property.split('.');
+      var value = tweet;
+      for (var j in keys) {
+        if (value == null || value == undefined)
+          break;
+        var value = value[keys[j]];
+      }
+
+      if (rule.pattern.test(to_string(value)))
+        classes.push.apply(classes, rule.classes);
     }
-
-    if (rule.pattern.test(to_string(value)))
-      classes.push.apply(classes, rule.classes);
+    tweet_db.data(tweet, 'censorship_classes', classes);
+    tweet_db.data(tweet, 'censorship_law', g_censorship_law);
+  } else {
+    classes = tweet_db.data(tweet, 'censorship_classes');
   }
 
   var p = calculate_spam_probability(tweet);
