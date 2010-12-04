@@ -681,14 +681,14 @@ function merge_tweets_n2o(tweet_sets)  //{{{3
     var tweets = tweet_sets[i];
     for (var j in tweets) {
       var t = tweets[j];
-      if (tweet_table[t.id] == null) {
-        tweet_table[t.id] = t;
-        tweet_ids.push(t.id);
+      if (tweet_table[t.id_str] == null) {
+        tweet_table[t.id_str] = t;
+        tweet_ids.push(t.id_str);
       }
     }
   }
 
-  tweet_ids.sort(function (a, b) {return a - b;});
+  tweet_ids.sort(compare_tweet_ids);
   tweet_ids.reverse();
 
     // newest, ..., oldest
