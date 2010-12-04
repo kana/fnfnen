@@ -661,7 +661,7 @@ function callback_update(response, name_since_id, queue_id)  //{{{3
       var NEWEST_TWEET_INDEX = 0;
       GLOBAL_VARIABLES[name_since_id] = Math.max(
         GLOBAL_VARIABLES[name_since_id],
-        new_tweets_n2o[NEWEST_TWEET_INDEX].id
+        new_tweets_n2o[NEWEST_TWEET_INDEX].id_str
       );
     }
   } else {
