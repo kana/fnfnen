@@ -1,5 +1,10 @@
 describe('Core', function () {
   describe('html_from_tweet', function () {
+    g_preferences = {};
+    g_preferences.tweet_html_template = function () {
+      return DEFAULT_TWEET_HTML_TEMPLATE;
+    };
+
     var tweet = {
       created_at: 'Wed Sep 08 14:01:49 +0000 2010',
       id: 18,
