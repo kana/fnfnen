@@ -1589,6 +1589,7 @@ function PreferenceForm()  //{{{2
 function TweetDatabase()  //{{{2
 {
   this._db = {};  // tweet_id: tweet
+  this._data_db = {};  // tweet_id: {arbitrary_key: arbitrary_value}
 
   this.add = function (new_tweets) {
     for (i in new_tweets) {
@@ -1623,6 +1624,22 @@ function TweetDatabase()  //{{{2
 
     save_prafbe_learning_result();
     return;
+  };
+
+  this.data = function (_, key, opt_value) {
+    var id_str = typeof(_) == 'string' ? _ : _.id_str;
+    var d = this._data_db[id_str];
+    if (d == null) {
+      d = {};
+      this._data_db[id_str] = d;
+    }
+
+    if (opt_value == null) {
+      return d[key];
+    } else {
+      d[key] = opt_value;
+      return;
+    }
   };
 
   this.get = function (id_str) {
