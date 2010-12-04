@@ -1393,7 +1393,12 @@ function tokenize_object(object)  //{{{2
 
 function tokenize_tweet(tweet)  //{{{2
 {
-  return tokenize_object(tweet);
+  var tokens = tweet_db.data(tweet, 'prafbe_tokens');
+  if (tokens == null) {
+    tokens = tokenize_object(tweet);
+    tweet_db.data(tweet, 'prafbe_tokens', tokens);
+  }
+  return tokens;
 }
 
 
