@@ -440,7 +440,7 @@ function node_from_tweet(tweet)  //{{{2
     node_tweet.data('json', tweet);
 
     node_tweet.addClass('tweet');
-    node_tweet.addClass(class_name_from_tweet_id(tweet.id));
+    node_tweet.addClass(class_name_from_tweet_id(tweet.id_str));
     if (tweet_mention_p(tweet))
       node_tweet.addClass('mention');
     if (tweet_mine_p(tweet))
