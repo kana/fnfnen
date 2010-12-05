@@ -4,6 +4,8 @@ describe('Core', function () {
     g_preferences.tweet_html_template = function () {
       return DEFAULT_TWEET_HTML_TEMPLATE;
     };
+    tweet_db.data('81', 'prafbe_learning_bias', 0);
+    tweet_db.data('81', 'prafbe_result', 0.1234);
 
     var tweet = {
       created_at: 'Wed Sep 08 14:01:49 +0000 2010',
@@ -133,8 +135,8 @@ describe('Core', function () {
       ]));
     });
     it('should reflect "prafbe_result" status', function () {
-      var t = $.extend({}, tweet, {prafbe_result: 0.9876});
-      expect(html_from_tweet(t)).toEqual(string_from_tree([
+      var _ = tweet_db.data(tweet, 'prafbe_result', 0.9876);
+      expect(html_from_tweet(tweet)).toEqual(string_from_tree([
         '<span class="debug prafbe">9876</span>',
         t_user_icon,
         t_screen_name,
@@ -145,10 +147,13 @@ describe('Core', function () {
         t_button_to_learn_tweet_as_right,
         t_button_to_learn_tweet_as_wrong,
       ]));
+      tweet_db.data(tweet, 'prafbe_result', _);
     });
     it('should reflect "prafbe_learning_bias" status', function () {
-      var t1 = $.extend({}, tweet, {prafbe_learning_bias: 12});
-      expect(html_from_tweet(t1)).toEqual(string_from_tree([
+      var _;
+
+      _ = tweet_db.data(tweet, 'prafbe_learning_bias', 12);
+      expect(html_from_tweet(tweet)).toEqual(string_from_tree([
         t_prafbe_information,
         t_user_icon,
         t_screen_name,
@@ -164,9 +169,10 @@ describe('Core', function () {
         ],
         t_button_to_learn_tweet_as_wrong,
       ]));
+      tweet_db.data(tweet, 'prafbe_learning_bias', _);
 
-      var t2 = $.extend({}, tweet, {prafbe_learning_bias: -34});
-      expect(html_from_tweet(t2)).toEqual(string_from_tree([
+      _ = tweet_db.data(tweet, 'prafbe_learning_bias', -34);
+      expect(html_from_tweet(tweet)).toEqual(string_from_tree([
         t_prafbe_information,
         t_user_icon,
         t_screen_name,
@@ -182,6 +188,7 @@ describe('Core', function () {
           '</a>',
         ],
       ]));
+      tweet_db.data(tweet, 'prafbe_learning_bias', _);
     });
   });
   describe('make_links_in_text', function () {
