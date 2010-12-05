@@ -2439,6 +2439,9 @@ $(document).ready(function () {  //{{{2
 
   raise_event('ready');
 
+  $(document).bind('keyup', 'ctrl+j', function () {show_balloon('j');})
+  $(document).bind('keyup', 'k', function () {show_balloon('k');})
+
   if (g_parameters['automatic_update'])
     update();
 });
