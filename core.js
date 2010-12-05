@@ -67,16 +67,20 @@ var TWITTER_SEARCH_URI = 'http://search.twitter.com/search?q=';
 var TWITTER_UI_URI = 'http://twitter.com/';
 
 var DEFAULT_TWEET_HTML_TEMPLATE = [
+  '<span class="main">',
   '{prafbe_information}',
   '{user_icon}',
   '{screen_name}',
   '{text}',
+  '</span>',
+  '<span class="meta">',
   '{posted_time}',
   '{button_to_reply}',
   '{button_to_show_conversation}',
   '{button_to_toggle_favorite}',
   '{button_to_learn_as_a_right_tweet}',
   '{button_to_learn_as_a_wrong_tweet}',
+  '</span>',
 ].join(''),
 
 
