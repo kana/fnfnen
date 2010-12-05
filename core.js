@@ -1650,8 +1650,9 @@ function TweetDatabase()  //{{{2
     if (opt_value == null) {
       return d[key];
     } else {
+      var previous_value = d[key];
       d[key] = opt_value;
-      return;
+      return previous_value;
     }
   };
 
