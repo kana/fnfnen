@@ -1990,6 +1990,54 @@ var load_cross_domain_script = (function () {  //{{{2
 
 
 
+function make(_steps)  //{{{2
+{
+  var steps = $.extend(true, {}, _steps);
+  var step_names = [];
+  for (var ks in steps)
+    step_names.push(ks);
+  step_names.sort()
+
+  var completed_p = false;
+  while (!completed_p) {
+    completed_p = true;
+
+    var still_running_p = false;
+    for (var i in step_names) {
+      var s = steps[step_names[i]];
+      var this_completed_p = s.executed_p;
+      var requirements_ready_p = s.requirements.every(function (step_name) {
+        return steps[step_name].executed_p;
+      });
+
+      completed_p = completed_p && this_completed_p;
+      if (requirements_ready_p && !this_completed_p) {
+        s.procedure();
+        s.executed_p = true;
+        still_running_p = true;
+      }
+    }
+
+    if ((!completed_p) && (!still_running_p)) {
+      throw new Error(
+        'make: Infinite loop.  Current status is:'
+        + step_names.map(function (step_name) {
+          return [
+            step_name,
+            ': ',
+            (steps[step_name].executed_p ? 'done' : '-'),
+          ].join('');
+        }).join('\n')
+      );
+    }
+  }
+
+  return;
+}
+
+
+
+
 function nop()  //{{{2
 {
   return;

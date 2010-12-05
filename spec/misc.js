@@ -119,6 +119,70 @@ describe('Misc.', function () {
       // expect().toEqual('FIXME: Not implemented yet');
     });
   });
+  describe('make', function () {
+    it('should execute independent steps', function () {
+      var xs = [];
+      var steps = {
+        a: {procedure: function () {xs.push('a');}, requirements: []},
+        b: {procedure: function () {xs.push('b');}, requirements: []},
+        c: {procedure: function () {xs.push('c');}, requirements: []},
+      };
+
+      make(steps);
+      expect(xs).toEqual(['a', 'b', 'c']);
+    });
+    it('should execute requirements first', function () {
+      var xs = [];
+      var steps = {
+        a: {procedure: function () {xs.push('a');}, requirements: ['b']},
+        b: {procedure: function () {xs.push('b');}, requirements: []},
+        c: {procedure: function () {xs.push('c');}, requirements: ['b']},
+      };
+
+      make(steps);
+      expect(xs).toEqual(['b', 'c', 'a']);
+    });
+    it('should execute requirements recursively', function () {
+      var xs = [];
+      var steps = {
+        a: {procedure: function () {xs.push('a');}, requirements: ['b', 'c']},
+        b: {procedure: function () {xs.push('b');}, requirements: ['e']},
+        c: {procedure: function () {xs.push('c');}, requirements: ['d']},
+        d: {procedure: function () {xs.push('d');}, requirements: ['e']},
+        e: {procedure: function () {xs.push('e');}, requirements: []},
+      };
+
+      make(steps);
+      expect(xs).toEqual(['e', 'b', 'd', 'c', 'a']);
+    });
+    it('should raise error for infinite loop: case 1', function () {
+      var xs = [];
+      var steps = {
+        a: {procedure: function () {xs.push('a');}, requirements: ['a']},
+      };
+
+      expect(function () {make(steps);}).toThrow();
+    });
+    it('should raise error for infinite loop: case 2', function () {
+      var xs = [];
+      var steps = {
+        a: {procedure: function () {xs.push('a');}, requirements: ['b']},
+        b: {procedure: function () {xs.push('b');}, requirements: ['c']},
+        c: {procedure: function () {xs.push('b');}, requirements: ['a']},
+      };
+
+      expect(function () {make(steps);}).toThrow();
+    });
+    it('should not have side effects', function () {
+      var xs = [];
+      var steps = {
+        a: {procedure: function () {xs.push('a');}, requirements: []},
+      };
+
+      make(steps);
+      expect(steps.a.executed_p).not.toBeDefined();
+    });
+  });
   describe('nop', function () {
     it('should do nothing', function () {
       expect(nop instanceof Function).toBeTruthy();
