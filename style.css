@@ -121,6 +121,10 @@ body
   border-top: solid thin;
   padding: 1ex;
 }
+
+.tweet .main {display: inline-block; width: 80%;}
+.tweet .meta {display: inline-block; width: 20%; text-align: right;}
+
 .tweet * {vertical-align: middle;}
 .tweet .posted_time {font-size: 80%; white-space: nowrap;}
 .tweet .screen_name,
