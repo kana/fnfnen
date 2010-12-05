@@ -2277,22 +2277,7 @@ $(document).ready(function () {  //{{{2
       procedure: function () {
         g_preferences = new PreferenceForm();
 
-        g_preferences.register(
-          'update_interval_sec',
-          DEFAULT_UPDATE_INTERVAL_SEC,
-          {
-            minimum_value: MINIMUM_UPDATE_INTERVAL_SEC,
-            on_application: function () {
-              reset_automatic_update_timer(this());
-            }
-          }
-        );
-        g_preferences.register(
-          'request_timeout_interval_sec',
-          15
-        );
-        g_preferences.register(
-          'custom_stylesheet',
+        g_preferences.register('custom_stylesheet',  //{{{
           '/* .user_icon {display: inline;} ... */',
           {
             form_type: 'textarea',
@@ -2309,21 +2294,15 @@ $(document).ready(function () {  //{{{2
             },
             rows: 10
           }
-        );
-        g_preferences.register(
-          'plugins',
-          '',
+        );  //}}}
+        g_preferences.register('tweet_html_template',  //{{{
+          DEFAULT_TWEET_HTML_TEMPLATE,
           {
             form_type: 'textarea',
-            on_application: function () {
-              var plugin_uris = this().split('\n');
-              load_plugins(plugin_uris);
-            },
-            rows: 10
+            rows: 3,
           }
-        );
-        g_preferences.register(
-          'censorship_law',
+        );  //}}}
+        g_preferences.register('censorship_law',  //{{{
           [
             '# Lines start with "#" are comments, so that they are ignored.',
             '# Blank lines are also ignored.',
@@ -2363,9 +2342,8 @@ $(document).ready(function () {  //{{{2
             },
             rows: 10
           }
-        );
-        g_preferences.register(
-          'censored_columns',
+        );  //}}}
+        g_preferences.register('censored_columns',  //{{{
           [
             '# Lines start with "#" are comments, so that they are ignored.',
             '# Blank lines are also ignored.',
@@ -2395,52 +2373,41 @@ $(document).ready(function () {  //{{{2
             },
             rows: 10
           }
-        );
-        g_preferences.register(
-          'tweet_html_template',
-          DEFAULT_TWEET_HTML_TEMPLATE,
+        );  //}}}
+        g_preferences.register('plugins',  //{{{
+          '',
           {
             form_type: 'textarea',
-            rows: 3,
+            on_application: function () {
+              var plugin_uris = this().split('\n');
+              load_plugins(plugin_uris);
+            },
+            rows: 10
           }
-        );
-        g_preferences.register(
-          'prafbe_right_dict',
-          {},
+        );  //}}}
+        g_preferences.register('update_interval_sec',  //{{{
+          DEFAULT_UPDATE_INTERVAL_SEC,
           {
-            form_type: 'textarea',
+            minimum_value: MINIMUM_UPDATE_INTERVAL_SEC,
+            on_application: function () {
+              reset_automatic_update_timer(this());
+            }
+          }
+        );  //}}}
+
+        g_preferences.register('request_timeout_interval_sec',  //{{{
+          15,
+          {
             is_advanced_p: true,
-            read_only_p: true,
-            rows: 3,
           }
-        );
-        g_preferences.register(
-          'prafbe_wrong_dict',
-          {},
-          {
-            form_type: 'textarea',
-            is_advanced_p: true,
-            read_only_p: true,
-            rows: 3,
-          }
-        );
-        g_preferences.register(
-          'spam_probability_threshold',
+        );  //}}}
+        g_preferences.register('spam_probability_threshold',  //{{{
           0.90,
           {
             is_advanced_p: true,
           }
-        );
-        g_preferences.register(
-          'last_learned_tweet_id',
-          '-13',  // Dummy tweet id which is less than any tweet id.
-          {
-            is_advanced_p: true,
-            read_only_p: true,
-          }
-        );
-        g_preferences.register(
-          'external_configuration_uri',
+        );  //}}}
+        g_preferences.register('external_configuration_uri',  //{{{
           '',
           {
             // Should apply at the last to override already applied values.
@@ -2455,7 +2422,32 @@ $(document).ready(function () {  //{{{2
               }
             }
           }
-        );
+        );  //}}}
+        g_preferences.register('last_learned_tweet_id',  //{{{
+          '-13',  // Dummy tweet id which is less than any tweet id.
+          {
+            is_advanced_p: true,
+            read_only_p: true,
+          }
+        );  //}}}
+        g_preferences.register('prafbe_right_dict',  //{{{
+          {},
+          {
+            form_type: 'textarea',
+            is_advanced_p: true,
+            read_only_p: true,
+            rows: 3,
+          }
+        );  //}}}
+        g_preferences.register('prafbe_wrong_dict',  //{{{
+          {},
+          {
+            form_type: 'textarea',
+            is_advanced_p: true,
+            read_only_p: true,
+            rows: 3,
+          }
+        );  //}}}
 
         g_preferences.apply('initialization');
       },
