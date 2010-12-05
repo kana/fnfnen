@@ -225,9 +225,24 @@ body {color: #000; background-color: #eee;}
 
 .tweet_hub,
 .tweet {border-color: #ccc;}
+.tweet:active,
+.tweet:focus,
+.tweet:hover {background-color: #ffe !important;}
 
 .tweet.mention {background-color: #fed;}
 .tweet.mine {background-color: #efe;}
+.tweet.spam {background-color: #ddd;}
+
+.tweet.score0 {color: #000000;}
+.tweet.score1 {color: #141414;}
+.tweet.score2 {color: #282828;}
+.tweet.score3 {color: #3d3d3d;}
+.tweet.score4 {color: #515151;}
+.tweet.score5 {color: #666666;}
+.tweet.score6 {color: #7a7a7a;}
+.tweet.score7 {color: #8e8e8e;}
+.tweet.score8 {color: #a3a3a3;}
+.tweet.score9 {color: #b7b7b7;}
 
 .tweet .posted_time {color: #666;}
 .tweet .screen_name {color: #000;}
