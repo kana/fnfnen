@@ -219,6 +219,7 @@ function fnfnen_external_configuration(data)  //{{{2
 
 function html_from_tweet(tweet)  //{{{2
 {
+  var bias = tweet_db.data(tweet, 'prafbe_learning_bias');
   var values = {
     prafbe_information: [
       'span',
@@ -226,7 +227,7 @@ function html_from_tweet(tweet)  //{{{2
         '@',
         ['class', 'debug prafbe'],
       ],
-      format_probability(tweet.prafbe_result),
+      format_probability(tweet_db.data(tweet, 'prafbe_result')),
     ],
     user_icon: [
       'a',
@@ -316,8 +317,8 @@ function html_from_tweet(tweet)  //{{{2
         ['class', 'button prafbe'],
         ['href', 'javascript:learn_tweet(\''+tweet.id_str+'\', true, true)'],
       ],
-      (0 < tweet.prafbe_learning_bias
-       ? '&#x25b2;' + tweet.prafbe_learning_bias.toString()
+      (0 < bias
+       ? '&#x25b2;' + bias.toString()
        : '&#x25b3;'),
     ],
     button_to_learn_as_a_wrong_tweet: [
@@ -327,8 +328,8 @@ function html_from_tweet(tweet)  //{{{2
         ['class', 'button prafbe'],
         ['href', 'javascript:learn_tweet(\''+tweet.id_str+'\', false, true)'],
       ],
-      (tweet.prafbe_learning_bias < 0
-       ? '&#x25bc;' + Math.abs(tweet.prafbe_learning_bias).toString()
+      (bias < 0
+       ? '&#x25bc;' + Math.abs(bias).toString()
        : '&#x25bd;'),
     ],
   };
@@ -347,23 +348,23 @@ function html_from_tweet(tweet)  //{{{2
 function learn_tweet(tweet_id, right_tweet_p, interactive_p)  //{{{2
 {
   var tweet = tweet_db.get(tweet_id);
-  tweet.prafbe_learning_bias = (tweet.prafbe_learning_bias || 0);
+  var bias = (tweet_db.data(tweet, 'prafbe_learning_bias') || 0);
 
   var tokens = tokenize_tweet(tweet);
   var step = function () {
     if (right_tweet_p) {
-      if (0 <= tweet.prafbe_learning_bias)
+      if (0 <= bias)
         prafbe.learn(g_preferences.prafbe_right_dict(), tokens);
       else
         prafbe.unlearn(g_preferences.prafbe_wrong_dict(), tokens);
     } else {
-      if (tweet.prafbe_learning_bias <= 0)
+      if (bias <= 0)
         prafbe.learn(g_preferences.prafbe_wrong_dict(), tokens);
       else
         prafbe.unlearn(g_preferences.prafbe_right_dict(), tokens);
     }
     g_prafbe_learning_count++;
-    tweet.prafbe_learning_bias += (right_tweet_p ? 1 : -1);
+    bias += (right_tweet_p ? 1 : -1);
   };
   var old_status = is_spam_tweet_p(tweet);
   var new_status = old_status;
@@ -374,9 +375,10 @@ function learn_tweet(tweet_id, right_tweet_p, interactive_p)  //{{{2
     var learned_wrong_tweet_as_wrong_p = (old_status && (!right_tweet_p));
     if (learned_right_tweet_as_right_p || learned_wrong_tweet_as_wrong_p)
       break;
-    if (tweet.prafbe_learning_bias != 0)
+    if (bias != 0)
       new_status = is_spam_tweet_p(tweet);
   }
+  tweet_db.data(tweet, 'prafbe_learning_bias', bias);
 
   if (interactive_p) {
     // It's caller's duty to save non-interactive learning result.
@@ -835,22 +837,30 @@ function censored_tweet_p(tweet, required_classes)  //{{{2
 
 function censorship_classes_from_tweet(tweet)  //{{{2
 {
-  var classes = [];
+  var classes;
 
-  for (var i in g_censorship_law) {
-    var rule = g_censorship_law[i];
+  if (tweet_db.data(tweet, 'censorship_law') != g_censorship_law) {
+    classes = [];
+    for (var i in g_censorship_law) {
+      var rule = g_censorship_law[i];
 
-    var keys = rule.property.split('.');
-    var value = tweet;
-    for (var j in keys) {
-      if (value == null || value == undefined)
-        break;
-      var value = value[keys[j]];
+      var keys = rule.property.split('.');
+      var value = tweet;
+      for (var j in keys) {
+        if (value == null || value == undefined)
+          break;
+        var value = value[keys[j]];
+      }
+
+      if (rule.pattern.test(to_string(value)))
+        classes.push.apply(classes, rule.classes);
     }
-
-    if (rule.pattern.test(to_string(value)))
-      classes.push.apply(classes, rule.classes);
+    tweet_db.data(tweet, 'censorship_classes', classes);
+    tweet_db.data(tweet, 'censorship_law', g_censorship_law);
+  } else {
+    classes = tweet_db.data(tweet, 'censorship_classes');
   }
+  classes = classes.slice(0);
 
   var p = calculate_spam_probability(tweet);
   classes.push(is_spam_tweet_p(tweet)
@@ -1319,30 +1329,22 @@ function register_plugin(plugin)  //{{{2
 // Prafbe  {{{1
 function calculate_spam_probability(tweet)  //{{{2
 {
-  var p = tweet.prafbe_result;
-  if (p == null
-      || tweet.prafbe_learning_count == null
-      || tweet.prafbe_learning_count < g_prafbe_learning_count)
-  {
-    var tokens = tokenize_tweet(tweet);
-    var itokens = prafbe.list_most_interesting_tokens(
+  var p = tweet_db.data(tweet, 'prafbe_result');
+  var c = tweet_db.data(tweet, 'prafbe_learning_count');
+  if (p == null || c == null || c < g_prafbe_learning_count) {
+    var tokens = prafbe.list_most_interesting_tokens(
       g_preferences.prafbe_right_dict(),
       g_preferences.prafbe_wrong_dict(),
-      tokens,
-      15
+      tokenize_tweet(tweet),
+      15,
+      true
     );
-    var ps = itokens.map(function (x) {
-      return prafbe.calculate_spamness(
-        g_preferences.prafbe_right_dict(),
-        g_preferences.prafbe_wrong_dict(),
-        x
-      );
-    });
+    var ps = tokens.map(function (x) {return x[2];});
     p = prafbe.calculate_spam_probability(ps);
   }
 
-  tweet.prafbe_learning_count = g_prafbe_learning_count;
-  tweet.prafbe_result = p;
+  tweet_db.data(tweet, 'prafbe_learning_count', g_prafbe_learning_count);
+  tweet_db.data(tweet, 'prafbe_result', p);
 
   return p;
 }
@@ -1399,7 +1401,12 @@ function tokenize_object(object)  //{{{2
 
 function tokenize_tweet(tweet)  //{{{2
 {
-  return tokenize_object(tweet);
+  var tokens = tweet_db.data(tweet, 'prafbe_tokens');
+  if (tokens == null) {
+    tokens = tokenize_object(tweet);
+    tweet_db.data(tweet, 'prafbe_tokens', tokens);
+  }
+  return tokens;
 }
 
 
@@ -1595,6 +1602,7 @@ function PreferenceForm()  //{{{2
 function TweetDatabase()  //{{{2
 {
   this._db = {};  // tweet_id: tweet
+  this._data_db = {};  // tweet_id: {arbitrary_key: arbitrary_value}
 
   this.add = function (new_tweets) {
     for (i in new_tweets) {
@@ -1629,6 +1637,23 @@ function TweetDatabase()  //{{{2
 
     save_prafbe_learning_result();
     return;
+  };
+
+  this.data = function (_, key, opt_value) {
+    var id_str = typeof(_) == 'string' ? _ : _.id_str;
+    var d = this._data_db[id_str];
+    if (d == null) {
+      d = {};
+      this._data_db[id_str] = d;
+    }
+
+    if (opt_value == null) {
+      return d[key];
+    } else {
+      var previous_value = d[key];
+      d[key] = opt_value;
+      return previous_value;
+    }
   };
 
   this.get = function (id_str) {
