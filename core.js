@@ -55,6 +55,7 @@
 var DEFAULT_APPLYING_PRIORITY = 0;
 var DEFAULT_UPDATE_INTERVAL_SEC = 5 * 60;
 var DUMMY_SINCE_ID = '1';
+var EVERYTHING_REQUIRED = true;
 var GLOBAL_VARIABLES = window;
 var HOME_COLUMN_NAME = 'Home';
 var LAST_APPLYING_PRIORITY = 1000;
@@ -1992,11 +1993,20 @@ var load_cross_domain_script = (function () {  //{{{2
 
 function make(_steps)  //{{{2
 {
-  var steps = $.extend(true, {}, _steps);
   var step_names = [];
-  for (var ks in steps)
+  for (var ks in _steps)
     step_names.push(ks);
   step_names.sort()
+
+  var steps = $.extend(true, {}, _steps);
+  for (var i in steps) {
+    var s = steps[i];
+    if (s.requirements === EVERYTHING_REQUIRED) {
+      s.requirements = step_names.filter(function (j) {
+        return (j != i) && (steps[j].requirements !== EVERYTHING_REQUIRED);
+      });
+    }
+  }
 
   var completed_p = false;
   while (!completed_p) {

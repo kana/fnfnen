@@ -182,6 +182,20 @@ describe('Misc.', function () {
       make(steps);
       expect(steps.a.executed_p).not.toBeDefined();
     });
+    it('should execute steps which require everything', function () {
+      var e = EVERYTHING_REQUIRED;
+      var xs = [];
+      var steps = {
+        a: {procedure: function () {xs.push('a');}, requirements: []},
+        b: {procedure: function () {xs.push('b');}, requirements: e},
+        c: {procedure: function () {xs.push('c');}, requirements: []},
+        d: {procedure: function () {xs.push('d');}, requirements: e},
+        e: {procedure: function () {xs.push('e');}, requirements: []},
+      };
+
+      make(steps);
+      expect(xs).toEqual(['a', 'c', 'e', 'b', 'd']);
+    });
   });
   describe('nop', function () {
     it('should do nothing', function () {
