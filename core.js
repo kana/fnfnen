@@ -860,6 +860,7 @@ function censorship_classes_from_tweet(tweet)  //{{{2
   } else {
     classes = tweet_db.data(tweet, 'censorship_classes');
   }
+  classes = classes.slice(0);
 
   var p = calculate_spam_probability(tweet);
   classes.push(is_spam_tweet_p(tweet)
