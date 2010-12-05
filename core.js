@@ -52,13 +52,11 @@
 // Variables  {{{1
 // Constants  {{{2
 
-var DEFAULT_APPLYING_PRIORITY = 0;
 var DEFAULT_UPDATE_INTERVAL_SEC = 5 * 60;
 var DUMMY_SINCE_ID = '1';
 var EVERYTHING_REQUIRED = true;
 var GLOBAL_VARIABLES = window;
 var HOME_COLUMN_NAME = 'Home';
-var LAST_APPLYING_PRIORITY = 1000;
 var MAX_COUNT_HOME = 200;
 var MAX_COUNT_MENTIONS = 200;
 var MAX_TWEET_CONTENT = 140;
@@ -1428,7 +1426,6 @@ function Preference(id, default_value, opt_kw)  //{{{2
     }
   };
 
-  _.applying_priority = kw.applying_priority || DEFAULT_APPLYING_PRIORITY;
   _.columns = kw.columns || 80;
   _.default_value = default_value;
   _.form_type = kw.form_type || 'text';
@@ -1438,6 +1435,7 @@ function Preference(id, default_value, opt_kw)  //{{{2
   _.minimum_value = kw.minimum_value || Number.MIN_VALUE;
   _.on_application = kw.on_application || nop;
   _.read_only_p = kw.read_only_p || false;  // User cannot modify value.
+  _.requirements = kw.requirements || [];
   _.rows = kw.rows || 25;
   _.value_type = typeof(default_value);
   _.view_only_p = kw.view_only_p || false;  // Value will never be saved.
@@ -1550,16 +1548,16 @@ function PreferenceForm()  //{{{2
                                         ? false
                                         : opt_mode);
 
-    var priorities = [];  // [[applying_priority, id], ...]
-    for (var id in this.preference_items)
-      priorities.push([this.preference_items[id].applying_priority, id]);
-    priorities.sort();
-
-    for (var _ in priorities) {
-      this.preference_items[priorities[_][1]].apply(
-        via_external_configuration_p
-      );
+    var steps = {};
+    for (var id in this.preference_items) {
+      steps[id] = (function (p) {
+        return {
+          procedure: function () {p.apply(via_external_configuration_p);},
+          requirements: p.requirements,
+        };
+      })(this.preference_items[id]);
     }
+    make(steps);
 
     // Notify to user.
     var actually_applied_p = (
@@ -2320,13 +2318,11 @@ $(document).ready(function () {  //{{{2
             ''
           ].join('\n'),
           {
-            applying_priority: (
-              g_preferences.censorship_law.applying_priority + 1
-            ),
             form_type: 'textarea',
             on_application: function () {
               set_up_censored_columns(this());
             },
+            requirements: ['censorship_law'],
             rows: 10
           }
         );  //}}}
@@ -2366,8 +2362,6 @@ $(document).ready(function () {  //{{{2
         g_preferences.register('external_configuration_uri',  //{{{
           '',
           {
-            // Should apply at the last to override already applied values.
-            applying_priority: LAST_APPLYING_PRIORITY,
             is_advanced_p: true,
             on_application: function (via_external_configuration_p) {
               if (!via_external_configuration_p) {
@@ -2376,7 +2370,8 @@ $(document).ready(function () {  //{{{2
                   load_cross_domain_script(this());
                 }
               }
-            }
+            },
+            requirements: EVERYTHING_REQUIRED,
           }
         );  //}}}
         g_preferences.register('last_learned_tweet_id',  //{{{
