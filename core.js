@@ -1491,9 +1491,23 @@ function Preference(id, default_value, opt_kw)  //{{{2
   };
 
   _.initialize_form = function () {
+    var node_reset_button = create_element('input');
+    node_reset_button.attr('type', 'button');
+    node_reset_button.attr('value', 'Reset');
+    node_reset_button.click(function () {
+      // There is more simple way to reset value: _(_.default_value).  But it
+      // automatically saves and applies new value.  The reset button is used
+      // when user edits preferences.  So that saving and applying should be
+      // executed via the "Apply" button.
+      _.current_value = _.default_value;
+      _.set_form();
+    });
+
     var node_dt = create_element('dt');
     node_dt.text(englishize(_.id)
                  + (_.read_only_p ? ' (read only)' : ''));
+    node_dt.append(' ');
+    node_dt.append(node_reset_button);
 
     var node_input;
     if (_.form_type == 'textarea') {
