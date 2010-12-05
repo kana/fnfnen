@@ -20,6 +20,7 @@ describe('Core', function () {
       },
       prafbe_result: 0.1234321,
     };
+    var t_main_begin = '<span class="main">';
     var t_prafbe_information = '<span class="debug prafbe">1234</span>';
     var t_user_icon = [
       '<a',
@@ -51,6 +52,8 @@ describe('Core', function () {
       ' hi',
       '</span>',
     ];
+    var t_main_end = '</span>';
+    var t_meta_begin = '<span class="meta">';
     var t_posted_time = [
       '<a class="posted_time" href="http://twitter.com/kana1/status/81">',
       '2010-09-08 23:01:49',
@@ -81,28 +84,36 @@ describe('Core', function () {
       '&#x25bd;',
       '</a>',
     ];
+    var t_meta_end = '</span>';
 
     it('should return a HTML snippet from a tweet', function () {
       var t = $.extend({}, tweet);
       expect(html_from_tweet(t)).toEqual(string_from_tree([
+        t_main_begin,
         t_prafbe_information,
         t_user_icon,
         t_screen_name,
         t_text,
+        t_main_end,
+        t_meta_begin,
         t_posted_time,
         t_button_to_reply,
         t_button_to_toggle_favorite,
         t_button_to_learn_tweet_as_right,
         t_button_to_learn_tweet_as_wrong,
+        t_meta_end,
       ]));
     });
     it('should reflect "favorited" status', function () {
       var t = $.extend({}, tweet, {favorited: true});
       expect(html_from_tweet(t)).toEqual(string_from_tree([
+        t_main_begin,
         t_prafbe_information,
         t_user_icon,
         t_screen_name,
         t_text,
+        t_main_end,
+        t_meta_begin,
         t_posted_time,
         t_button_to_reply,
         '<a class="button favorite"',
@@ -111,15 +122,19 @@ describe('Core', function () {
         '</a>',
         t_button_to_learn_tweet_as_right,
         t_button_to_learn_tweet_as_wrong,
+        t_meta_end,
       ]));
     });
     it('should reflect "in_reply_to_status_id" status', function () {
       var t = $.extend({}, tweet, {in_reply_to_status_id: 8181});
       expect(html_from_tweet(t)).toEqual(string_from_tree([
+        t_main_begin,
         t_prafbe_information,
         t_user_icon,
         t_screen_name,
         t_text,
+        t_main_end,
+        t_meta_begin,
         t_posted_time,
         t_button_to_reply,
         [
@@ -132,20 +147,25 @@ describe('Core', function () {
         t_button_to_toggle_favorite,
         t_button_to_learn_tweet_as_right,
         t_button_to_learn_tweet_as_wrong,
+        t_meta_end,
       ]));
     });
     it('should reflect "prafbe_result" status', function () {
       var _ = tweet_db.data(tweet, 'prafbe_result', 0.9876);
       expect(html_from_tweet(tweet)).toEqual(string_from_tree([
+        t_main_begin,
         '<span class="debug prafbe">9876</span>',
         t_user_icon,
         t_screen_name,
         t_text,
+        t_main_end,
+        t_meta_begin,
         t_posted_time,
         t_button_to_reply,
         t_button_to_toggle_favorite,
         t_button_to_learn_tweet_as_right,
         t_button_to_learn_tweet_as_wrong,
+        t_meta_end,
       ]));
       tweet_db.data(tweet, 'prafbe_result', _);
     });
@@ -154,10 +174,13 @@ describe('Core', function () {
 
       _ = tweet_db.data(tweet, 'prafbe_learning_bias', 12);
       expect(html_from_tweet(tweet)).toEqual(string_from_tree([
+        t_main_begin,
         t_prafbe_information,
         t_user_icon,
         t_screen_name,
         t_text,
+        t_main_end,
+        t_meta_begin,
         t_posted_time,
         t_button_to_reply,
         t_button_to_toggle_favorite,
@@ -168,15 +191,19 @@ describe('Core', function () {
           '</a>',
         ],
         t_button_to_learn_tweet_as_wrong,
+        t_meta_end,
       ]));
       tweet_db.data(tweet, 'prafbe_learning_bias', _);
 
       _ = tweet_db.data(tweet, 'prafbe_learning_bias', -34);
       expect(html_from_tweet(tweet)).toEqual(string_from_tree([
+        t_main_begin,
         t_prafbe_information,
         t_user_icon,
         t_screen_name,
         t_text,
+        t_main_end,
+        t_meta_begin,
         t_posted_time,
         t_button_to_reply,
         t_button_to_toggle_favorite,
@@ -187,6 +214,7 @@ describe('Core', function () {
           '&#x25bc;34',
           '</a>',
         ],
+        t_meta_end,
       ]));
       tweet_db.data(tweet, 'prafbe_learning_bias', _);
     });
