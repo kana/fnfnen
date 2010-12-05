@@ -1431,6 +1431,7 @@ function Preference(id, default_value, opt_kw)  //{{{2
   _.columns = kw.columns || 80;
   _.default_value = default_value;
   _.form_type = kw.form_type || 'text';
+  _.help_text = kw.help_text || null;
   _.id = id;
   _.is_advanced_p = (kw.is_advanced_p != null ? kw.is_advanced_p : false);
   _.maximum_value = kw.maximum_value || Number.MAX_VALUE;
@@ -1484,9 +1485,20 @@ function Preference(id, default_value, opt_kw)  //{{{2
   };
 
   _.initialize_form = function () {
+    var node_help_button = create_element('input');
+    node_help_button.attr('type', 'button');
+    node_help_button.val('?');
+    node_help_button.click(function () {
+      alert(_.help_text);
+    });
+
     var node_dt = create_element('dt');
     node_dt.text(englishize(_.id)
                  + (_.read_only_p ? ' (read only)' : ''));
+    if (_.help_text) {
+      node_dt.append(' ');
+      node_dt.append(node_help_button);
+    }
 
     var node_input;
     if (_.form_type == 'textarea') {
