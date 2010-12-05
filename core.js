@@ -2138,59 +2138,6 @@ function tree_from_jsxn_element(jsxn_element)  //{{{2
 
 
 // Main  {{{1
-function initialize(steps)  //{{{2
-{
-  var completed_p = false;
-  var executed_p = function (x) {return x.executed_p;};
-  var _i = 0;
-  var _result_table = (create_element('table')
-                       .attr('summary', 'Initialization results'));
-
-  var _header_row = create_element('tr');
-  _header_row.append(create_element('th').text('#'));
-  for (var ks in steps)
-    _header_row.append(create_element('th')
-                       .text(ks.replace(/^initialize_/, '')));
-  _result_table.append(_header_row);
-
-  for (var ks in steps) {
-    steps[ks]._requirements = steps[ks].requirements.map(function (x) {
-      return steps[x];
-    });
-  }
-
-  while (!completed_p) {
-    _i++;
-    completed_p = true;
-    var _result_row = create_element('tr');
-    _result_row.append(create_element('th').text(_i));
-
-    for (var ks in steps) {
-      var s = steps[ks];
-
-      completed_p = completed_p && s.executed_p;
-      var requirements_ready_p = s._requirements.every(executed_p);
-      var this_completed_p = executed_p(s);
-      if (requirements_ready_p && !this_completed_p) {
-        s.procedure();
-        s.executed_p = true;
-      }
-
-      _result_row.append(create_element('td').text(
-        (requirements_ready_p ? 'R' : '_') + (this_completed_p ? 'S' : '_')
-      ));
-    }
-
-    _result_table.append(_result_row);
-  }
-
-  $('body').append(_result_table.hide());
-  return;
-}
-
-
-
-
 $(document).ready(function () {  //{{{2
   var executed_in_valid_application_page_p = /fnfnen/.test($('title').text());
   if (!executed_in_valid_application_page_p)
@@ -2473,7 +2420,7 @@ $(document).ready(function () {  //{{{2
     },  //}}}
   };
 
-  initialize(initialization_steps);
+  make(initialization_steps);
 
   log_notice('System', 'Initialization has been completed');
 
