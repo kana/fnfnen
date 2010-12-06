@@ -383,8 +383,15 @@ function learn_tweet(tweet_id, right_tweet_p, interactive_p)  //{{{2
   tweet_db.data(tweet, 'prafbe_learning_bias', bias);
 
   if (interactive_p) {
-    // It's caller's duty to save non-interactive learning result.
-    save_prafbe_learning_result();
+    if (false) {
+      // To improve response time for interactive learn_tweet(),
+      // save_prafbe_learning_result() is not called intentionally.
+      //
+      // Though learning result should be saved at this point, it takes a long
+      // time to save.  And save_prafbe_learning_result() is also called from
+      // TweetDatabase.add() which is periodically called via update().
+      save_prafbe_learning_result();
+    }
 
     var update_view = function (tweet_id) {
       // $('foo').replaceWith($('#bar')) replaces all foo elements with #bar,
