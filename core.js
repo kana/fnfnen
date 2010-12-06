@@ -1452,7 +1452,7 @@ function Preference(id, default_value, opt_kw)  //{{{2
   _.view_only_p = kw.view_only_p || false;  // Value will never be saved.
 
   _.apply = function (via_external_configuration_p) {
-    _.get_form();
+    _.current_value = _.get_form();
     _.save();
     if (via_external_configuration_p) {
       // Leave form content as-is.
@@ -1490,7 +1490,7 @@ function Preference(id, default_value, opt_kw)  //{{{2
       if (_.maximum_value < v)
         v = _.maximum_value;
     }
-    _.current_value = v;
+    return v;
   };
 
   _.initialize_form = function () {
