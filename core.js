@@ -383,8 +383,15 @@ function learn_tweet(tweet_id, right_tweet_p, interactive_p)  //{{{2
   tweet_db.data(tweet, 'prafbe_learning_bias', bias);
 
   if (interactive_p) {
-    // It's caller's duty to save non-interactive learning result.
-    save_prafbe_learning_result();
+    if (false) {
+      // To improve response time for interactive learn_tweet(),
+      // save_prafbe_learning_result() is not called intentionally.
+      //
+      // Though learning result should be saved at this point, it takes a long
+      // time to save.  And save_prafbe_learning_result() is also called from
+      // TweetDatabase.add() which is periodically called via update().
+      save_prafbe_learning_result();
+    }
 
     var update_view = function (tweet_id) {
       // $('foo').replaceWith($('#bar')) replaces all foo elements with #bar,
@@ -1457,8 +1464,10 @@ function Preference(id, default_value, opt_kw)  //{{{2
   _.view_only_p = kw.view_only_p || false;  // Value will never be saved.
 
   _.apply = function (via_external_configuration_p) {
-    _.get_form();
-    _.save();
+    var old_value = _.current_value;
+    _.current_value = _.get_form();
+    if (_.should_save_p(_.current_value, old_value))
+      _.save();
     if (via_external_configuration_p) {
       // Leave form content as-is.
       // But use external configuration if it is available.
@@ -1495,7 +1504,7 @@ function Preference(id, default_value, opt_kw)  //{{{2
       if (_.maximum_value < v)
         v = _.maximum_value;
     }
-    _.current_value = v;
+    return v;
   };
 
   _.initialize_form = function () {
@@ -1508,7 +1517,7 @@ function Preference(id, default_value, opt_kw)  //{{{2
       // when user edits preferences.  So that saving and applying should be
       // executed via the "Apply" button.
       _.current_value = _.default_value;
-      _.set_form();
+      _.set_form(_.encode(_.current_value));
     });
 
     var node_help_button = create_element('input');
@@ -1559,13 +1568,27 @@ function Preference(id, default_value, opt_kw)  //{{{2
   };
 
   _.save = function () {
+    var encoded_value = _.encode(_.current_value);
     if (!(_.view_only_p))
-      $.storage(_.id, _.encode(_.current_value));
-    _.set_form();
+      $.storage(_.id, encoded_value);
+    _.set_form(encoded_value);
   };
 
-  _.set_form = function () {
-    _.node().val(_.encode(_.current_value));
+  _.set_form = function (encoded_value) {
+    _.node().val(encoded_value);
+  };
+
+  _.should_save_p = function (l, r) {
+    if (_.value_type == 'object') {
+      if (_.read_only_p) {
+        // In this case, this preference will never be modified by user.
+        return false;
+      } else {
+        return true;
+      }
+    } else {
+      return l != r;
+    }
   };
 
   _.current_value = _.decode($.storage(id)) || default_value;
