@@ -865,10 +865,15 @@ function censorship_classes_from_tweet(tweet)  //{{{2
   classes = classes.slice(0);
 
   var p = calculate_spam_probability(tweet);
+  var bias = tweet_db.data(tweet, 'prafbe_learning_bias');
   classes.push(is_spam_tweet_p(tweet)
                ? 'spam'
                : 'nonspam');
   classes.push('score' + Math.min(Math.round(p * 10), 9));
+  if (0 < bias)
+    classes.push('bias_plus');
+  if (bias < 0)
+    classes.push('bias_minus');
 
   return classes;
 }
