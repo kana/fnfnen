@@ -58,8 +58,6 @@ var DUMMY_SINCE_ID = '1';
 var GLOBAL_VARIABLES = window;
 var HOME_COLUMN_NAME = 'Home';
 var LAST_APPLYING_PRIORITY = 1000;
-var MAX_COUNT_HOME = 200;
-var MAX_COUNT_MENTIONS = 200;
 var MAX_TWEET_CONTENT = 140;
 var MINIMUM_UPDATE_INTERVAL_SEC = 1 * 60;
 var TWITTER_API_URI = 'http://api.twitter.com/1/';
@@ -778,7 +776,7 @@ function update()  //{{{3
     from: 'Update (home)',
     method: 'get',
     parameters: {
-      count: MAX_COUNT_HOME,
+      count: g_preferences.maximum_number_of_tweets_to_fetch(),
       since_id: g_since_id_home,
     },
     uri: TWITTER_API_URI + 'statuses/home_timeline.json',
@@ -790,7 +788,7 @@ function update()  //{{{3
     from: 'Update (mentions)',
     method: 'get',
     parameters: {
-      count: MAX_COUNT_MENTIONS,
+      count: g_preferences.maximum_number_of_tweets_to_fetch(),
       since_id: g_since_id_mentions,
     },
     uri: TWITTER_API_URI + 'statuses/mentions.json',
@@ -2396,6 +2394,13 @@ $(document).ready(function () {  //{{{2
             on_application: function () {
               reset_automatic_update_timer(this());
             }
+          }
+        );  //}}}
+        g_preferences.register('maximum_number_of_tweets_to_fetch',  //{{{
+          200,
+          {
+            maximum_value: 200,
+            minimum_value: 20,
           }
         );  //}}}
 
