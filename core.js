@@ -1452,8 +1452,10 @@ function Preference(id, default_value, opt_kw)  //{{{2
   _.view_only_p = kw.view_only_p || false;  // Value will never be saved.
 
   _.apply = function (via_external_configuration_p) {
+    var old_value = _.current_value;
     _.current_value = _.get_form();
-    _.save();
+    if (_.should_save_p(_.current_value, old_value))
+      _.save();
     if (via_external_configuration_p) {
       // Leave form content as-is.
       // But use external configuration if it is available.
@@ -1562,6 +1564,19 @@ function Preference(id, default_value, opt_kw)  //{{{2
 
   _.set_form = function (encoded_value) {
     _.node().val(encoded_value);
+  };
+
+  _.should_save_p = function (l, r) {
+    if (_.value_type == 'object') {
+      if (_.read_only_p) {
+        // In this case, this preference will never be modified by user.
+        return false;
+      } else {
+        return true;
+      }
+    } else {
+      return l != r;
+    }
   };
 
   _.current_value = _.decode($.storage(id)) || default_value;
