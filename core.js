@@ -1503,7 +1503,7 @@ function Preference(id, default_value, opt_kw)  //{{{2
       // when user edits preferences.  So that saving and applying should be
       // executed via the "Apply" button.
       _.current_value = _.default_value;
-      _.set_form();
+      _.set_form(_.encode(_.current_value));
     });
 
     var node_help_button = create_element('input');
@@ -1554,13 +1554,14 @@ function Preference(id, default_value, opt_kw)  //{{{2
   };
 
   _.save = function () {
+    var encoded_value = _.encode(_.current_value);
     if (!(_.view_only_p))
-      $.storage(_.id, _.encode(_.current_value));
-    _.set_form();
+      $.storage(_.id, encoded_value);
+    _.set_form(encoded_value);
   };
 
-  _.set_form = function () {
-    _.node().val(_.encode(_.current_value));
+  _.set_form = function (encoded_value) {
+    _.node().val(encoded_value);
   };
 
   _.current_value = _.decode($.storage(id)) || default_value;
