@@ -77,7 +77,7 @@ var DEFAULT_TWEET_HTML_TEMPLATE = [
   '{button_to_toggle_favorite}',
   '{button_to_learn_as_a_right_tweet}',
   '{button_to_learn_as_a_wrong_tweet}',
-].join(''),
+].join('');
 
 
 
