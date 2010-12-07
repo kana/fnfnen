@@ -2075,12 +2075,22 @@ function string_from_tree(tree)  //{{{2
 function replace_stylesheet(id, text)  //{{{2
 {
   // Not all schemas/DTDs define id attribute for style element.
-  // Use title attribute instead.
+  // Use jQuery.data() to identify style element for a given id.
+  //
+  // NB: There is another candidate that is title attribute.  But it can not
+  // be used.  Because style element with title attribute causes unexpected
+  // result.  For example, if there are 3 style elements which have "foo",
+  // "bar" and "baz" as their title attribute values, one of them is applied
+  // and the rest are ignored, at least on Safari 5.  It seems like link
+  // element for alternate stylesheet, but I couldn't find this behavior is
+  // described in any W3C recommendation.
 
-  $('style[title="' + id + '"]').remove();
+  $('style').
+    filter(function () {return $(this).data('id') == id;}).
+    remove();
 
   var node_style = create_element('style');
-  node_style.attr('title', id);
+  node_style.data('id', id);
   node_style.attr('type', 'text/css');
   node_style.text(text);
   $('head').append(node_style);
