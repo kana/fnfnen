@@ -2311,15 +2311,7 @@ $(document).ready(function () {  //{{{2
           {
             form_type: 'textarea',
             on_application: function () {
-              // Not all schemas/DTDs define id attribute for style element.
-              var id = 'fnfnen custom stylesheet';
-              $('style[title="' + id + '"]').remove();
-
-              var node_style = create_element('style');
-              node_style.attr('title', id);
-              node_style.attr('type', 'text/css');
-              node_style.text(this());
-              $('head').append(node_style);
+              replace_stylesheet('fnfnen_custom_stylesheet', this());
             },
             rows: 10
           }
