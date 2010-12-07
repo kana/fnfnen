@@ -2072,6 +2072,23 @@ function string_from_tree(tree)  //{{{2
 
 
 
+function replace_stylesheet(id, text)  //{{{2
+{
+  // Not all schemas/DTDs define id attribute for style element.
+  // Use title attribute instead.
+
+  $('style[title="' + id + '"]').remove();
+
+  var node_style = create_element('style');
+  node_style.attr('title', id);
+  node_style.attr('type', 'text/css');
+  node_style.text(text);
+  $('head').append(node_style);
+}
+
+
+
+
 function to_string(value)  //{{{2
 {
   if (value == null)
