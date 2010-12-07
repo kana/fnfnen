@@ -1002,19 +1002,31 @@ function set_up_censorship_law(rule_text)  //{{{2
 
 function update_censored_columns(tweets_n2o) //{{{2
 {
+  // Tweet views (.tweet) are filtered at CSS level instead of DOM level.
+  // Because tweet views may be updated after they are inserted into a column.
+
   raise_event('new_tweets', {tweets: tweets_n2o});
 
+  for (var column_name in g_censored_columns)
+    add_tweets_n2o_into_column(column(column_name), tweets_n2o);
+
+  var css = [];
+  css.push('.column .tweet {display: none;}\n');
   for (var column_name in g_censored_columns) {
-    var node_column = column(column_name);
     var required_classes = g_censored_columns[column_name];
-    var matches_p = function (t) {
-      return censored_tweet_p(t, required_classes);
-    };
-
-    var censored_tweets_n2o = tweets_n2o.filter(matches_p);
-
-    add_tweets_n2o_into_column(node_column, censored_tweets_n2o);
+    css.push([
+      '.column',
+      '.', class_name_from_column_name(column_name),
+      ' ',
+      '.tweet',
+      required_classes.map(function (x) {return ['.', x];}),
+      ' ',
+      '{display: block;}',
+      '\n',
+    ]);
   }
+  replace_stylesheet('fnfnen_column_filtering_stylesheet',
+                     string_from_tree(css));
 
   return;
 }
