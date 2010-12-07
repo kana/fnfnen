@@ -692,10 +692,11 @@ function callback_update(response, name_since_id, queue_id)  //{{{3
     new_tweets_n2o = response;
 
     if (0 < new_tweets_n2o.length) {
-      var NEWEST_TWEET_INDEX = 0;
-      GLOBAL_VARIABLES[name_since_id] = Math.max(
-        GLOBAL_VARIABLES[name_since_id],
-        new_tweets_n2o[NEWEST_TWEET_INDEX].id_str
+      var newest_id = new_tweets_n2o[0].id_str;
+      GLOBAL_VARIABLES[name_since_id] = (
+        0 < compare_tweet_ids(GLOBAL_VARIABLES[name_since_id], newest_id)
+        ? GLOBAL_VARIABLES[name_since_id]
+        : newest_id
       );
     }
   } else {
