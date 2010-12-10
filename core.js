@@ -1372,6 +1372,30 @@ function save_prafbe_learning_result()  //{{{2
 
 
 
+function serialize_prafbe_dict_into_json(dict)  //{{{2
+{
+  // $.toJSON is too slow for a big prafbe dict though $.toJSON uses
+  // browser-native JSON serializer/parser if it's available.  So that it's
+  // necessary to implement custom JSON serializer for a big prafbe dict to
+  // improve performance.
+  //
+  // For example, suppose d to be a big prafbe dict where $.toJSON(d).length
+  // is roughly equal to 350 KiB.  $.toJSON(d) takes about 3000 ms while
+  // serialize_prafbe_dict_into_json(d) takes less than 90 ms on Safari 5.
+
+  var xs = [];
+  xs.push('{');
+  for (var key in dict)
+    xs.push('"', key, '":', dict[key], ',');
+  if (xs[xs.length - 1] == ',')
+    xs.pop();  // Remove the last extra ','.
+  xs.push('}');
+  return xs.join('');
+}
+
+
+
+
 function tokenize_object(object)  //{{{2
 {
   var result = [];
