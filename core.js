@@ -1015,19 +1015,31 @@ function set_up_censorship_law(rule_text)  //{{{2
 
 function update_censored_columns(tweets_n2o) //{{{2
 {
+  // Tweet views (.tweet) are filtered at CSS level instead of DOM level.
+  // Because tweet views may be updated after they are inserted into a column.
+
   raise_event('new_tweets', {tweets: tweets_n2o});
 
+  for (var column_name in g_censored_columns)
+    add_tweets_n2o_into_column(column(column_name), tweets_n2o);
+
+  var css = [];
+  css.push('.column .tweet {display: none;}\n');
   for (var column_name in g_censored_columns) {
-    var node_column = column(column_name);
     var required_classes = g_censored_columns[column_name];
-    var matches_p = function (t) {
-      return censored_tweet_p(t, required_classes);
-    };
-
-    var censored_tweets_n2o = tweets_n2o.filter(matches_p);
-
-    add_tweets_n2o_into_column(node_column, censored_tweets_n2o);
+    css.push([
+      '.column',
+      '.', class_name_from_column_name(column_name),
+      ' ',
+      '.tweet',
+      required_classes.map(function (x) {return ['.', x];}),
+      ' ',
+      '{display: block;}',
+      '\n',
+    ]);
   }
+  replace_stylesheet('fnfnen_column_filtering_stylesheet',
+                     string_from_tree(css));
 
   return;
 }
@@ -2101,6 +2113,33 @@ function string_from_tree(tree)  //{{{2
 
 
 
+function replace_stylesheet(id, text)  //{{{2
+{
+  // Not all schemas/DTDs define id attribute for style element.
+  // Use jQuery.data() to identify style element for a given id.
+  //
+  // NB: There is another candidate that is title attribute.  But it can not
+  // be used.  Because style element with title attribute causes unexpected
+  // result.  For example, if there are 3 style elements which have "foo",
+  // "bar" and "baz" as their title attribute values, one of them is applied
+  // and the rest are ignored, at least on Safari 5.  It seems like link
+  // element for alternate stylesheet, but I couldn't find this behavior is
+  // described in any W3C recommendation.
+
+  $('style').
+    filter(function () {return $(this).data('id') == id;}).
+    remove();
+
+  var node_style = create_element('style');
+  node_style.data('id', id);
+  node_style.attr('type', 'text/css');
+  node_style.text(text);
+  $('head').append(node_style);
+}
+
+
+
+
 function to_string(value)  //{{{2
 {
   if (value == null)
@@ -2313,15 +2352,7 @@ $(document).ready(function () {  //{{{2
           {
             form_type: 'textarea',
             on_application: function () {
-              // Not all schemas/DTDs define id attribute for style element.
-              var id = 'fnfnen custom stylesheet';
-              $('style[title="' + id + '"]').remove();
-
-              var node_style = create_element('style');
-              node_style.attr('title', id);
-              node_style.attr('type', 'text/css');
-              node_style.text(this());
-              $('head').append(node_style);
+              replace_stylesheet('fnfnen_custom_stylesheet', this());
             },
             rows: 10
           }
