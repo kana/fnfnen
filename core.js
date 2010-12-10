@@ -2467,6 +2467,7 @@ $(document).ready(function () {  //{{{2
         g_preferences.register('prafbe_right_dict',  //{{{
           {},
           {
+            custom_encoder: serialize_prafbe_dict_into_json,
             form_type: 'textarea',
             is_advanced_p: true,
             read_only_p: true,
@@ -2476,6 +2477,7 @@ $(document).ready(function () {  //{{{2
         g_preferences.register('prafbe_wrong_dict',  //{{{
           {},
           {
+            custom_encoder: serialize_prafbe_dict_into_json,
             form_type: 'textarea',
             is_advanced_p: true,
             read_only_p: true,
