@@ -1462,6 +1462,7 @@ function Preference(id, default_value, opt_kw)  //{{{2
 
   _.applying_priority = kw.applying_priority || DEFAULT_APPLYING_PRIORITY;
   _.columns = kw.columns || 80;
+  _.custom_encoder = kw.custom_encoder || $.toJSON;
   _.default_value = default_value;
   _.form_type = kw.form_type || 'text';
   _.help_text = kw.help_text || null;
@@ -1501,7 +1502,7 @@ function Preference(id, default_value, opt_kw)  //{{{2
   _.encode = function (value) {
     return (_.value_type == 'string'
             ? value
-            : $.toJSON(value));
+            : _.custom_encoder(value));
   };
 
   _.get_form = function () {
