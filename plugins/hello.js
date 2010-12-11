@@ -1,5 +1,5 @@
 // hello - Example of fnfnen plugin
-// Version: @@VERSION@@
+// Version: 0.1.9
 // Copyright (C) 2009-2010 kana <http://whileimautomaton.net/>
 // License: MIT license  {{{
 //     Permission is hereby granted, free of charge, to any person
