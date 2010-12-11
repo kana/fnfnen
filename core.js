@@ -1913,10 +1913,6 @@ function compare_tweet_ids(l, r)  //{{{2
 
 function englishize(id)  //{{{2
 {
-  // 'foo_bar_baz' ==> 'Foo bar baz'
-  // 'foo_bar_sec' ==> 'Foo bar (sec.)'
-  // 'foo_uri' ==> 'Foo URI'
-
   var words = id.split('_');
 
   if (1 <= words.length) {
