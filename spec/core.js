@@ -287,6 +287,20 @@ describe('Core', function () {
   });
 });
 describe('Prafbe', function () {
+  describe('serialize_prafbe_dict_into_json', function () {
+    it('should serialize an empty dict into JSON', function () {
+      var d = {};
+      expect($.evalJSON(serialize_prafbe_dict_into_json(d))).
+      toEqual(d);
+    });
+    it('should serialize a prafbe dict into JSON', function () {
+      var d = {'a': 1, 'b': 2, 'c': 3};
+      expect($.evalJSON(serialize_prafbe_dict_into_json(d))).
+      toEqual(d);
+    });
+    xit('should be very faster than $.toJSON', function () {
+    });
+  });
   describe('tokenize_object', function () {
     it('should tokenize string values', function () {
       expect(tokenize_object({key: 'va*lue'})).
@@ -312,4 +326,4 @@ describe('Prafbe', function () {
 // __END__
 // vim: expandtab shiftwidth=2 softtabstop=2
 // vim: foldmethod=expr
-// vim: foldexpr=getline(v\:lnum)=~#'\\v(<describe>|<it>).*<function>\\s*\\([^()]*\\)\\s*\\{'?'a1'\:(getline(v\:lnum)=~#'^\\s*});'?'s1'\:'=')
+// vim: foldexpr=getline(v\:lnum)=~#'\\v<x?(describe|it)>.*<function>\\s*\\([^()]*\\)\\s*\\{'?'a1'\:(getline(v\:lnum)=~#'^\\s*});'?'s1'\:'=')

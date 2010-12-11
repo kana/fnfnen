@@ -1397,6 +1397,30 @@ function save_prafbe_learning_result()  //{{{2
 
 
 
+function serialize_prafbe_dict_into_json(dict)  //{{{2
+{
+  // $.toJSON is too slow for a big prafbe dict though $.toJSON uses
+  // browser-native JSON serializer/parser if it's available.  So that it's
+  // necessary to implement custom JSON serializer for a big prafbe dict to
+  // improve performance.
+  //
+  // For example, suppose d to be a big prafbe dict where $.toJSON(d).length
+  // is roughly equal to 350 KiB.  $.toJSON(d) takes about 3000 ms while
+  // serialize_prafbe_dict_into_json(d) takes less than 90 ms on Safari 5.
+
+  var xs = [];
+  xs.push('{');
+  for (var key in dict)
+    xs.push('"', key, '":', dict[key], ',');
+  if (xs[xs.length - 1] == ',')
+    xs.pop();  // Remove the last extra ','.
+  xs.push('}');
+  return xs.join('');
+}
+
+
+
+
 function tokenize_object(object)  //{{{2
 {
   var result = [];
@@ -1463,6 +1487,7 @@ function Preference(id, default_value, opt_kw)  //{{{2
 
   _.applying_priority = kw.applying_priority || DEFAULT_APPLYING_PRIORITY;
   _.columns = kw.columns || 80;
+  _.custom_encoder = kw.custom_encoder || $.toJSON;
   _.default_value = default_value;
   _.form_type = kw.form_type || 'text';
   _.help_text = kw.help_text || null;
@@ -1504,7 +1529,7 @@ function Preference(id, default_value, opt_kw)  //{{{2
   _.encode = function (value) {
     return (_.value_type == 'string'
             ? value
-            : $.toJSON(value));
+            : _.custom_encoder(value));
   };
 
   _.get_form = function () {
@@ -2502,6 +2527,7 @@ $(document).ready(function () {  //{{{2
         g_preferences.register('prafbe_right_dict',  //{{{
           {},
           {
+            custom_encoder: serialize_prafbe_dict_into_json,
             form_type: 'textarea',
             is_advanced_p: true,
             read_only_p: true,
@@ -2511,6 +2537,7 @@ $(document).ready(function () {  //{{{2
         g_preferences.register('prafbe_wrong_dict',  //{{{
           {},
           {
+            custom_encoder: serialize_prafbe_dict_into_json,
             form_type: 'textarea',
             is_advanced_p: true,
             read_only_p: true,
