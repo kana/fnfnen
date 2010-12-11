@@ -1365,8 +1365,35 @@ function is_spam_tweet_p(tweet)  //{{{2
 
 function save_prafbe_learning_result()  //{{{2
 {
-  g_preferences.prafbe_right_dict.save();
-  g_preferences.prafbe_wrong_dict.save();
+  var MAXIMUM_BYTES = 1 * 1024 * 1024;
+  var kibibytes = function (bytes) {
+    return Math.round(bytes / 1024);
+  };
+  var save = function (p) {
+    var original_size = p.encode(p()).length;
+    var l = original_size;
+    while (MAXIMUM_BYTES < l) {
+      prafbe.compact(p());
+      l = p.encode(p()).length;
+    }
+    p.save();
+
+    if (l != original_size) {
+      log_notice(
+        p.id,
+        [
+          'Compacted:',
+          kibibytes(original_size),
+          'KiB =>',
+          kibibytes(l),
+          'KiB'
+        ].join(' ')
+      );
+    }
+  };
+
+  save(g_preferences.prafbe_right_dict);
+  save(g_preferences.prafbe_wrong_dict);
 }
 
 
