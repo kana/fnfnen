@@ -1928,6 +1928,8 @@ function englishize(id)  //{{{2
     var i = words.length - 1;
     if (words[i] == 'sec')
       words[i] = '(sec.)';
+    if (words[i] == 'kib')
+      words[i] = '(KiB)';
   }
 
   return words.join(' ');

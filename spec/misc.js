@@ -54,6 +54,7 @@ describe('Misc.', function () {
       expect(englishize('foo_bar_baz')).toEqual('Foo bar baz');
       expect(englishize('foo_bar_sec')).toEqual('Foo bar (sec.)');
       expect(englishize('foo_uri')).toEqual('Foo URI');
+      expect(englishize('foo_kib')).toEqual('Foo (KiB)');
     });
   });
   describe('expand_template', function () {
