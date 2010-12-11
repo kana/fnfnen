@@ -370,7 +370,8 @@ function learn_tweet(tweet_id, right_tweet_p, interactive_p)  //{{{2
   };
   var old_status = is_spam_tweet_p(tweet);
   var new_status = old_status;
-  while (new_status == old_status) {
+  var limit = 100;  // step() may be repeated many times.  Define the limit.
+  while (new_status == old_status && 0 < limit) {
     step();
 
     var learned_right_tweet_as_right_p = ((!old_status) && right_tweet_p);
@@ -379,6 +380,7 @@ function learn_tweet(tweet_id, right_tweet_p, interactive_p)  //{{{2
       break;
     if (bias != 0)
       new_status = is_spam_tweet_p(tweet);
+    limit--;
   }
   tweet_db.data(tweet, 'prafbe_learning_bias', bias);
 
