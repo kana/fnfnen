@@ -1365,7 +1365,7 @@ function is_spam_tweet_p(tweet)  //{{{2
 
 function save_prafbe_learning_result()  //{{{2
 {
-  var MAXIMUM_BYTES = 1 * 1024 * 1024;
+  var MAXIMUM_BYTES = g_preferences.maximum_size_of_prafbe_dict_kib() * 1024;
   var kibibytes = function (bytes) {
     return Math.round(bytes / 1024);
   };
@@ -2480,6 +2480,12 @@ $(document).ready(function () {  //{{{2
             is_advanced_p: true,
             read_only_p: true,
             rows: 3,
+          }
+        );  //}}}
+        g_preferences.register('maximum_size_of_prafbe_dict_kib',  //{{{
+          1024,
+          {
+            is_advanced_p: true,
           }
         );  //}}}
 
