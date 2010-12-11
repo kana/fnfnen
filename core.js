@@ -1392,8 +1392,35 @@ function is_spam_tweet_p(tweet)  //{{{2
 
 function save_prafbe_learning_result()  //{{{2
 {
-  g_preferences.prafbe_right_dict.save();
-  g_preferences.prafbe_wrong_dict.save();
+  var MAXIMUM_BYTES = g_preferences.maximum_size_of_prafbe_dict_kib() * 1024;
+  var kibibytes = function (bytes) {
+    return Math.round(bytes / 1024);
+  };
+  var save = function (p) {
+    var original_size = p.encode(p()).length;
+    var l = original_size;
+    while (MAXIMUM_BYTES < l) {
+      prafbe.compact(p());
+      l = p.encode(p()).length;
+    }
+    p.save();
+
+    if (l != original_size) {
+      log_notice(
+        p.id,
+        [
+          'Compacted:',
+          kibibytes(original_size),
+          'KiB =>',
+          kibibytes(l),
+          'KiB'
+        ].join(' ')
+      );
+    }
+  };
+
+  save(g_preferences.prafbe_right_dict);
+  save(g_preferences.prafbe_wrong_dict);
 }
 
 
@@ -1981,10 +2008,6 @@ function compare_tweet_ids(l, r)  //{{{2
 
 function englishize(id)  //{{{2
 {
-  // 'foo_bar_baz' ==> 'Foo bar baz'
-  // 'foo_bar_sec' ==> 'Foo bar (sec.)'
-  // 'foo_uri' ==> 'Foo URI'
-
   var words = id.split('_');
 
   if (1 <= words.length) {
@@ -1996,6 +2019,8 @@ function englishize(id)  //{{{2
     var i = words.length - 1;
     if (words[i] == 'sec')
       words[i] = '(sec.)';
+    if (words[i] == 'kib')
+      words[i] = '(KiB)';
   }
 
   return words.join(' ');
@@ -2544,6 +2569,12 @@ $(document).ready(function () {  //{{{2
             is_advanced_p: true,
             read_only_p: true,
             rows: 3,
+          }
+        );  //}}}
+        g_preferences.register('maximum_size_of_prafbe_dict_kib',  //{{{
+          1024,
+          {
+            is_advanced_p: true,
           }
         );  //}}}
 
